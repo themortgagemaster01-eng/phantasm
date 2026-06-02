@@ -447,6 +447,31 @@ body{
 .lv-clip .clip-acts{display:flex;gap:8px;margin-top:8px;align-items:center}
 .lv-clip .clip-acts button{flex:0 0 auto;width:auto;padding:7px 12px;font-size:11px;border-radius:9px}
 .lv-clip .loopbtn.on{background:linear-gradient(120deg,#3a2d12,#5a4516);color:#ecd793;border-color:rgba(212,175,55,.5)}
+
+/* ============================================================
+   v3.5 — Tesla-calm home: device status · bigger CTA · less noise
+   ============================================================ */
+.hero-status{font-size:12.5px!important;letter-spacing:.16em;color:var(--t2)!important;text-transform:uppercase;font-weight:600;margin-top:14px}
+.cta{min-height:64px!important;font-size:17px!important;letter-spacing:.05em;margin-top:20px!important;box-shadow:0 14px 34px rgba(56,189,248,.20)!important}
+.disclaimer-ribbon{background:transparent;border:none;color:var(--muted);font-size:10px;padding:9px 8px 0;opacity:.8;line-height:1.5}
+.disclaimer-ribbon b{color:var(--t2);font-weight:600}
+/* Live Sensors — real device status */
+.sensors{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--panel-2);border:1px solid var(--panel-line);border-radius:16px;overflow:hidden;margin-top:12px}
+.sensor{display:flex;align-items:center;gap:11px;padding:15px 16px;border-right:1px solid var(--panel-line);border-bottom:1px solid var(--panel-line)}
+.sensor:nth-child(2n){border-right:none}
+.sensor:nth-last-child(-n+2){border-bottom:none}
+.sensor .sdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:var(--muted);color:var(--muted);box-shadow:0 0 8px currentColor}
+.sensor .sdot.live{background:var(--green);color:var(--green)}
+.sensor .sdot.ready{background:var(--gold-soft);color:var(--gold-soft)}
+.sensor .sdot.demo{background:var(--yellow);color:var(--yellow)}
+.sensor .sname{flex:1;font-size:13.5px;color:var(--ink);font-weight:500}
+.sensor .sstat{font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.sensor .sstat.live{color:var(--green)} .sensor .sstat.ready{color:var(--gold-soft)} .sensor .sstat.demo{color:var(--yellow)}
+.last-sess{margin-top:11px;font-size:11.5px;color:var(--muted);text-align:center;letter-spacing:.03em}
+.last-sess b{color:var(--t2);font-weight:600}
+/* calmer tool cards — no hover pop / glow */
+.tool{transition:border-color .2s!important;box-shadow:none!important}
+.tool:hover{transform:none!important}
 </style>
 </head>
 <body>
@@ -491,7 +516,7 @@ body{
   </div>
   <div class="threat" id="threat">● STANDBY</div>
   <div class="hero-activity">Activity Index <b id="activity">0</b></div>
-  <div class="hero-status">Live environmental monitoring</div>
+  <div class="hero-status" id="heroStatus">READY TO INVESTIGATE</div>
   <div class="corr-break" id="corrBreak"></div>
 </div>
 
@@ -506,8 +531,17 @@ body{
 <!-- ===== PRIMARY ACTIONS ===== -->
 <button class="cta" id="quickBtn">
   <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20" fill="currentColor"/></svg>
-  Start Investigation
+  <span id="ctaLabel">START SESSION</span>
 </button>
+
+<div class="sec-label">Live Sensors</div>
+<div class="sensors">
+  <div class="sensor"><span class="sdot" id="dMag"></span><span class="sname">Magnetometer</span><span class="sstat" id="sMag">—</span></div>
+  <div class="sensor"><span class="sdot" id="dMic"></span><span class="sname">Microphone</span><span class="sstat" id="sMic">—</span></div>
+  <div class="sensor"><span class="sdot" id="dCam"></span><span class="sname">Camera</span><span class="sstat" id="sCam">—</span></div>
+  <div class="sensor"><span class="sdot" id="dMot"></span><span class="sname">Motion Sensors</span><span class="sstat" id="sMot">—</span></div>
+</div>
+<div class="last-sess" id="lastSess"></div>
 
 <div class="sec-label">Investigation Tools</div>
 <div class="tools">
@@ -549,7 +583,7 @@ body{
 <details class="acc"><summary>Investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body">Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v3.4 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.</footer>
+<footer>PHANTASM v3.5 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.</footer>
 </div>
 
 <!-- Welcome -->
@@ -761,10 +795,30 @@ function startDemoField(){
 function startAmbient(){ ambientTimer=setInterval(()=>{ if(S.mode==="none") S.current=+(Math.random()*0.3+0.1).toFixed(1); },400); }
 function stopAmbient(){ if(ambientTimer){ clearInterval(ambientTimer); ambientTimer=null; } }
 
+let motionAttached=false;
 async function initMotion(){
   const h=ev=>{ const a=ev.accelerationIncludingGravity||ev.acceleration; if(a){ const m=Math.sqrt((a.x||0)**2+(a.y||0)**2+(a.z||0)**2)/9.81; S.motion=Math.abs(m-1); } const r=ev.rotationRate; if(r){ S.gyro=Math.min(1,(Math.abs(r.alpha||0)+Math.abs(r.beta||0)+Math.abs(r.gamma||0))/300); } };
-  if(typeof DeviceMotionEvent!=="undefined"&&typeof DeviceMotionEvent.requestPermission==="function"){ try{ const r=await DeviceMotionEvent.requestPermission(); if(r==="granted") addEventListener("devicemotion",h); }catch(_){} }
-  else if(typeof DeviceMotionEvent!=="undefined"){ addEventListener("devicemotion",h); }
+  if(typeof DeviceMotionEvent!=="undefined"&&typeof DeviceMotionEvent.requestPermission==="function"){ try{ const r=await DeviceMotionEvent.requestPermission(); if(r==="granted"){ addEventListener("devicemotion",h); motionAttached=true; } }catch(_){} }
+  else if(typeof DeviceMotionEvent!=="undefined"){ addEventListener("devicemotion",h); motionAttached=true; }
+}
+// ── DEVICE STATUS (Live Sensors panel) ────────────────────
+function setSensor(dotId,statId,cls,txt){ const d=el(dotId),s=el(statId); if(d) d.className="sdot "+cls; if(s){ s.className="sstat "+cls; s.textContent=txt; } }
+function updateSensors(){
+  if(S.mode==="magnetometer") setSensor("dMag","sMag","live","Live");
+  else if(S.mode==="demo") setSensor("dMag","sMag","demo","Demo");
+  else if("Magnetometer" in window) setSensor("dMag","sMag","ready","Ready");
+  else setSensor("dMag","sMag","demo","Demo · iOS");
+  if(S.camActive){ setSensor("dMic","sMic","live","Active"); setSensor("dCam","sCam","live","Active"); }
+  else { setSensor("dMic","sMic","ready","Standby"); setSensor("dCam","sCam","ready","Standby"); }
+  setSensor("dMot","sMot",motionAttached?"live":"ready",motionAttached?"Active":"Ready");
+}
+function relTime(iso){ const t=new Date(iso).getTime(); if(!t) return ""; let s=Math.max(1,Math.round((Date.now()-t)/1000)); if(s<60) return s+"s ago"; const m=Math.round(s/60); if(m<60) return m+"m ago"; const h=Math.round(m/60); if(h<24) return h+"h ago"; return Math.round(h/24)+"d ago"; }
+function updateLastSession(){
+  const elx=el("lastSess"); if(!elx) return;
+  let sess=[]; try{ sess=loadSessions(); }catch(_){}
+  if(sess.length) elx.innerHTML="Last saved session · <b>"+esc(sess[0].name||"Session")+"</b> · "+relTime(sess[0].date);
+  else if(S.log.length) elx.innerHTML="Last activity · <b>"+relTime(S.log[0].time)+"</b>";
+  else elx.textContent="No saved sessions yet";
 }
 async function initSoundFromStream(stream){
   try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==="suspended") await audioCtx.resume();
@@ -854,6 +908,10 @@ function homeLoop(){
   }
   S.lastThreat=lv.n;
   updateCorrBreak(); driftCheck(base);
+  // Tesla-calm status surfaces (throttled)
+  const hs=el("heroStatus"); if(hs){ hs.textContent=(liveView&&liveView.classList.contains("open"))?"LIVE SPECTRUM ACTIVE":(S.armed?"INVESTIGATION ACTIVE":"READY TO INVESTIGATE"); }
+  const cl=el("ctaLabel"); if(cl){ cl.textContent=S.armed?"ENTER FULL SPECTRUM":"START SESSION"; }
+  homeLoop._n=(homeLoop._n||0)+1; if(homeLoop._n%30===1){ updateSensors(); updateLastSession(); }
 }
 
 // ── CORRELATION BREAKDOWN (why confidence rose) ───────────
@@ -1024,7 +1082,7 @@ function doOpenLive(){
 
   navigator.mediaDevices.getUserMedia({video:{facingMode,width:{ideal:1280},height:{ideal:720}},audio:true}).then(stream=>{
     camStream=stream; video.srcObject=stream; video.play();
-    initSoundFromStream(stream);
+    initSoundFromStream(stream); S.camActive=true; updateSensors();
     el("lvRecDot").classList.remove("on");
     rafLive=requestAnimationFrame(liveLoop);
   }).catch(err=>{
@@ -1039,6 +1097,7 @@ function closeLive(){
   if(mediaRec&&mediaRec.state!=="inactive"){ mediaRec.stop(); }
   if(recTimer){ clearInterval(recTimer); recTimer=null; }
   if(listening){ stopListen(); }
+  S.camActive=false; updateSensors();
   el("lvRecDot").classList.remove("on"); prevFrame=null;
 }
 
