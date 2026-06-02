@@ -415,6 +415,38 @@ body{
   background-attachment: scroll, fixed, fixed !important;
 }
 @media (prefers-reduced-motion: reduce){ body{background-attachment:scroll,scroll,scroll!important} }
+
+/* ============================================================
+   v3.4 — launch-plan updates (disclaimer · drift · sessions · share)
+   ============================================================ */
+.disclaimer-ribbon{margin-top:10px;text-align:center;font-size:10.5px;letter-spacing:.03em;color:var(--muted);
+  background:rgba(255,255,255,.04);border:1px solid var(--panel-line);border-radius:10px;padding:8px 13px;line-height:1.55}
+.disclaimer-ribbon b{color:var(--gold-soft);font-weight:600}
+.corr-break{margin-top:6px;font-size:11px;color:var(--muted);min-height:14px;letter-spacing:.02em}
+.corr-break b{color:var(--gold)}
+#driftBanner{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);max-width:92vw;
+  background:linear-gradient(135deg,#7a5a16,#4a3a10);color:#ffe8a8;font-size:11.5px;letter-spacing:.02em;
+  padding:11px 14px;border-radius:10px;z-index:998;text-align:center;box-shadow:0 0 22px rgba(0,0,0,.5);display:none;align-items:center;gap:10px}
+#driftBanner.show{display:flex}
+#driftBanner button{flex:0 0 auto;width:auto;padding:7px 12px;font-size:11px;border-radius:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;letter-spacing:.04em}
+.entry{cursor:pointer}
+.entry .share-hint{margin-left:auto;flex:0 0 auto;color:var(--muted);font-size:14px;opacity:.55}
+.sess-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.sess-item:last-child{border-bottom:none}
+.sess-item .si-main{flex:1;min-width:0}
+.sess-item .si-name{font-size:14px;color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sess-item .si-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.sess-item button{flex:0 0 auto;width:auto;padding:8px 12px;font-size:11px;border-radius:9px}
+.sess-save{display:flex;gap:8px;margin:8px 0 4px}
+.sess-save input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--panel-line);border-radius:12px;color:var(--ink);padding:12px 14px;font-size:14px;font-family:inherit}
+.sess-save button{flex:0 0 auto;width:auto;padding:12px 16px}
+.perm-list{list-style:none;padding:0;margin:8px 0 0}
+.perm-list li{display:flex;gap:11px;padding:9px 0;font-size:13.5px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.05)}
+.perm-list li:last-child{border-bottom:none}
+.perm-list b{color:var(--ink)}
+.lv-clip .clip-acts{display:flex;gap:8px;margin-top:8px;align-items:center}
+.lv-clip .clip-acts button{flex:0 0 auto;width:auto;padding:7px 12px;font-size:11px;border-radius:9px}
+.lv-clip .loopbtn.on{background:linear-gradient(120deg,#3a2d12,#5a4516);color:#ecd793;border-color:rgba(212,175,55,.5)}
 </style>
 </head>
 <body>
@@ -430,6 +462,8 @@ body{
 
 <!-- Correlation banner -->
 <div id="corrBanner"></div>
+<!-- Baseline drift banner -->
+<div id="driftBanner"></div>
 
 <div class="wrap">
 <header>
@@ -458,7 +492,10 @@ body{
   <div class="threat" id="threat">● STANDBY</div>
   <div class="hero-activity">Activity Index <b id="activity">0</b></div>
   <div class="hero-status">Live environmental monitoring</div>
+  <div class="corr-break" id="corrBreak"></div>
 </div>
+
+<div class="disclaimer-ribbon"><b>For entertainment &amp; EMF education</b> — PHANTASM logs real sensor data and never claims a ghost is present. Not proof of the paranormal.</div>
 
 <div class="metrics">
   <div class="tile"><div class="k">Baseline</div><div class="v" id="baseline">—<small> mG</small></div></div>
@@ -498,7 +535,7 @@ body{
 <div class="sec-label">Evidence Timeline</div>
 <div class="log">
   <h3><span id="logCount">0 EVENTS</span>
-    <span class="acts"><button id="markBtn2">Mark</button><button id="exportBtn">Export</button><button class="danger" id="clearBtn">Clear</button></span>
+    <span class="acts"><button id="markBtn2">Mark</button><button id="shareBtn">Share</button><button id="sessionsBtn">Sessions</button><button id="exportBtn">Export</button><button class="danger" id="clearBtn">Clear</button></span>
   </h3>
   <div class="items" id="items"><div class="empty">No events yet. Tap Start Investigation.</div></div>
 </div>
@@ -512,7 +549,7 @@ body{
 <details class="acc"><summary>Investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body">Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v3.3 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.</footer>
+<footer>PHANTASM v3.4 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.</footer>
 </div>
 
 <!-- Welcome -->
@@ -556,13 +593,34 @@ body{
 <!-- Local Haunts -->
 <div class="modal" id="hauntModal"><div class="sheet">
   <h2>LOCAL HAUNTS &amp; STORIES <button class="close" id="hauntClose">×</button></h2>
-  <p class="m">Famous true hauntings and ghost legends, retold for you. Tap "Use my location" to surface cases near you, or search any place or name. For exploration &amp; entertainment.</p>
+  <p class="m">Original retellings of well-known public folklore and historical cases — not claims of fact. Tap "Use my location" to surface cases near you, or search any place or name. For exploration &amp; entertainment.</p>
   <button class="btn-quick" id="hauntGeo" style="width:100%">📍 USE MY LOCATION</button>
   <div class="haunt-search">
     <input id="hauntCity" placeholder="…or type a city / town" autocomplete="off" />
     <button id="hauntGo">Search</button>
   </div>
   <div id="hauntResults"></div>
+</div></div>
+
+<!-- Saved Sessions -->
+<div class="modal" id="sessionsModal"><div class="sheet">
+  <h2>SAVED SESSIONS <button class="close" id="sessionsClose">×</button></h2>
+  <p class="m">Save the current timeline as a named investigation you can reopen later. Stored on this device only — nothing is uploaded.</p>
+  <div class="sess-save"><input id="sessName" placeholder="Name this session (e.g. Basement — Oct 12)" autocomplete="off"/><button class="btn-quick" id="sessSave">Save</button></div>
+  <div id="sessList"></div>
+</div></div>
+
+<!-- Permission priming -->
+<div class="modal" id="permModal"><div class="sheet">
+  <h2>BEFORE WE START <button class="close" id="permClose">×</button></h2>
+  <p class="m">Full Spectrum uses your phone's sensors. Your phone will ask permission next — here's exactly why:</p>
+  <ul class="perm-list">
+    <li><b>Camera —</b> detects movement &amp; contrast shifts in view.</li>
+    <li><b>Microphone —</b> records audio for EVP review.</li>
+    <li><b>Motion —</b> reads magnetic-field (EMF) &amp; movement.</li>
+  </ul>
+  <p class="m" style="font-size:12px;margin-top:12px">Nothing is uploaded — every reading stays on your device.</p>
+  <button class="startnow" id="permContinue">CONTINUE</button>
 </div></div>
 
 <!-- Full Spectrum -->
@@ -587,12 +645,12 @@ body{
     <canvas id="lvWave"></canvas>
     <div class="lv-actions">
       <button class="rec" id="lvRec">● REC EVP</button>
-      <button class="ears" id="lvEars">👂 AI EARS</button>
+      <button class="ears" id="lvEars" title="Transcribes audible speech to text — it never invents or fabricates words.">👂 AI EARS</button>
       <button id="lvFlag">■ FLAG</button>
       <button id="lvFlip">■ FLIP</button>
     </div>
     <div class="lv-clip" id="lvClip"></div>
-    <div class="lv-hint">Camera, EMF &amp; audio live together. Evidence rises only when signals correlate. For investigation &amp; entertainment — not proof of the paranormal.</div>
+    <div class="lv-hint">Camera, EMF &amp; audio live together. Evidence rises only when signals correlate. AI Ears transcribes audible speech only — it never invents words. For investigation &amp; entertainment — not proof of the paranormal.</div>
   </div>
   <div class="cam-msg" id="lvMsg"></div>
 </div>
@@ -761,7 +819,7 @@ function metrics(){
   S.activity=Math.min(100,Math.round(idx*100));
   const now=Date.now(), base=S.baseline==null?30:S.baseline, dev=base>0?(S.current-base)/base*100:0;
   if(dev>=15) S.spikeT=now; if(audioN>0.55) S.audioT=now; if(motionN>0.45) S.motionT=now;
-  const W=5000, e=now-S.spikeT<W, a=now-S.audioT<W, m=now-S.motionT<W;
+  const W=5000, e=now-S.spikeT<W, a=now-S.audioT<W, m=now-S.motionT<W; S.corrFlags={e,a,m};
   let conf="—"; if(e&&a&&m) conf="HIGH"; else if(e&&a) conf="MEDIUM"; else if(e||a||m) conf="LOW";
   if(S.armed&&(e&&a)&&conf!==S.lastConf&&(conf==="HIGH"||conf==="MEDIUM")&&now-S.lastCorrT>4000){
     addEntry(conf==="HIGH"?"HIGH":"MEDIUM","Correlated: EMF spike + audio peak"+(m?" + motion":"")+" within 5s · "+conf+" confidence");
@@ -795,11 +853,43 @@ function homeLoop(){
     addEntry(lv.n,"EMF "+lv.n+" — "+v.toFixed(1)+" mG ("+Math.round(dev)+"% over baseline)"); S.lastEventAt=Date.now();
   }
   S.lastThreat=lv.n;
+  updateCorrBreak(); driftCheck(base);
+}
+
+// ── CORRELATION BREAKDOWN (why confidence rose) ───────────
+function updateCorrBreak(){
+  const elb=el("corrBreak"); if(!elb) return;
+  if(!S.armed){ elb.textContent=""; return; }
+  const f=S.corrFlags||{}; const parts=[];
+  if(f.e) parts.push("EMF"); if(f.a) parts.push("Audio"); if(f.m) parts.push("Motion");
+  if(S.confidence==="HIGH"||S.confidence==="MEDIUM"){ elb.innerHTML="Why: "+parts.join(" + ")+" within 5s → <b>"+S.confidence+"</b>"; }
+  else if(S.confidence==="LOW"&&parts.length){ elb.innerHTML=parts.join(" + ")+" active — single signal, low confidence"; }
+  else { elb.textContent="Awaiting correlated signals…"; }
+}
+
+// ── BASELINE DRIFT WARNING ─────────────────────────────────
+let _driftAt=0;
+function driftCheck(base){
+  const db=el("driftBanner"); if(!db) return;
+  if(!S.armed||S.baseline==null||emfWin.length<15){ return; }
+  const mean=emfWin.reduce((a,b)=>a+b,0)/emfWin.length;
+  const drift=base>0?Math.abs(mean-base)/base:0;
+  if(drift>0.6){
+    if(!db.classList.contains("show")&&Date.now()-_driftAt>20000){
+      db.innerHTML="<span>Baseline shifted "+Math.round(drift*100)+"% — recalibrate for accurate readings?</span>";
+      const rb=document.createElement("button"); rb.textContent="Recalibrate";
+      rb.addEventListener("click",()=>{ db.classList.remove("show"); calibrate(); });
+      const xb=document.createElement("button"); xb.textContent="Dismiss"; xb.style.background="transparent";
+      xb.addEventListener("click",()=>{ db.classList.remove("show"); _driftAt=Date.now(); });
+      db.appendChild(rb); db.appendChild(xb);
+      db.classList.add("show"); _driftAt=Date.now();
+    }
+  } else if(drift<0.35&&db.classList.contains("show")){ db.classList.remove("show"); }
 }
 
 function sevColor(n){ const t=THREAT.find(x=>x.n===n); return t?t.c:"#8c8ca0"; }
 function addEntry(sev,msg){ const now=new Date();
-  S.log.unshift({time:now.toISOString(),display:now.toLocaleTimeString([],{hour12:false}),severity:sev,message:msg,emf:+S.current.toFixed(1),activity:S.activity,confidence:S.confidence,sound:S.soundDb});
+  S.log.unshift({time:now.toISOString(),display:now.toLocaleTimeString([],{hour12:false}),severity:sev,message:msg,emf:+S.current.toFixed(1),activity:S.activity,confidence:S.confidence,sound:S.soundDb,motion:!!(S.corrFlags&&S.corrFlags.m),spark:emfWin.slice(-40)});
   if(S.log.length>200) S.log.pop(); render(); saveLog();
 }
 function render(){
@@ -807,8 +897,9 @@ function render(){
   updateToolSummaries();
   if(!S.log.length){ el("items").innerHTML='<div class="empty">No events yet. Tap Start Investigation.</div>'; return; }
   el("items").innerHTML="";
-  S.log.forEach(e=>{ const d=document.createElement("div"); d.className="entry";
-    d.innerHTML='<span class="sev" style="background:'+sevColor(e.severity)+';color:'+sevColor(e.severity)+'"></span><span class="t">'+e.display+'</span><span class="m">'+e.message+'</span>';
+  S.log.forEach(e=>{ const d=document.createElement("div"); d.className="entry"; d.title="Tap to share this moment as an image";
+    d.innerHTML='<span class="sev" style="background:'+sevColor(e.severity)+';color:'+sevColor(e.severity)+'"></span><span class="t">'+e.display+'</span><span class="m">'+e.message+'</span><span class="share-hint">⤴</span>';
+    d.addEventListener("click",()=>shareEvent(e));
     el("items").appendChild(d); });
 }
 function updateToolSummaries(){
@@ -920,7 +1011,12 @@ function drawSpark(canvas,data,color){
   ctx.stroke();
 }
 
+let _permPrimed=false; try{ _permPrimed=localStorage.getItem("phantasm_perm")==="1"; }catch(_){}
 function openLive(){
+  if(_permPrimed){ doOpenLive(); return; }
+  openM(el("permModal"));
+}
+function doOpenLive(){
   liveView.classList.add("open");
   const ow=overlay.parentElement.offsetWidth, oh=window.innerHeight;
   overlay.width=ow; overlay.height=oh;
@@ -1021,8 +1117,13 @@ el("lvRec").addEventListener("click",()=>{
     const url=URL.createObjectURL(blob);
     const clip=el("lvClip"); clip.innerHTML=""; clip.classList.add("show");
     const aud=document.createElement("audio"); aud.src=url; aud.controls=true; clip.appendChild(aud);
-    const dl=document.createElement("a"); dl.href=url; dl.download="phantasm_evp_"+Date.now()+".webm"; dl.textContent="⬇ Download EVP"; clip.appendChild(dl);
-    addEntry("BASELINE","EVP recording saved — "+Math.round((Date.now()-recStart)/1000)+"s");
+    const acts=document.createElement("div"); acts.className="clip-acts";
+    const loop=document.createElement("button"); loop.className="loopbtn"; loop.textContent="↻ Loop";
+    loop.addEventListener("click",()=>{ aud.loop=!aud.loop; loop.classList.toggle("on",aud.loop); if(aud.loop){ aud.play().catch(()=>{}); } });
+    const dl=document.createElement("a"); dl.href=url; dl.download="phantasm_evp_"+Date.now()+".webm"; dl.textContent="⬇ Download EVP";
+    dl.style.cssText="display:inline-block;color:var(--cyan);font-size:11px;text-decoration:none;border:1px solid rgba(118,211,255,.3);padding:7px 12px;border-radius:9px";
+    acts.appendChild(loop); acts.appendChild(dl); clip.appendChild(acts);
+    addEntry("BASELINE","EVP recording saved — "+Math.round((Date.now()-recStart)/1000)+"s · scrub or loop to review");
   };
   mediaRec.start(); recStart=Date.now(); el("lvRecDot").classList.add("on"); el("lvRec").textContent="■ STOP REC";
   let secs=0; recTimer=setInterval(()=>{ secs++; el("lvRecTime").textContent=Math.floor(secs/60)+":"+(secs%60).toString().padStart(2,"0"); },1000);
@@ -1233,6 +1334,105 @@ el("soundBtn").addEventListener("click",e=>{ e.stopPropagation(); initAudio(); a
 el("markBtn2").addEventListener("click",()=>{ if(soundOn) noiseBurst(0.18,900,0.24); });
 el("lvFlag").addEventListener("click",()=>{ if(soundOn) noiseBurst(0.18,900,0.24); });
 el("spectrumBtn").addEventListener("click",()=>{ initAudio(); acResume(); if(soundOn) sfxSweep(); });
+
+// ── SHAREABLE EVIDENCE CARD ───────────────────────────────
+function roundRect(x,rx,ry,rw,rh,r){ x.beginPath(); x.moveTo(rx+r,ry); x.arcTo(rx+rw,ry,rx+rw,ry+rh,r); x.arcTo(rx+rw,ry+rh,rx,ry+rh,r); x.arcTo(rx,ry+rh,rx,ry,r); x.arcTo(rx,ry,rx+rw,ry,r); x.closePath(); }
+function wrapText(x,text,tx,ty,maxW,lh){ const words=(text||"").split(/\s+/); let line="",yy=ty; for(let i=0;i<words.length;i++){ const test=line+words[i]+" "; if(x.measureText(test).width>maxW&&line){ x.fillText(line.trim(),tx,yy); line=words[i]+" "; yy+=lh; if(yy>ty+lh*3){ x.fillText(line.trim()+"…",tx,yy); return; } } else line=test; } x.fillText(line.trim(),tx,yy); }
+function renderEvidenceCard(e){
+  const W=1080,H=1920,c=document.createElement("canvas"); c.width=W; c.height=H;
+  const x=c.getContext("2d");
+  const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,"#0F172A"); g.addColorStop(1,"#070B14"); x.fillStyle=g; x.fillRect(0,0,W,H);
+  const rg=x.createRadialGradient(W/2,H*0.40,120,W/2,H*0.40,H*0.7); rg.addColorStop(0,"rgba(94,234,212,0.10)"); rg.addColorStop(1,"rgba(94,234,212,0)"); x.fillStyle=rg; x.fillRect(0,0,W,H);
+  x.textAlign="left";
+  x.fillStyle="#5EEAD4"; x.font="700 52px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("PHANTASM",90,160);
+  x.fillStyle="#94A3B8"; x.font="600 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("EVIDENCE LOG",92,206);
+  const dt=new Date(e.time);
+  x.fillStyle="#F8FAFC"; x.font="500 34px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(dt.toLocaleDateString([],{year:'numeric',month:'long',day:'numeric'}),90,300);
+  x.fillStyle="#CBD5E1"; x.font="400 30px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(dt.toLocaleTimeString([],{hour12:true}),90,344);
+  const conf=e.confidence||"—"; const cc=conf==="HIGH"?"#EF4444":conf==="MEDIUM"?"#F59E0B":conf==="LOW"?"#F5C451":"#94A3B8";
+  x.fillStyle=cc; roundRect(x,90,396,480,76,16); x.fill();
+  x.fillStyle="#04121a"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("EVIDENCE: "+conf,116,446);
+  const tiles=[["PEAK EMF",(e.emf!=null?e.emf:"—")+"","mG"],["AUDIO",(e.sound!=null?e.sound:"—")+"","dB"],["MOTION",e.motion?"YES":"—",""]];
+  const tw=300,th=200,gap=30,ty=540;
+  tiles.forEach((t,i)=>{ const tx=90+i*(tw+gap);
+    x.fillStyle="rgba(255,255,255,0.05)"; roundRect(x,tx,ty,tw,th,18); x.fill();
+    x.strokeStyle="rgba(255,255,255,0.10)"; x.lineWidth=1; roundRect(x,tx,ty,tw,th,18); x.stroke();
+    x.fillStyle="#94A3B8"; x.font="600 22px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(t[0],tx+24,ty+52);
+    x.fillStyle="#F8FAFC"; x.font="700 56px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(t[1],tx+24,ty+128);
+    if(t[2]){ x.fillStyle="#94A3B8"; x.font="500 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(t[2],tx+24,ty+170); }
+  });
+  const gx=90,gy=800,gw=900,gh=300;
+  x.fillStyle="rgba(255,255,255,0.04)"; roundRect(x,gx,gy,gw,gh,18); x.fill();
+  x.fillStyle="#94A3B8"; x.font="600 22px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("EMF — EVENT WINDOW",gx+24,gy+46);
+  const sp=(e.spark&&e.spark.length>1)?e.spark:[e.emf||0,e.emf||0];
+  const mx=Math.max(40,...sp);
+  x.beginPath(); x.strokeStyle="#5EEAD4"; x.lineWidth=4;
+  sp.forEach((v,i)=>{ const px=gx+30+i/(sp.length-1)*(gw-60); const py=gy+gh-40-(v/mx)*(gh-100); i===0?x.moveTo(px,py):x.lineTo(px,py); });
+  x.stroke();
+  x.fillStyle="#CBD5E1"; x.font="400 30px -apple-system,Segoe UI,Roboto,sans-serif"; wrapText(x,e.message||"",90,1210,900,42);
+  x.fillStyle="rgba(255,255,255,0.05)"; x.fillRect(0,H-210,W,210);
+  x.textAlign="center";
+  x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("PHANTASM",W/2,H-130);
+  x.fillStyle="#94A3B8"; x.font="400 24px -apple-system,Segoe UI,Roboto,sans-serif";
+  x.fillText("For entertainment — not proof of the paranormal.",W/2,H-86);
+  x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
+  x.textAlign="left";
+  return c;
+}
+async function shareEvent(e){
+  if(!e) return;
+  let canvas; try{ canvas=renderEvidenceCard(e); }catch(err){ return; }
+  canvas.toBlob(async(blob)=>{
+    if(!blob) return;
+    try{
+      const file=new File([blob],"phantasm-evidence.png",{type:"image/png"});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:"PHANTASM Evidence",text:"Logged with PHANTASM — for entertainment."}); return;
+      }
+    }catch(_){}
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="phantasm-evidence-"+Date.now()+".png"; a.click();
+  },"image/png");
+}
+function shareHighlight(){
+  if(!S.log.length){ alert("No events yet. Run an investigation first."); return; }
+  const order={HIGH:3,MEDIUM:2,LOW:1}; let best=S.log[0];
+  S.log.forEach(e=>{ if((order[e.confidence]||0)>(order[best.confidence]||0)) best=e; });
+  shareEvent(best);
+}
+el("shareBtn").addEventListener("click",shareHighlight);
+
+// ── SAVED & NAMED SESSIONS ────────────────────────────────
+function loadSessions(){ try{ return JSON.parse(localStorage.getItem("phantasm_sessions")||"[]")||[]; }catch(_){ return []; } }
+function storeSessions(arr){ try{ localStorage.setItem("phantasm_sessions",JSON.stringify(arr.slice(0,50))); }catch(_){} }
+function renderSessions(){
+  const list=el("sessList"); const arr=loadSessions();
+  if(!arr.length){ list.innerHTML='<div class="empty" style="padding:18px 0">No saved sessions yet.</div>'; return; }
+  list.innerHTML="";
+  arr.forEach(s=>{ const d=document.createElement("div"); d.className="sess-item";
+    d.innerHTML='<div class="si-main"><div class="si-name"></div><div class="si-meta"></div></div>';
+    d.querySelector(".si-name").textContent=s.name||"Untitled session";
+    d.querySelector(".si-meta").textContent=(s.count||0)+" events · "+new Date(s.date).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const open=document.createElement("button"); open.className="btn-quick"; open.textContent="Open";
+    open.addEventListener("click",()=>{ S.log=(s.log||[]).slice(0,200); render(); saveLog(); closeM(el("sessionsModal")); const l=document.querySelector(".log"); if(l) l.scrollIntoView({behavior:"smooth",block:"start"}); });
+    const del=document.createElement("button"); del.className="danger"; del.textContent="Delete";
+    del.addEventListener("click",()=>{ storeSessions(loadSessions().filter(z=>z.id!==s.id)); renderSessions(); });
+    d.appendChild(open); d.appendChild(del); list.appendChild(d);
+  });
+}
+el("sessionsBtn").addEventListener("click",()=>{ renderSessions(); openM(el("sessionsModal")); });
+el("sessionsClose").addEventListener("click",()=>closeM(el("sessionsModal")));
+el("sessionsModal").addEventListener("click",e=>{ if(e.target===el("sessionsModal")) closeM(el("sessionsModal")); });
+el("sessSave").addEventListener("click",()=>{
+  if(!S.log.length){ alert("Nothing to save yet — run an investigation first."); return; }
+  const name=(el("sessName").value||"").trim()||("Session "+new Date().toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}));
+  const arr=loadSessions(); arr.unshift({id:"s"+Date.now(),name:name,date:new Date().toISOString(),count:S.log.length,log:S.log.slice(0,200)});
+  storeSessions(arr); el("sessName").value=""; renderSessions();
+});
+
+// ── PERMISSION PRIMING ────────────────────────────────────
+el("permContinue").addEventListener("click",()=>{ try{ localStorage.setItem("phantasm_perm","1"); }catch(_){} _permPrimed=true; closeM(el("permModal")); doOpenLive(); });
+el("permClose").addEventListener("click",()=>closeM(el("permModal")));
+el("permModal").addEventListener("click",e=>{ if(e.target===el("permModal")) closeM(el("permModal")); });
 
 // ── INIT ──────────────────────────────────────────────────
 loadLog(); render(); startAmbient(); homeLoop();
