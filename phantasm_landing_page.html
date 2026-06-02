@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PHANTASM — Professional Paranormal Investigation Platform</title>
+<style>
+  :root{--bg:#0a0a0f;--panel:#13131c;--gold:#d4af37;--gold-soft:#e8cf7e;--ink:#f3f0e6;--muted:#8a8a9a;--line:rgba(212,175,55,.18)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .container{max-width:980px;margin:0 auto;padding:0 22px}
+  .hero{text-align:center;padding:90px 22px 70px;background:radial-gradient(900px 500px at 50% -10%,#1a1a26 0%,var(--bg) 65%);border-bottom:1px solid var(--line)}
+  .logo{font-weight:700;letter-spacing:.4em;font-size:30px;color:var(--gold);text-shadow:0 0 28px rgba(212,175,55,.4)}
+  .tag{letter-spacing:.24em;font-size:11px;color:var(--muted);margin-top:10px;text-transform:uppercase}
+  .hero h1{font-size:clamp(30px,6vw,52px);margin:28px auto 16px;max-width:14ch;line-height:1.15;font-weight:700}
+  .hero p{color:var(--muted);max-width:54ch;margin:0 auto 34px;font-size:17px}
+  .cta{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  .btn{display:inline-block;padding:15px 30px;border-radius:14px;font-weight:700;letter-spacing:.08em;text-decoration:none;font-size:14px}
+  .btn.primary{background:linear-gradient(180deg,var(--gold) 0%,#b8932b 100%);color:#1a1407;box-shadow:0 8px 26px rgba(212,175,55,.3)}
+  .btn.ghost{border:1px solid var(--line);color:var(--ink)}
+  section{padding:64px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:26px;letter-spacing:.04em;margin-bottom:8px;text-align:center}
+  .sub{text-align:center;color:var(--muted);margin-bottom:40px;font-size:14px}
+  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  .feat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .feat .ic{font-size:24px}
+  .feat h3{color:var(--gold-soft);font-size:16px;margin:12px 0 6px;letter-spacing:.04em}
+  .feat p{color:var(--muted);font-size:14px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;counter-reset:s}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;position:relative}
+  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-14px;left:22px;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#1a1407;font-weight:700;display:grid;place-items:center;font-size:14px}
+  .step h3{font-size:15px;margin:10px 0 6px}
+  .step p{color:var(--muted);font-size:13px}
+  .specs{max-width:680px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
+  .specs div{padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;font-size:14px}
+  .specs span{color:var(--muted)}
+  .faq{max-width:720px;margin:0 auto}
+  .qa{border-bottom:1px solid rgba(255,255,255,.06);padding:18px 0}
+  .qa h3{font-size:15px;color:var(--gold-soft);margin-bottom:6px}
+  .qa p{color:var(--muted);font-size:14px}
+  footer{padding:40px 22px;text-align:center;color:#56566a;font-size:12px;line-height:1.8}
+  .disclaim{max-width:640px;margin:24px auto 0;font-size:12px;color:#6a6a7c;background:rgba(245,144,66,.05);border:1px solid rgba(245,144,66,.16);border-radius:12px;padding:14px 18px}
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="logo">PHANTASM</div>
+    <div class="tag">Professional Paranormal Investigation</div>
+    <h1>Real EMF detection in your pocket.</h1>
+    <p>Turn your phone into a professional-grade investigation tool. Live magnetic-field readings, threat assessment, and timestamped logging — no gimmicks, no ads, your data stays on your device.</p>
+    <div class="cta">
+      <a class="btn primary" href="index.html">Launch the App →</a>
+      <a class="btn ghost" href="#how">How it works</a>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <h2>Built for serious investigators</h2>
+      <p class="sub">Genuine sensor data with professional analysis</p>
+      <div class="features">
+        <div class="feat"><div class="ic">📡</div><h3>Real EMF Detection</h3><p>Reads your device magnetometer in milliGauss with live graphing and anomaly alerts.</p></div>
+        <div class="feat"><div class="ic">⚠️</div><h3>Threat Assessment</h3><p>Classifies activity from baseline to critical against your calibrated environment.</p></div>
+        <div class="feat"><div class="ic">🎚️</div><h3>Multi-Sensor Fusion</h3><p>Correlates EMF with motion and ambient sound for a fuller picture.</p></div>
+        <div class="feat"><div class="ic">📝</div><h3>Investigation Logging</h3><p>Timestamped events with severity levels you can review and mark by hand.</p></div>
+        <div class="feat"><div class="ic">📤</div><h3>Session Export</h3><p>Export the full session as JSON for team analysis and archiving.</p></div>
+        <div class="feat"><div class="ic">🔌</div><h3>Offline Capable</h3><p>Install to your home screen and run a full investigation with no internet.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="container">
+      <h2>Up and running in minutes</h2>
+      <p class="sub">No account, no download from a store</p>
+      <div class="steps">
+        <div class="step"><h3>Open</h3><p>Launch the app in your mobile browser.</p></div>
+        <div class="step"><h3>Calibrate</h3><p>Tap Calibrate to set a baseline for your location.</p></div>
+        <div class="step"><h3>Investigate</h3><p>Start a session and watch the field respond.</p></div>
+        <div class="step"><h3>Export</h3><p>Save your timestamped log as JSON.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>Technical specifications</h2>
+      <p class="sub">&nbsp;</p>
+      <div class="specs">
+        <div>Sensor <span>Magnetometer (mG)</span></div>
+        <div>Latency <span>&lt;100ms</span></div>
+        <div>Motion <span>Accelerometer</span></div>
+        <div>Sound <span>Microphone (dB)</span></div>
+        <div>Export <span>JSON</span></div>
+        <div>Connectivity <span>Offline capable</span></div>
+        <div>iOS <span>13+ (Safari)</span></div>
+        <div>Android <span>8.0+ (Chrome)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container faq">
+      <h2>Frequently asked</h2>
+      <p class="sub">&nbsp;</p>
+      <div class="qa"><h3>Does it really detect ghosts?</h3><p>PHANTASM measures real electromagnetic fields — the same data professional EMF meters report. What those fluctuations mean is up to you. We make no claim that the readings are evidence of the paranormal; the app is for investigation, exploration, and entertainment.</p></div>
+      <div class="qa"><h3>Why does it say "demo mode" on my iPhone?</h3><p>Apple does not give web pages access to the raw magnetometer. On iPhone the web app runs a simulated field so you can experience the interface. For true sensor EMF on iOS, the native (Flutter) build is required.</p></div>
+      <div class="qa"><h3>Will switching to Chrome fix it on iPhone?</h3><p>No. Apple requires every iOS browser — Chrome, Firefox, Edge — to run on Safari's WebKit engine, so they all share the same limits and none can read the raw magnetometer. Switching browsers won't unlock live EMF on iPhone; only the native app will. (On Android, Chrome does expose the sensor, so live readings work there.)</p></div>
+      <div class="qa"><h3>Is my data tracked?</h3><p>No. There are no ads and no analytics. Everything runs and stays on your device.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    PHANTASM · Professional Paranormal Investigation Platform<br/>
+    No ads · No tracking · Data stays on your device
+    <div class="disclaim">PHANTASM reports real magnetic-field sensor data for investigation and entertainment. It is not a scientific instrument and its readings are not evidence of paranormal activity. Use responsibly.</div>
+  </footer>
+</body>
+</html>
