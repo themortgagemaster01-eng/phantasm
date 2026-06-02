@@ -472,6 +472,22 @@ body{
 /* calmer tool cards — no hover pop / glow */
 .tool{transition:border-color .2s!important;box-shadow:none!important}
 .tool:hover{transform:none!important}
+
+/* ===== v3.6 — top disclaimer banner · contact/support form ===== */
+.topbar{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;
+  background:rgba(94,234,212,.06);border:1px solid var(--panel-line);border-radius:12px;
+  padding:9px 14px;margin-bottom:14px;font-size:10.5px;letter-spacing:.04em;color:var(--t2);line-height:1.45}
+.topbar b{color:var(--gold);font-weight:700;letter-spacing:.08em}
+.contact-field{display:block;margin:10px 0}
+.contact-field label{display:block;font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.contact-field input,.contact-field textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--panel-line);border-radius:12px;color:var(--ink);padding:12px 14px;font-size:14px;font-family:inherit}
+.contact-field textarea{min-height:110px;resize:vertical}
+.contact-send{margin-top:8px;background:var(--grad)!important;color:#04121a!important;border:none!important;width:100%}
+.contact-note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5}
+.contact-msg{font-size:13px;margin-top:10px;padding:11px 13px;border-radius:10px;display:none;line-height:1.5}
+.contact-msg.ok{display:block;background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.contact-msg.err{display:block;background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.footer-link{display:inline-block;margin-top:8px;color:var(--gold-soft);text-decoration:none;font-size:11px;letter-spacing:.08em;border-bottom:1px solid rgba(56,189,248,.35);padding-bottom:1px}
 </style>
 </head>
 <body>
@@ -491,6 +507,7 @@ body{
 <div id="driftBanner"></div>
 
 <div class="wrap">
+<div class="topbar"><b>FOR INVESTIGATION &amp; ENTERTAINMENT ONLY</b> · Not scientific proof of the paranormal</div>
 <header>
   <div class="logo">
     <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -583,7 +600,7 @@ body{
 <details class="acc"><summary>Investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body">Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v3.5 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.</footer>
+<footer>PHANTASM v3.6 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -657,6 +674,21 @@ body{
   <button class="startnow" id="permContinue">CONTINUE</button>
 </div></div>
 
+<!-- Contact / Support -->
+<div class="modal" id="contactModal"><div class="sheet">
+  <h2>CONTACT &amp; SUPPORT <button class="close" id="contactClose">×</button></h2>
+  <p class="m">Questions, bug reports, or feedback? Send a note and we'll get back to you by email. Your message goes straight to our team.</p>
+  <form id="contactForm">
+    <div class="contact-field"><label>Your name</label><input id="cName" type="text" autocomplete="name" required/></div>
+    <div class="contact-field"><label>Your email</label><input id="cEmail" type="email" autocomplete="email" required placeholder="so we can reply to you"/></div>
+    <div class="contact-field"><label>Subject</label><input id="cSubject" type="text"/></div>
+    <div class="contact-field"><label>Message</label><textarea id="cMessage" required></textarea></div>
+    <button type="submit" class="contact-send" id="cSend">Send inquiry</button>
+    <div class="contact-msg" id="cMsg"></div>
+  </form>
+  <p class="contact-note">We never share your details. Replies come from PHANTASM support.</p>
+</div></div>
+
 <!-- Full Spectrum -->
 <div id="liveView">
   <video id="lvVideo" playsinline muted></video>
@@ -679,12 +711,12 @@ body{
     <canvas id="lvWave"></canvas>
     <div class="lv-actions">
       <button class="rec" id="lvRec">● REC EVP</button>
-      <button class="ears" id="lvEars" title="Transcribes audible speech to text — it never invents or fabricates words.">👂 AI EARS</button>
+      <button class="ears" id="lvEars" title="AI-assisted audio analysis — transcribes audible speech to text. It does not generate or invent speech.">👂 AI EARS</button>
       <button id="lvFlag">■ FLAG</button>
       <button id="lvFlip">■ FLIP</button>
     </div>
     <div class="lv-clip" id="lvClip"></div>
-    <div class="lv-hint">Camera, EMF &amp; audio live together. Evidence rises only when signals correlate. AI Ears transcribes audible speech only — it never invents words. For investigation &amp; entertainment — not proof of the paranormal.</div>
+    <div class="lv-hint">Camera, EMF &amp; audio live together. Evidence rises only when signals correlate. AI Ears is AI-assisted audio analysis — it transcribes audible speech and does not generate or invent speech. For investigation &amp; entertainment — not proof of the paranormal.</div>
   </div>
   <div class="cam-msg" id="lvMsg"></div>
 </div>
@@ -1209,7 +1241,7 @@ let recog=null, listening=false, transcriptBuf="";
 const tEl=el("lvTranscript");
 function showCap(){
   const has=transcriptBuf.trim()||tEl._interim;
-  tEl.innerHTML=has?('<span class="cap"><span class="tag">AI EARS · LIVE TRANSCRIPT</span>'+
+  tEl.innerHTML=has?('<span class="cap"><span class="tag">AI EARS · AUDIO ANALYSIS — TRANSCRIBES SPEECH</span>'+
     transcriptBuf+(tEl._interim?' <span class="interim">'+tEl._interim+'</span>':'')+'</span>'):'';
 }
 function startListen(){
@@ -1492,6 +1524,29 @@ el("sessSave").addEventListener("click",()=>{
 el("permContinue").addEventListener("click",()=>{ try{ localStorage.setItem("phantasm_perm","1"); }catch(_){} _permPrimed=true; closeM(el("permModal")); doOpenLive(); });
 el("permClose").addEventListener("click",()=>closeM(el("permModal")));
 el("permModal").addEventListener("click",e=>{ if(e.target===el("permModal")) closeM(el("permModal")); });
+
+// ── CONTACT / SUPPORT (Web3Forms — destination email stays private) ──
+const SUPPORT_KEY="REPLACE_WITH_WEB3FORMS_KEY"; // access key only; the real inbox address never appears in this file
+const contactModal=el("contactModal");
+{ const cl=el("contactLink"); if(cl) cl.addEventListener("click",e=>{ e.preventDefault(); openM(contactModal); }); }
+el("contactClose").addEventListener("click",()=>closeM(contactModal));
+contactModal.addEventListener("click",e=>{ if(e.target===contactModal) closeM(contactModal); });
+el("contactForm").addEventListener("submit",async(e)=>{
+  e.preventDefault();
+  const msg=el("cMsg"), send=el("cSend");
+  const name=el("cName").value.trim(), email=el("cEmail").value.trim(), subject=el("cSubject").value.trim(), message=el("cMessage").value.trim();
+  if(!name||!email||!message){ msg.className="contact-msg err"; msg.textContent="Please add your name, email, and a message."; return; }
+  if(SUPPORT_KEY.indexOf("REPLACE")===0){ msg.className="contact-msg ok"; msg.textContent="Thanks, "+name+"! Support delivery is being finalized — please try again shortly."; return; }
+  send.disabled=true; send.textContent="Sending…";
+  try{
+    const r=await fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
+      body:JSON.stringify({access_key:SUPPORT_KEY,subject:"PHANTASM support — "+(subject||"Inquiry"),from_name:"PHANTASM Support",name:name,email:email,message:message,botcheck:""})});
+    const j=await r.json();
+    if(j&&j.success){ msg.className="contact-msg ok"; msg.textContent="Thanks, "+name+" — your message was sent. We'll reply by email."; el("contactForm").reset(); }
+    else { msg.className="contact-msg err"; msg.textContent="Couldn't send right now — please try again in a moment."; }
+  }catch(_){ msg.className="contact-msg err"; msg.textContent="Network error — please try again."; }
+  send.disabled=false; send.textContent="Send inquiry";
+});
 
 // ── INIT ──────────────────────────────────────────────────
 loadLog(); render(); startAmbient(); homeLoop();
