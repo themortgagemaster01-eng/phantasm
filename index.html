@@ -498,6 +498,51 @@ body{
     url("gaugebg.jpg") center / cover no-repeat,
     var(--panel) !important;
 }
+
+/* ============================================================
+   v4.0 — score · report · classification · achievements · polish
+   ============================================================ */
+/* typography & spacing polish */
+.sec-label{margin:30px 2px 12px!important;font-size:12.5px!important;letter-spacing:.12em!important}
+.reading{letter-spacing:-.04em!important}
+.tool .tt{font-size:15.5px!important;letter-spacing:-.01em}
+.tool .ic{background:linear-gradient(135deg,rgba(94,234,212,.18),rgba(167,139,250,.16))!important;color:var(--gold)!important}
+/* subtle sensor scan inside the gauge */
+.gauge .scanfx{position:absolute;left:0;right:0;top:0;height:2px;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(94,234,212,.45),transparent);opacity:.45;animation:gscan 5.5s linear infinite}
+@keyframes gscan{0%{top:0;opacity:0}8%{opacity:.45}92%{opacity:.45}100%{top:100%;opacity:0}}
+@media (prefers-reduced-motion: reduce){ .gauge .scanfx{animation:none;opacity:0} }
+/* anomaly classification line */
+.anomaly-line{margin-top:8px;font-size:11px;letter-spacing:.07em;color:var(--gold-soft);min-height:14px;text-transform:uppercase;font-weight:600}
+/* session report modal */
+.rp-score-wrap{text-align:center;margin:8px 0 2px}
+.rp-score{font-size:66px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.03em}
+.rp-score small{font-size:14px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.rp-bar{height:8px;background:var(--panel-2);border:1px solid var(--panel-line);border-radius:99px;overflow:hidden;margin:12px 0 2px}
+.rp-bar i{display:block;height:100%;background:var(--grad);border-radius:99px;width:0;transition:width .6s ease-out}
+.rp-cap{text-align:center;font-size:10.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.rp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--panel-2);border:1px solid var(--panel-line);border-radius:14px;overflow:hidden;margin-top:14px}
+.rp-tile{padding:14px 8px;text-align:center;border-right:1px solid var(--panel-line);border-bottom:1px solid var(--panel-line)}
+.rp-tile:nth-child(3n){border-right:none}
+.rp-tile:nth-last-child(-n+3){border-bottom:none}
+.rp-k{font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.rp-v{font-size:20px;font-weight:700;color:var(--ink);margin-top:6px}
+.rp-summary{margin-top:14px;font-size:13px;line-height:1.62;color:var(--t2);background:var(--panel-2);border:1px solid var(--panel-line);border-radius:12px;padding:13px 14px}
+.rp-share{margin-top:14px;background:var(--grad)!important;color:#04121a!important;border:none!important;width:100%}
+/* achievements */
+.ach-head{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);letter-spacing:.04em}
+.ach-head b{color:var(--gold)}
+.ach-grid{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.ach{display:flex;align-items:center;gap:12px;padding:12px 13px;border:1px solid var(--panel-line);border-radius:14px;background:var(--panel-2);opacity:.55}
+.ach.on{opacity:1;border-color:rgba(94,234,212,.35)}
+.ach .ai{font-size:22px;flex:0 0 auto;filter:grayscale(1) opacity(.7)} .ach.on .ai{filter:none}
+.ach .ax{flex:1;min-width:0} .ach .at{font-size:14px;font-weight:600;color:var(--ink)} .ach .ad{font-size:11.5px;color:var(--muted);margin-top:1px}
+.ach .alock{flex:0 0 auto;color:var(--muted);font-size:14px} .ach.on .alock{color:var(--green)}
+.ach-toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(16px);opacity:0;z-index:999;
+  display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0F172A,#1e293b);border:1px solid rgba(94,234,212,.4);
+  border-radius:14px;padding:12px 16px;box-shadow:0 12px 30px rgba(0,0,0,.55);transition:opacity .3s,transform .3s;max-width:90vw}
+.ach-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.ach-toast .ai{font-size:26px} .ach-toast .at{font-size:9.5px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase} .ach-toast .an{font-size:14px;font-weight:700;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -529,6 +574,7 @@ body{
   </div>
   <div class="head-right">
     <div class="status-dot"><span class="dot" id="dot"></span><span id="sensorMode">STANDBY</span></div>
+    <button class="icon-btn" id="achBtn" aria-label="Achievements">🏅</button>
     <button class="icon-btn" id="soundBtn" aria-label="Sound on/off">🔊</button>
     <button class="icon-btn" id="helpBtn" aria-label="How to use">?</button>
     <button class="icon-btn i" id="infoBtn" aria-label="About">i</button>
@@ -537,6 +583,7 @@ body{
 
 <!-- ===== HERO ===== -->
 <div class="gauge">
+  <div class="scanfx"></div>
   <div class="ringwrap">
     <svg class="ring" viewBox="0 0 208 208"><circle class="ring-bg" cx="104" cy="104" r="92"/><circle class="ring-fg" id="ringFg" cx="104" cy="104" r="92"/></svg>
     <div class="ring-center"><div class="reading" id="reading">0.0</div><div class="unit">mG · EMF</div></div>
@@ -544,6 +591,7 @@ body{
   <div class="threat" id="threat">● STANDBY</div>
   <div class="hero-activity">Activity Index <b id="activity">0</b></div>
   <div class="hero-status" id="heroStatus">READY TO INVESTIGATE</div>
+  <div class="anomaly-line" id="anomalyLine"></div>
   <div class="corr-break" id="corrBreak"></div>
 </div>
 
@@ -573,19 +621,19 @@ body{
 <div class="sec-label">Investigation Tools</div>
 <div class="tools">
   <button class="tool" id="spectrumBtn">
-    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6.5" width="14" height="11" rx="2.5"/><path d="M16 10.5l6-3v9l-6-3z"/></svg></span>
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/><path d="M12 1.5v2.6M12 19.9v2.6M1.5 12h2.6M19.9 12h2.6"/></svg></span>
     <span class="tt">Spectrum Cam</span><span class="ts">Live camera + sensor fusion</span>
   </button>
   <button class="tool" id="evpCard">
-    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span>
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2.2M7.3 8.5v7M11 4.5v15M14.7 7v10M18.4 9.5v5M21 12h.01"/></svg></span>
     <span class="tt">EVP Recorder</span><span class="ts" id="tsEvp">Capture &amp; review audio</span>
   </button>
   <button class="tool" id="hauntBtn">
-    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.4-7-11a7 7 0 0 1 14 0c0 5.6-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12z"/><path d="M9.2 12.2l2.8-2.6 2.8 2.6V15h-5.6z"/></svg></span>
     <span class="tt">Local Haunts</span><span class="ts" id="tsHaunt">Real stories near you</span>
   </button>
   <button class="tool" id="timelineCard">
-    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h11"/></svg></span>
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="18" r="1.6" fill="currentColor" stroke="none"/><path d="M9.5 6H20M9.5 12H20M9.5 18h7"/></svg></span>
     <span class="tt">Evidence Timeline</span><span class="ts" id="tsTimeline">Timestamped session log</span>
   </button>
 </div>
@@ -596,7 +644,7 @@ body{
 <div class="sec-label">Evidence Timeline</div>
 <div class="log">
   <h3><span id="logCount">0 EVENTS</span>
-    <span class="acts"><button id="markBtn2" title="Log the current moment to the timeline">Mark</button><button id="shareBtn" title="Share the top moment as an image card">Share</button><button id="sessionsBtn" title="Save this session with a name and reopen past ones">Sessions</button><button id="exportBtn" title="Download the session as an HTML report">Export</button><button class="danger" id="clearBtn" title="Clear the current timeline">Clear</button></span>
+    <span class="acts"><button id="markBtn2" title="Log the current moment to the timeline">Mark</button><button id="shareBtn" title="Share the top moment as an image card">Share</button><button id="sessionsBtn" title="Save this session with a name and reopen past ones">Sessions</button><button id="reportBtn" title="Session score, summary &amp; shareable report card">Report</button><button id="exportBtn" title="Download the session as an HTML report">Export</button><button class="danger" id="clearBtn" title="Clear the current timeline">Clear</button></span>
   </h3>
   <div class="items" id="items"><div class="empty">No events yet — tap Start Session.<br/>You can Mark moments, Share them as image cards, and save named Sessions to revisit later.</div></div>
 </div>
@@ -610,7 +658,7 @@ body{
 <details class="acc"><summary>Investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body">Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v3.9 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a></footer>
+<footer>PHANTASM v4.0 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -624,7 +672,9 @@ body{
     <li><b>Watch the Activity Index &amp; Evidence.</b> Activity Index (0–100) reflects the room only. Evidence Confidence rises to Medium/High only when signals <em>correlate</em> (e.g. EMF + audio within seconds) — that's the honest part.</li>
     <li><b>Review &amp; Export.</b> Everything lands in the timeline. EXPORT saves the session as a formatted report.</li>
   </ol>
-  <p class="m" style="margin-top:14px;font-size:12px">It reads real sensor data. It can't confirm a ghost — it's for investigation and entertainment.</p>
+  <h3>After the session</h3>
+  <p class="m" style="font-size:12.5px">Get a <b>Session Activity Score</b>, an auto-written <b>summary</b>, and a shareable <b>report card</b> — and unlock <b>achievements</b> as you investigate.</p>
+  <p class="m" style="margin-top:12px;font-size:12px">It reads real sensor data. It can't confirm a ghost — it's for investigation and entertainment.</p>
   <button class="startnow" id="welcomeStart">GOT IT — LET'S GO</button>
 </div></div>
 
@@ -697,6 +747,25 @@ body{
     <div class="contact-msg" id="cMsg"></div>
   </form>
   <p class="contact-note">We never share your details. Replies come from PHANTASM support.</p>
+</div></div>
+
+<!-- Session Report -->
+<div class="modal" id="reportModal"><div class="sheet">
+  <h2>SESSION REPORT <button class="close" id="reportClose">×</button></h2>
+  <p class="m">An automated recap of your recorded sensor data — a measure of session activity, not a determination of paranormal activity.</p>
+  <div class="rp-score-wrap"><div class="rp-score"><span id="rpScore">0</span><small> / 100</small></div></div>
+  <div class="rp-bar"><i id="rpScoreFill"></i></div>
+  <div class="rp-cap">Session Activity Score</div>
+  <div class="rp-grid" id="rpStats"></div>
+  <div class="rp-summary" id="rpSummary"></div>
+  <button class="rp-share" id="rpShare">Share report card</button>
+</div></div>
+
+<!-- Achievements -->
+<div class="modal" id="achModal"><div class="sheet">
+  <h2>ACHIEVEMENTS <button class="close" id="achClose">×</button></h2>
+  <div class="ach-head"><span>Unlock badges as you investigate</span><b id="achCount">0 / 8</b></div>
+  <div class="ach-grid" id="achGrid"></div>
 </div></div>
 
 <!-- Full Spectrum -->
@@ -918,7 +987,7 @@ function metrics(){
   const W=5000, e=now-S.spikeT<W, a=now-S.audioT<W, m=now-S.motionT<W; S.corrFlags={e,a,m};
   let conf="—"; if(e&&a&&m) conf="HIGH"; else if(e&&a) conf="MEDIUM"; else if(e||a||m) conf="LOW";
   if(S.armed&&(e&&a)&&conf!==S.lastConf&&(conf==="HIGH"||conf==="MEDIUM")&&now-S.lastCorrT>4000){
-    addEntry(conf==="HIGH"?"HIGH":"MEDIUM","Correlated: EMF spike + audio peak"+(m?" + motion":"")+" within 5s · "+conf+" confidence");
+    addEntry(conf==="HIGH"?"HIGH":"MEDIUM","Correlated "+anomalyClass(conf)+" event — EMF + audio"+(m?" + motion":"")+" within 5s · "+conf+" confidence");
     showCorrBanner("⚡ CORRELATED EVENT — EMF + Audio"+(m?" + Motion":"")+" · "+conf);
     S.lastCorrT=now;
   }
@@ -946,9 +1015,10 @@ function homeLoop(){
   { const _g=document.querySelector(".gauge"); if(_g) _g.style.setProperty("--g",(0.12+frac*0.55).toFixed(3)); }
   const th=el("threat"); th.style.color=lv.c; th.textContent="● "+(S.armed?lv.n:"STANDBY");
   if(S.armed&&lv.n!==S.lastThreat&&lv.n!=="BASELINE"&&Date.now()-S.lastEventAt>1500){
-    addEntry(lv.n,"EMF "+lv.n+" — "+v.toFixed(1)+" mG ("+Math.round(dev)+"% over baseline)"); S.lastEventAt=Date.now();
+    addEntry(lv.n,"Electromagnetic event · "+anomalyClass(lv.n)+" — "+v.toFixed(1)+" mG ("+Math.round(dev)+"% over baseline) · "+classConfidence(lv.n)+"% confidence"); S.lastEventAt=Date.now();
   }
   S.lastThreat=lv.n;
+  { const al=el("anomalyLine"); if(al){ if(S.armed&&lv.n!=="BASELINE"){ al.textContent="⬡ "+anomalyClass(lv.n)+" electromagnetic event · "+classConfidence(lv.n)+"%"; al.style.color=lv.c; } else { al.textContent=""; } } }
   updateCorrBreak(); driftCheck(base);
   // Tesla-calm status surfaces (throttled)
   const hs=el("heroStatus"); if(hs){ hs.textContent=(liveView&&liveView.classList.contains("open"))?"LIVE SPECTRUM ACTIVE":(S.armed?"INVESTIGATION ACTIVE":"READY TO INVESTIGATE"); }
@@ -990,7 +1060,7 @@ function driftCheck(base){
 function sevColor(n){ const t=THREAT.find(x=>x.n===n); return t?t.c:"#8c8ca0"; }
 function addEntry(sev,msg){ const now=new Date();
   S.log.unshift({time:now.toISOString(),display:now.toLocaleTimeString([],{hour12:false}),severity:sev,message:msg,emf:+S.current.toFixed(1),activity:S.activity,confidence:S.confidence,sound:S.soundDb,motion:!!(S.corrFlags&&S.corrFlags.m),spark:emfWin.slice(-40)});
-  if(S.log.length>200) S.log.pop(); render(); saveLog();
+  if(S.log.length>200) S.log.pop(); render(); saveLog(); checkAch();
 }
 function render(){
   el("logCount").textContent=S.log.length+(S.log.length===1?" EVENT":" EVENTS");
@@ -1482,6 +1552,7 @@ function renderEvidenceCard(e){
 }
 async function shareEvent(e){
   if(!e) return;
+  if(typeof unlock==="function") unlock("shared");
   let canvas; try{ canvas=renderEvidenceCard(e); }catch(err){ return; }
   canvas.toBlob(async(blob)=>{
     if(!blob) return;
@@ -1527,7 +1598,7 @@ el("sessSave").addEventListener("click",()=>{
   if(!S.log.length){ alert("Nothing to save yet — run an investigation first."); return; }
   const name=(el("sessName").value||"").trim()||("Session "+new Date().toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}));
   const arr=loadSessions(); arr.unshift({id:"s"+Date.now(),name:name,date:new Date().toISOString(),count:S.log.length,log:S.log.slice(0,200)});
-  storeSessions(arr); el("sessName").value=""; renderSessions();
+  storeSessions(arr); el("sessName").value=""; renderSessions(); if(typeof unlock==="function") unlock("saved");
 });
 
 // ── PERMISSION PRIMING ────────────────────────────────────
@@ -1557,6 +1628,125 @@ el("contactForm").addEventListener("submit",async(e)=>{
   }catch(_){ msg.className="contact-msg err"; msg.textContent="Network error — please try again."; }
   send.disabled=false; send.textContent="Send inquiry";
 });
+
+// ── ANOMALY CLASSIFICATION (signal-strength tiers — not ghost claims) ──
+function anomalyClass(sev){ if(sev==="CRITICAL"||sev==="HIGH") return "Class A"; if(sev==="MEDIUM") return "Class B"; if(sev==="LOW") return "Class C"; return "Baseline"; }
+function classConfidence(sev){ const f=S.corrFlags||{}; let c=40; if(f.e) c+=20; if(f.a) c+=22; if(f.m) c+=10; if(sev==="HIGH"||sev==="CRITICAL") c+=8; else if(sev==="MEDIUM") c+=4; return Math.max(35,Math.min(96,Math.round(c))); }
+
+// ── SESSION STATS · ACTIVITY SCORE · AUTO SUMMARY ─────────
+function sessionStats(log){
+  log=log||S.log;
+  const emfEvents=log.filter(e=>["LOW","MEDIUM","HIGH","CRITICAL"].indexOf(e.severity)>=0||/electromagnetic/i.test(e.message)).length;
+  const evp=log.filter(e=>/EVP/i.test(e.message)).length;
+  const motion=log.filter(e=>e.motion).length;
+  const correlated=log.filter(e=>e.severity==="HIGH"||e.severity==="MEDIUM").length;
+  const high=log.filter(e=>e.severity==="HIGH").length;
+  const peak=log.length?Math.max(...log.map(e=>e.emf||0)):0;
+  let durMin=0; if(log.length>1){ const t0=new Date(log[log.length-1].time), t1=new Date(log[0].time); durMin=Math.max(1,Math.round((t1-t0)/60000)); }
+  let score=Math.min(100, emfEvents*6 + correlated*9 + evp*5 + motion*3 + high*4); if(!log.length) score=0;
+  return {emfEvents,evp,motion,correlated,high,peak:+peak.toFixed(1),durMin,total:log.length,score:Math.round(score)};
+}
+function investigationSummary(log){
+  log=log||S.log; const s=sessionStats(log);
+  if(!log.length) return "No events were logged in this session.";
+  const first=log[log.length-1].display, last=log[0].display;
+  let t="During this "+(s.durMin?s.durMin+"-minute ":"")+"session, PHANTASM logged "+s.emfEvents+" electromagnetic event"+(s.emfEvents===1?"":"s");
+  if(s.correlated) t+=" ("+s.correlated+" correlated with audio/motion)";
+  t+=", "+s.evp+" EVP "+(s.evp===1?"capture":"captures")+", and "+s.motion+" motion event"+(s.motion===1?"":"s")+". ";
+  t+="Peak EMF reached "+s.peak+" mG. Activity ran from "+first+" to "+last+". ";
+  t+="This is an automated recap of recorded sensor data — not a determination of paranormal activity.";
+  return t;
+}
+
+// ── SESSION REPORT (modal + shareable card) ───────────────
+function statTile(k,v){ return '<div class="rp-tile"><div class="rp-k">'+k+'</div><div class="rp-v">'+v+'</div></div>'; }
+function openReport(){
+  const s=sessionStats();
+  el("rpScore").textContent=s.score; el("rpScoreFill").style.width=s.score+"%";
+  el("rpStats").innerHTML=statTile("EMF EVENTS",s.emfEvents)+statTile("CORRELATED",s.correlated)+statTile("EVP",s.evp)+statTile("MOTION",s.motion)+statTile("PEAK EMF",s.peak+" mG")+statTile("DURATION",(s.durMin?s.durMin+" min":"—"));
+  el("rpSummary").textContent=investigationSummary();
+  openM(el("reportModal"));
+}
+function renderReportCard(){
+  const s=sessionStats(); const W=1080,H=1920,c=document.createElement("canvas"); c.width=W;c.height=H; const x=c.getContext("2d");
+  const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,"#0F172A"); g.addColorStop(1,"#070B14"); x.fillStyle=g; x.fillRect(0,0,W,H);
+  const rg=x.createRadialGradient(W/2,440,80,W/2,440,780); rg.addColorStop(0,"rgba(94,234,212,0.12)"); rg.addColorStop(1,"rgba(94,234,212,0)"); x.fillStyle=rg; x.fillRect(0,0,W,H);
+  x.textAlign="center";
+  x.fillStyle="#5EEAD4"; x.font="700 56px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("PHANTASM",W/2,150);
+  x.fillStyle="#94A3B8"; x.font="600 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("INVESTIGATION REPORT",W/2,196);
+  const cx=W/2,cy=440,r=150, sc=s.score, col=sc>=70?"#22C55E":sc>=40?"#F59E0B":"#5EEAD4";
+  x.lineWidth=22; x.strokeStyle="rgba(255,255,255,0.08)"; x.beginPath(); x.arc(cx,cy,r,0,Math.PI*2); x.stroke();
+  x.strokeStyle=col; x.lineCap="round"; x.beginPath(); x.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*(sc/100)); x.stroke(); x.lineCap="butt";
+  x.fillStyle="#F8FAFC"; x.font="800 120px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(String(sc),cx,cy+38);
+  x.fillStyle="#94A3B8"; x.font="600 24px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("SESSION ACTIVITY SCORE",cx,cy+90);
+  const tiles=[["EMF EVENTS",s.emfEvents],["CORRELATED",s.correlated],["EVP",s.evp],["MOTION",s.motion],["PEAK EMF",s.peak+" mG"],["DURATION",(s.durMin?s.durMin+" min":"—")]];
+  const tw=420,th=150,gpx=40,gpy=24,gx=(W-(2*tw+gpx))/2,gy=730; x.textAlign="left";
+  tiles.forEach((t,i)=>{ const tx=gx+(i%2)*(tw+gpx), ty=gy+Math.floor(i/2)*(th+gpy);
+    x.fillStyle="rgba(255,255,255,0.05)"; roundRect(x,tx,ty,tw,th,18); x.fill();
+    x.strokeStyle="rgba(255,255,255,0.10)"; x.lineWidth=1; roundRect(x,tx,ty,tw,th,18); x.stroke();
+    x.fillStyle="#94A3B8"; x.font="600 22px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(t[0],tx+28,ty+52);
+    x.fillStyle="#F8FAFC"; x.font="700 58px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(String(t[1]),tx+28,ty+118); });
+  x.fillStyle="#CBD5E1"; x.font="400 28px -apple-system,Segoe UI,Roboto,sans-serif"; wrapText(x,investigationSummary(),90,1320,900,40);
+  x.fillStyle="rgba(255,255,255,0.05)"; x.fillRect(0,H-210,W,210); x.textAlign="center";
+  x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("PHANTASM",W/2,H-130);
+  x.fillStyle="#94A3B8"; x.font="400 24px -apple-system,Segoe UI,Roboto,sans-serif";
+  x.fillText("For entertainment — not proof of the paranormal.",W/2,H-86);
+  x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
+  x.textAlign="left"; return c;
+}
+async function shareReport(){
+  if(!S.log.length){ alert("No session data yet — run an investigation first."); return; }
+  if(typeof unlock==="function") unlock("shared");
+  let c; try{ c=renderReportCard(); }catch(_){ return; }
+  c.toBlob(async(blob)=>{ if(!blob) return;
+    try{ const file=new File([blob],"phantasm-report.png",{type:"image/png"});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:"PHANTASM Investigation Report",text:"My PHANTASM session — for entertainment."}); return; } }catch(_){}
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="phantasm-report-"+Date.now()+".png"; a.click();
+  },"image/png");
+}
+el("reportBtn").addEventListener("click",openReport);
+el("reportClose").addEventListener("click",()=>closeM(el("reportModal")));
+el("reportModal").addEventListener("click",e=>{ if(e.target===el("reportModal")) closeM(el("reportModal")); });
+el("rpShare").addEventListener("click",shareReport);
+
+// ── ACHIEVEMENTS ──────────────────────────────────────────
+const ACH=[
+  {id:"first",t:"First Investigation",d:"Calibrate and arm PHANTASM",i:"🛰️"},
+  {id:"evidence",t:"Evidence Logged",d:"Record your first timeline event",i:"📍"},
+  {id:"corr",t:"Correlator",d:"Capture a correlated (Medium+) event",i:"⚡"},
+  {id:"high",t:"Strong Signal",d:"Log a HIGH-confidence event",i:"🔺"},
+  {id:"evp",t:"EVP Captured",d:"Record an EVP clip",i:"🎙️"},
+  {id:"saved",t:"Archivist",d:"Save a named session",i:"💾"},
+  {id:"shared",t:"Field Reporter",d:"Share an evidence or report card",i:"⤴️"},
+  {id:"night",t:"Night Owl",d:"Investigate between 10pm–4am",i:"🌙"}
+];
+function loadAch(){ try{ return JSON.parse(localStorage.getItem("phantasm_ach")||"{}")||{}; }catch(_){ return {}; } }
+function saveAchObj(o){ try{ localStorage.setItem("phantasm_ach",JSON.stringify(o)); }catch(_){} }
+function unlock(id){ const o=loadAch(); if(o[id]) return; o[id]=Date.now(); saveAchObj(o); const a=ACH.find(x=>x.id===id); if(a) achToast(a); }
+function achToast(a){ const t=document.createElement("div"); t.className="ach-toast";
+  t.innerHTML='<span class="ai">'+a.i+'</span><div><div class="at">Achievement unlocked</div><div class="an">'+a.t+'</div></div>';
+  document.body.appendChild(t); requestAnimationFrame(()=>t.classList.add("show"));
+  setTimeout(()=>{ t.classList.remove("show"); setTimeout(()=>t.remove(),420); },3200);
+}
+function renderAch(){
+  const o=loadAch(); const grid=el("achGrid"); grid.innerHTML="";
+  ACH.forEach(a=>{ const on=!!o[a.id]; const d=document.createElement("div"); d.className="ach"+(on?" on":"");
+    d.innerHTML='<span class="ai">'+a.i+'</span><div class="ax"><div class="at">'+a.t+'</div><div class="ad">'+a.d+'</div></div><span class="alock">'+(on?"✓":"🔒")+'</span>';
+    grid.appendChild(d); });
+  el("achCount").textContent=ACH.filter(a=>o[a.id]).length+" / "+ACH.length;
+}
+function checkAch(){
+  const o=loadAch();
+  if(S.armed&&!o.first) unlock("first");
+  if(S.log.length&&!o.evidence) unlock("evidence");
+  if(!o.corr&&S.log.some(e=>e.severity==="HIGH"||e.severity==="MEDIUM")) unlock("corr");
+  if(!o.high&&S.log.some(e=>e.severity==="HIGH")) unlock("high");
+  if(!o.evp&&S.log.some(e=>/EVP recording saved|EVP clip|EVP transcript/i.test(e.message))) unlock("evp");
+  const h=new Date().getHours(); if(!o.night&&(h>=22||h<4)) unlock("night");
+}
+el("achBtn").addEventListener("click",()=>{ renderAch(); openM(el("achModal")); });
+el("achClose").addEventListener("click",()=>closeM(el("achModal")));
+el("achModal").addEventListener("click",e=>{ if(e.target===el("achModal")) closeM(el("achModal")); });
 
 // ── INIT ──────────────────────────────────────────────────
 loadLog(); render(); startAmbient(); homeLoop();
