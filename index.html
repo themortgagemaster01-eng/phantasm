@@ -596,9 +596,9 @@ body{
 <div class="sec-label">Evidence Timeline</div>
 <div class="log">
   <h3><span id="logCount">0 EVENTS</span>
-    <span class="acts"><button id="markBtn2">Mark</button><button id="shareBtn">Share</button><button id="sessionsBtn">Sessions</button><button id="exportBtn">Export</button><button class="danger" id="clearBtn">Clear</button></span>
+    <span class="acts"><button id="markBtn2" title="Log the current moment to the timeline">Mark</button><button id="shareBtn" title="Share the top moment as an image card">Share</button><button id="sessionsBtn" title="Save this session with a name and reopen past ones">Sessions</button><button id="exportBtn" title="Download the session as an HTML report">Export</button><button class="danger" id="clearBtn" title="Clear the current timeline">Clear</button></span>
   </h3>
-  <div class="items" id="items"><div class="empty">No events yet. Tap Start Investigation.</div></div>
+  <div class="items" id="items"><div class="empty">No events yet — tap Start Session.<br/>You can Mark moments, Share them as image cards, and save named Sessions to revisit later.</div></div>
 </div>
 
 <!-- ===== SECONDARY ===== -->
@@ -610,7 +610,7 @@ body{
 <details class="acc"><summary>Investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body">Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v3.8 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a></footer>
+<footer>PHANTASM v3.9 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -995,7 +995,7 @@ function addEntry(sev,msg){ const now=new Date();
 function render(){
   el("logCount").textContent=S.log.length+(S.log.length===1?" EVENT":" EVENTS");
   updateToolSummaries();
-  if(!S.log.length){ el("items").innerHTML='<div class="empty">No events yet. Tap Start Investigation.</div>'; return; }
+  if(!S.log.length){ el("items").innerHTML='<div class="empty">No events yet — tap Start Session.<br/>You can Mark moments, Share them as image cards, and save named Sessions to revisit later.</div>'; return; }
   el("items").innerHTML="";
   S.log.forEach(e=>{ const d=document.createElement("div"); d.className="entry"; d.title="Tap to share this moment as an image";
     d.innerHTML='<span class="sev" style="background:'+sevColor(e.severity)+';color:'+sevColor(e.severity)+'"></span><span class="t">'+e.display+'</span><span class="m">'+e.message+'</span><span class="share-hint">⤴</span>';
