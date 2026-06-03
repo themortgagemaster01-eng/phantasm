@@ -1534,7 +1534,7 @@ el("permClose").addEventListener("click",()=>closeM(el("permModal")));
 el("permModal").addEventListener("click",e=>{ if(e.target===el("permModal")) closeM(el("permModal")); });
 
 // ── CONTACT / SUPPORT (Web3Forms — destination email stays private) ──
-const SUPPORT_KEY="REPLACE_WITH_WEB3FORMS_KEY"; // access key only; the real inbox address never appears in this file
+const SUPPORT_KEY="2f7563fe-dac5-4571-b65d-3f6bc43b1fd1"; // Web3Forms public access key — destination inbox address is NOT exposed here
 const contactModal=el("contactModal");
 { const cl=el("contactLink"); if(cl) cl.addEventListener("click",e=>{ e.preventDefault(); openM(contactModal); }); }
 el("contactClose").addEventListener("click",()=>closeM(contactModal));
