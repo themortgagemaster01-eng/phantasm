@@ -1,8 +1,8 @@
 /* PHANTASM service worker — network-first so updates always show, cache as offline fallback */
-const CACHE = "phantasm-v38";
+const CACHE = "phantasm-v39";
 const ASSETS = [
   "./", "./index.html", "./manifest.json",
-  "./icon-192.png", "./icon-512.png", "./phantasm_landing_page.html", "./bg.jpg", "./gaugebg.jpg"
+  "./icon-192.png", "./icon-512.png", "./phantasm_landing_page.html", "./bg.jpg", "./gaugebg.jpg", "./privacy.html"
 ];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
