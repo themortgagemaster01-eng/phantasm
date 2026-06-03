@@ -474,9 +474,11 @@ body{
 .tool:hover{transform:none!important}
 
 /* ===== v3.6 — top disclaimer banner · contact/support form ===== */
-.topbar{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;
-  background:rgba(94,234,212,.06);border:1px solid var(--panel-line);border-radius:12px;
-  padding:9px 14px;margin-bottom:14px;font-size:10.5px;letter-spacing:.04em;color:var(--t2);line-height:1.45}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;
+  background:rgba(9,13,22,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--panel-line);border-radius:12px;
+  padding:10px 14px;margin:0 0 14px;font-size:10.5px;letter-spacing:.04em;color:var(--t2);line-height:1.45;
+  box-shadow:0 6px 18px rgba(0,0,0,.35)}
 .topbar b{color:var(--gold);font-weight:700;letter-spacing:.08em}
 .contact-field{display:block;margin:10px 0}
 .contact-field label{display:block;font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
@@ -572,7 +574,7 @@ body{
 <div class="tools">
   <button class="tool" id="spectrumBtn">
     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6.5" width="14" height="11" rx="2.5"/><path d="M16 10.5l6-3v9l-6-3z"/></svg></span>
-    <span class="tt">Ghost Cam</span><span class="ts">Camera + sensor fusion</span>
+    <span class="tt">Spectrum Cam</span><span class="ts">Live camera + sensor fusion</span>
   </button>
   <button class="tool" id="evpCard">
     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span>
@@ -608,7 +610,7 @@ body{
 <details class="acc"><summary>Investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body">Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v3.7 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a></footer>
+<footer>PHANTASM v3.8 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a></footer>
 </div>
 
 <!-- Welcome -->
