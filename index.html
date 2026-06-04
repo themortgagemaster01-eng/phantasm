@@ -547,6 +547,20 @@ body{
 /* ===== v4.4 — analog EMF meter dial (segmented ticks + needle) ===== */
 .gaugecv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
 .ringwrap .ring{display:none!important}
+
+/* ===== v4.5 — Paranormal Pulse atmosphere (HUD grid · scan · activity pulse) ===== */
+.fx-grid{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.045;
+  background-image:linear-gradient(rgba(94,234,212,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(94,234,212,.5) 1px,transparent 1px);
+  background-size:46px 46px}
+.fx-scan{position:fixed;left:0;right:0;top:-160px;height:160px;z-index:2;pointer-events:none;opacity:.06;
+  background:linear-gradient(180deg,transparent,rgba(94,234,212,.55),transparent);animation:fxscan 8s linear infinite}
+@keyframes fxscan{0%{top:-160px}100%{top:100vh}}
+.gauge .pulse-ring{position:absolute;inset:-1px;border-radius:24px;pointer-events:none;z-index:0;
+  box-shadow:0 0 calc(10px + var(--pulse,0)*46px) rgba(94,234,212,calc(.10 + var(--pulse,0)*.5)),
+             inset 0 0 calc(var(--pulse,0)*42px) rgba(94,234,212,calc(var(--pulse,0)*.16));
+  animation:pulseRing 2.6s ease-in-out infinite}
+@keyframes pulseRing{0%,100%{opacity:.55}50%{opacity:1}}
+@media (prefers-reduced-motion: reduce){ .fx-scan{display:none} .gauge .pulse-ring{animation:none} }
 </style>
 </head>
 <body>
@@ -559,6 +573,8 @@ body{
 <div class="orb orb3"></div>
 <div class="radar"></div>
 <div class="scanline"></div>
+<div class="fx-grid"></div>
+<div class="fx-scan"></div>
 
 <!-- Correlation banner -->
 <div id="corrBanner"></div>
@@ -587,6 +603,7 @@ body{
 
 <!-- ===== HERO ===== -->
 <div class="gauge">
+  <div class="pulse-ring"></div>
   <div class="scanfx"></div>
   <div class="ringwrap">
     <canvas class="gaugecv" id="gaugeCv"></canvas>
@@ -663,7 +680,7 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v4.4 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>PHANTASM v4.5 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -1047,7 +1064,7 @@ function homeLoop(){
   const lv=threatFor(dev), frac=Math.min(1,dev/150);
   el("ringFg").style.strokeDashoffset=RING*(1-frac); el("ringFg").style.stroke=lv.c; el("reading").style.color=lv.c;
   drawGauge(frac, lv.c, S.armed);
-  { const _g=document.querySelector(".gauge"); if(_g) _g.style.setProperty("--g",(0.12+frac*0.55).toFixed(3)); }
+  { const _g=document.querySelector(".gauge"); if(_g){ _g.style.setProperty("--g",(0.12+frac*0.55).toFixed(3)); _g.style.setProperty("--pulse",(S.armed?S.activity/100:0).toFixed(2)); } }
   const th=el("threat"); th.style.color=lv.c; th.textContent="● "+(S.armed?lv.n:"STANDBY");
   if(S.armed&&lv.n!==S.lastThreat&&lv.n!=="BASELINE"&&Date.now()-S.lastEventAt>1500){
     addEntry(lv.n,"Electromagnetic event · "+anomalyClass(lv.n)+" — "+v.toFixed(1)+" mG ("+Math.round(dev)+"% over baseline) · "+classConfidence(lv.n)+"% confidence"); S.lastEventAt=Date.now();
