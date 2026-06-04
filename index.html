@@ -655,15 +655,15 @@ body{
   <div class="acc-body">It reads your phone's magnetic sensor (EMF), camera (movement) and microphone (audio) together and timestamps anything unusual. Evidence Confidence only rises when signals <b>correlate</b> within seconds — it never claims a ghost, it shows the data and lets you decide.</div></details>
 <details class="acc"><summary>Sensors &amp; device support<span class="chev">▾</span></summary>
   <div class="acc-body" id="capabilityNote"></div></details>
-<details class="acc"><summary>Investigation tips<span class="chev">▾</span></summary>
-  <div class="acc-body">Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
+<details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
+  <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v4.2 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>PHANTASM v4.3 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
-<div class="modal" id="welcomeModal"><div class="sheet">
-  <h2>WELCOME TO PHANTASM <button class="close" id="welcomeClose">×</button></h2>
+<div class="modal" id="welcomeModal"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>WELCOME TO PHANTASM <button class="close" aria-label="Close" id="welcomeClose">×</button></h2>
   <p class="m">PHANTASM is an evidence-logging platform. It reads your phone's magnetic sensor (EMF), camera (movement) and microphone (audio) together, and records exactly what they detect — timestamped — so you can review it later. It never claims a ghost is present; it shows you the data and lets you decide.</p>
   <h3>How to use it — 4 steps</h3>
   <ol class="steplist">
@@ -679,8 +679,8 @@ body{
 </div></div>
 
 <!-- About -->
-<div class="modal" id="infoModal"><div class="sheet">
-  <h2>HOW PHANTASM WORKS <button class="close" id="closeBtn">×</button></h2>
+<div class="modal" id="infoModal"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>HOW PHANTASM WORKS <button class="close" aria-label="Close" id="closeBtn">×</button></h2>
   <p class="m">Most paranormal apps are random-number generators. PHANTASM is built on provable cause and effect: sensor changes drive the readings, events are timestamped, and you can review the data afterward.</p>
   <h3>What each sensor does</h3>
   <ul class="trust">
@@ -702,8 +702,8 @@ body{
 </div></div>
 
 <!-- Local Haunts -->
-<div class="modal" id="hauntModal"><div class="sheet">
-  <h2>LOCAL HAUNTS &amp; STORIES <button class="close" id="hauntClose">×</button></h2>
+<div class="modal" id="hauntModal"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>LOCAL HAUNTS &amp; STORIES <button class="close" aria-label="Close" id="hauntClose">×</button></h2>
   <p class="m">Original retellings of well-known public folklore and historical cases — not claims of fact. Tap "Use my location" to surface cases near you, or search any place or name. For exploration &amp; entertainment.</p>
   <button class="btn-quick" id="hauntGeo" style="width:100%">📍 USE MY LOCATION</button>
   <div class="haunt-search">
@@ -714,16 +714,16 @@ body{
 </div></div>
 
 <!-- Saved Sessions -->
-<div class="modal" id="sessionsModal"><div class="sheet">
-  <h2>SAVED SESSIONS <button class="close" id="sessionsClose">×</button></h2>
+<div class="modal" id="sessionsModal"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>SAVED SESSIONS <button class="close" aria-label="Close" id="sessionsClose">×</button></h2>
   <p class="m">Save the current timeline as a named investigation you can reopen later. Stored on this device only — nothing is uploaded.</p>
   <div class="sess-save"><input id="sessName" placeholder="Name this session (e.g. Basement — Oct 12)" autocomplete="off"/><button class="btn-quick" id="sessSave">Save</button></div>
   <div id="sessList"></div>
 </div></div>
 
 <!-- Permission priming -->
-<div class="modal" id="permModal"><div class="sheet">
-  <h2>BEFORE WE START <button class="close" id="permClose">×</button></h2>
+<div class="modal" id="permModal"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>BEFORE WE START <button class="close" aria-label="Close" id="permClose">×</button></h2>
   <p class="m">Full Spectrum uses your phone's sensors. Your phone will ask permission next — here's exactly why:</p>
   <ul class="perm-list">
     <li><b>Camera —</b> detects movement &amp; contrast shifts in view.</li>
@@ -735,8 +735,8 @@ body{
 </div></div>
 
 <!-- Contact / Support -->
-<div class="modal" id="contactModal"><div class="sheet">
-  <h2>CONTACT &amp; SUPPORT <button class="close" id="contactClose">×</button></h2>
+<div class="modal" id="contactModal"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>CONTACT &amp; SUPPORT <button class="close" aria-label="Close" id="contactClose">×</button></h2>
   <p class="m">Questions, bug reports, or feedback? Send a note and we'll get back to you by email. Your message goes straight to our team.</p>
   <form id="contactForm">
     <div class="contact-field"><label>Your name</label><input id="cName" type="text" autocomplete="name" required/></div>
@@ -750,8 +750,8 @@ body{
 </div></div>
 
 <!-- Session Report -->
-<div class="modal" id="reportModal"><div class="sheet">
-  <h2>SESSION REPORT <button class="close" id="reportClose">×</button></h2>
+<div class="modal" id="reportModal"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>SESSION REPORT <button class="close" aria-label="Close" id="reportClose">×</button></h2>
   <p class="m">An automated recap of your recorded sensor data — a measure of session activity, not a determination of paranormal activity.</p>
   <div class="rp-score-wrap"><div class="rp-score"><span id="rpScore">0</span><small> / 100</small></div></div>
   <div class="rp-bar"><i id="rpScoreFill"></i></div>
@@ -762,8 +762,8 @@ body{
 </div></div>
 
 <!-- Achievements -->
-<div class="modal" id="achModal"><div class="sheet">
-  <h2>ACHIEVEMENTS <button class="close" id="achClose">×</button></h2>
+<div class="modal" id="achModal"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>ACHIEVEMENTS <button class="close" aria-label="Close" id="achClose">×</button></h2>
   <p class="m">The 🏅 badge button up top opens this screen. Badges are just-for-fun rewards you earn as you use PHANTASM — each one unlocks when you do the thing it describes (calibrate, log an event, record an EVP, and so on).</p>
   <p class="m" style="font-size:12px">A <b>🔒 lock</b> = not earned yet. A <b style="color:var(--green)">✓</b> = unlocked. They're saved on your device only and don't affect your investigations.</p>
   <div class="ach-head"><span>Your progress</span><b id="achCount">0 / 8</b></div>
@@ -776,7 +776,7 @@ body{
   <canvas id="lvOverlay"></canvas>
   <div class="lv-crt"></div><div class="lv-vig"></div><div class="lv-scan"></div>
   <div class="lv-recdot" id="lvRecDot">REC</div>
-  <div class="lv-top"><div class="lv-brand">PHANTASM <span>· LIVE SPECTRUM</span></div><button class="cam-x" id="lvClose">×</button></div>
+  <div class="lv-top"><div class="lv-brand">PHANTASM <span>· LIVE SPECTRUM</span></div><button class="cam-x" id="lvClose" aria-label="Close live view">×</button></div>
   <div class="hud emf-hud">
     <div class="hud-k">EMF</div><div class="hud-v"><span id="lvEmf">0.0</span><i>mG</i></div>
     <div class="hud-threat" id="lvThreat">BASELINE</div><canvas class="spark" id="lvSpark"></canvas>
@@ -791,10 +791,10 @@ body{
     <div class="evp-line"><span>EVP · Audio Spectrum</span><span class="rec" id="lvRecTime"></span></div>
     <canvas id="lvWave"></canvas>
     <div class="lv-actions">
-      <button class="rec" id="lvRec">● REC EVP</button>
-      <button class="ears" id="lvEars" title="AI-assisted audio analysis — transcribes audible speech to text. It does not generate or invent speech.">👂 AI EARS</button>
-      <button id="lvFlag">■ FLAG</button>
-      <button id="lvFlip">■ FLIP</button>
+      <button class="rec" id="lvRec" aria-label="Record EVP audio clip">● REC EVP</button>
+      <button class="ears" id="lvEars" aria-label="AI Ears — transcribe audible speech" title="AI-assisted audio analysis — transcribes audible speech to text. It does not generate or invent speech.">👂 AI EARS</button>
+      <button id="lvFlag" aria-label="Flag this moment in the timeline">■ FLAG</button>
+      <button id="lvFlip" aria-label="Flip camera">■ FLIP</button>
     </div>
     <div class="lv-clip" id="lvClip"></div>
     <div class="lv-hint">Camera, EMF &amp; audio live together. Evidence rises only when signals correlate. AI Ears is AI-assisted audio analysis — it transcribes audible speech and does not generate or invent speech. For investigation &amp; entertainment — not proof of the paranormal.</div>
