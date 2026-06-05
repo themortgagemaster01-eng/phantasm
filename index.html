@@ -573,6 +573,8 @@ body{
 #liveView.thermal #lvVideo{visibility:hidden}
 .lv-actions{flex-wrap:wrap}
 .lv-actions .thermal.on{background:linear-gradient(120deg,#7a1020,#c8364a);color:#fff;border-color:rgba(255,83,102,.5)}
+#lvSkel{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+.lv-actions .skel.on{background:linear-gradient(120deg,#0c3a2e,#10b981);color:#04121a;border-color:rgba(16,185,129,.6)}
 </style>
 </head>
 <body>
@@ -692,7 +694,7 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>Paranormal Pulse v4.7 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v4.8 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -809,6 +811,7 @@ body{
   <video id="lvVideo" playsinline muted></video>
   <canvas id="lvThermalCv" width="192" height="144"></canvas>
   <canvas id="lvOverlay"></canvas>
+  <canvas id="lvSkel"></canvas>
   <div class="lv-crt"></div><div class="lv-vig"></div><div class="lv-scan"></div>
   <div class="lv-recdot" id="lvRecDot">REC</div>
   <div class="lv-top"><div class="lv-brand">Paranormal Pulse <span>· LIVE SPECTRUM</span></div><button class="cam-x" id="lvClose" aria-label="Close live view">×</button></div>
@@ -829,11 +832,12 @@ body{
       <button class="rec" id="lvRec" aria-label="Record EVP audio clip">● REC EVP</button>
       <button class="ears" id="lvEars" aria-label="AI Ears — transcribe audible speech" title="AI-assisted audio analysis — transcribes audible speech to text. It does not generate or invent speech.">👂 AI EARS</button>
       <button class="thermal" id="lvThermal" aria-label="Thermal camera view">🌡 THERMAL</button>
+      <button class="skel" id="lvSkelBtn" aria-label="Skeleton body tracker">🦴 SKELETON</button>
       <button id="lvFlag" aria-label="Flag this moment in the timeline">■ FLAG</button>
       <button id="lvFlip" aria-label="Flip camera">■ FLIP</button>
     </div>
     <div class="lv-clip" id="lvClip"></div>
-    <div class="lv-hint">Camera, EMF &amp; audio live together. Evidence rises only when signals correlate. AI Ears is AI-assisted audio analysis — it transcribes audible speech and does not generate or invent speech. For investigation &amp; entertainment — not proof of the paranormal.</div>
+    <div class="lv-hint">Camera, EMF &amp; audio live together. Evidence rises only when signals correlate. AI Ears transcribes audible speech only (it never invents words). Skeleton tracks real human bodies in frame — not ghosts. For investigation &amp; entertainment — not proof of the paranormal.</div>
   </div>
   <div class="cam-msg" id="lvMsg"></div>
 </div>
@@ -1256,6 +1260,7 @@ function doOpenLive(){
   liveView.classList.add("open");
   const ow=overlay.parentElement.offsetWidth, oh=window.innerHeight;
   overlay.width=ow; overlay.height=oh;
+  { const sk=el("lvSkel"); if(sk){ sk.width=ow; sk.height=oh; } }
   lvMsg.className="cam-msg"; lvMsg.innerHTML="";
 
   navigator.mediaDevices.getUserMedia({video:{facingMode,width:{ideal:1280},height:{ideal:720}},audio:true}).then(stream=>{
@@ -1275,7 +1280,7 @@ function closeLive(){
   if(mediaRec&&mediaRec.state!=="inactive"){ mediaRec.stop(); }
   if(recTimer){ clearInterval(recTimer); recTimer=null; }
   if(listening){ stopListen(); }
-  S.camActive=false; updateSensors(); if(typeof setThermal==="function") setThermal(false);
+  S.camActive=false; updateSensors(); if(typeof setThermal==="function") setThermal(false); if(typeof setSkel==="function") setSkel(false);
   el("lvRecDot").classList.remove("on"); prevFrame=null;
 }
 
@@ -1347,6 +1352,58 @@ const lvTherm=el("lvThermalCv"); const tctx=lvTherm?lvTherm.getContext("2d",{wil
 let thermalOn=false;
 function setThermal(on){ thermalOn=on; liveView.classList.toggle("thermal",on); const b=el("lvThermal"); if(b) b.classList.toggle("on",on); }
 { const b=el("lvThermal"); if(b) b.addEventListener("click",()=>setThermal(!thermalOn)); }
+
+// ── SKELETON BODY TRACKER (real on-device pose detection · TF.js MoveNet) ──
+let skelOn=false, poseDetector=null, poseLoading=false, latestPoses=[];
+const SKEL_PAIRS=[[5,7],[7,9],[6,8],[8,10],[5,6],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16],[0,5],[0,6]];
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+async function ensurePoseModel(){
+  if(poseDetector) return poseDetector;
+  if(poseLoading) return null;
+  poseLoading=true;
+  try{
+    if(!window.tf) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js");
+    if(!window.poseDetection) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js");
+    poseDetector=await window.poseDetection.createDetector(window.poseDetection.SupportedModels.MoveNet,{modelType:window.poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING});
+  }catch(e){ poseDetector=null; }
+  poseLoading=false; return poseDetector;
+}
+function skelMsg(t){ const m=el("lvMsg"); if(!m) return; m.innerHTML="<div><p style='font-size:14px'>"+t+"</p></div>"; m.classList.add("show"); setTimeout(()=>m.classList.remove("show"),2400); }
+async function setSkel(on){
+  const b=el("lvSkelBtn");
+  if(on){
+    if(b){ b.classList.add("on"); b.textContent="🦴 LOADING…"; }
+    const det=await ensurePoseModel();
+    if(!det){ if(b){ b.classList.remove("on"); b.textContent="🦴 SKELETON"; } skelMsg("Body tracker needs a connection to load. Try again online."); return; }
+    skelOn=true; if(b) b.textContent="🦴 SKELETON";
+    detectLoop();
+  } else {
+    skelOn=false; if(b){ b.classList.remove("on"); b.textContent="🦴 SKELETON"; }
+    const sk=el("lvSkel"); if(sk){ const c=sk.getContext("2d"); c.clearRect(0,0,sk.width,sk.height); }
+  }
+}
+async function detectLoop(){
+  if(!skelOn) return;
+  if(poseDetector && video.readyState>=2 && video.videoWidth){
+    try{ latestPoses=await poseDetector.estimatePoses(video,{maxPoses:1,flipHorizontal:false}); }catch(_){ latestPoses=[]; }
+    drawSkeleton();
+  }
+  setTimeout(detectLoop,110);
+}
+function drawSkeleton(){
+  const sk=el("lvSkel"); if(!sk) return; const c=sk.getContext("2d"); c.clearRect(0,0,sk.width,sk.height);
+  if(!latestPoses||!latestPoses.length) return;
+  const vW=video.videoWidth, vH=video.videoHeight, cW=sk.width, cH=sk.height; if(!vW||!vH) return;
+  const scale=Math.max(cW/vW,cH/vH), dx=(cW-vW*scale)/2, dy=(cH-vH*scale)/2;
+  const kp=latestPoses[0].keypoints; const P=p=>({x:p.x*scale+dx,y:p.y*scale+dy,s:p.score});
+  c.strokeStyle="#10F0C0"; c.lineWidth=4; c.lineCap="round"; c.shadowBlur=12; c.shadowColor="#10F0C0";
+  SKEL_PAIRS.forEach(pr=>{ const A=P(kp[pr[0]]),B=P(kp[pr[1]]); if(A.s>0.3&&B.s>0.3){ c.beginPath(); c.moveTo(A.x,A.y); c.lineTo(B.x,B.y); c.stroke(); } });
+  c.shadowBlur=0; c.fillStyle="#eafff8";
+  kp.forEach(p=>{ if(p.score>0.3){ const q=P(p); c.beginPath(); c.arc(q.x,q.y,5,0,Math.PI*2); c.fill(); } });
+  c.fillStyle="rgba(16,240,192,.95)"; c.font="700 15px -apple-system,Segoe UI,Roboto,sans-serif"; c.textAlign="center";
+  c.fillText("● BODY DETECTED",cW/2,48); c.textAlign="left";
+}
+{ const b=el("lvSkelBtn"); if(b) b.addEventListener("click",()=>setSkel(!skelOn)); }
 
 // ── FLAG BUTTON (FIXED) ───────────────────────────────────
 el("lvFlag").addEventListener("click",()=>{
