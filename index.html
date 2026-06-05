@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#08080d" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="PHANTASM" />
+<meta name="apple-mobile-web-app-title" content="Paranormal Pulse" />
 <link rel="manifest" href="manifest.json" />
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
-<title>PHANTASM — Paranormal Investigation Platform</title>
+<title>Paranormal Pulse — Paranormal Investigation Platform</title>
 <style>
 :root{
   --bg:#08080d; --bg2:#0e0e16; --panel:rgba(255,255,255,.035); --panel-line:rgba(255,255,255,.08);
@@ -548,6 +548,11 @@ body{
 .gaugecv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
 .ringwrap .ring{display:none!important}
 
+/* ===== v4.6 — rename to Paranormal Pulse (fit longer wordmark) ===== */
+.logo .wm{font-size:15px!important;letter-spacing:.05em!important;line-height:1.1}
+.logo .wm small{letter-spacing:.16em!important;font-size:7.5px!important;margin-top:4px}
+.logo svg{width:28px;height:28px}
+
 /* ===== v4.5 — Paranormal Pulse atmosphere (HUD grid · scan · activity pulse) ===== */
 .fx-grid{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.045;
   background-image:linear-gradient(rgba(94,234,212,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(94,234,212,.5) 1px,transparent 1px);
@@ -590,7 +595,7 @@ body{
       <path d="M24 3 L43 14 L43 31 C43 39 34 44 24 46 C14 44 5 39 5 31 L5 14 Z" fill="none" stroke="url(#g)" stroke-width="2"/>
       <circle cx="24" cy="22" r="9" fill="none" stroke="url(#g)" stroke-width="2"/><circle cx="24" cy="22" r="3" fill="#5EEAD4"/>
     </svg>
-    <div class="wm">PHANTASM<small>PARANORMAL INVESTIGATION</small></div>
+    <div class="wm">Paranormal Pulse<small>INVESTIGATION PLATFORM</small></div>
   </div>
   <div class="head-right">
     <div class="status-dot"><span class="dot" id="dot"></span><span id="sensorMode">STANDBY</span></div>
@@ -617,7 +622,7 @@ body{
   <div class="corr-break" id="corrBreak"></div>
 </div>
 
-<div class="disclaimer-ribbon"><b>For entertainment &amp; EMF education</b> — PHANTASM logs real sensor data and never claims a ghost is present. Not proof of the paranormal.</div>
+<div class="disclaimer-ribbon"><b>For entertainment &amp; EMF education</b> — Paranormal Pulse logs real sensor data and never claims a ghost is present. Not proof of the paranormal.</div>
 
 <div class="metrics">
   <div class="tile"><div class="k">Baseline</div><div class="v" id="baseline">—<small> mG</small></div></div>
@@ -673,20 +678,20 @@ body{
 
 <!-- ===== SECONDARY ===== -->
 <div class="sec-label">Reference</div>
-<details class="acc"><summary>How PHANTASM works<span class="chev">▾</span></summary>
+<details class="acc"><summary>How Paranormal Pulse works<span class="chev">▾</span></summary>
   <div class="acc-body">It reads your phone's magnetic sensor (EMF), camera (movement) and microphone (audio) together and timestamps anything unusual. Evidence Confidence only rises when signals <b>correlate</b> within seconds — it never claims a ghost, it shows the data and lets you decide.</div></details>
 <details class="acc"><summary>Sensors &amp; device support<span class="chev">▾</span></summary>
   <div class="acc-body" id="capabilityNote"></div></details>
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>PHANTASM v4.5 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v4.6 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
 <div class="modal" id="welcomeModal"><div class="sheet" role="dialog" aria-modal="true">
-  <h2>WELCOME TO PHANTASM <button class="close" aria-label="Close" id="welcomeClose">×</button></h2>
-  <p class="m">PHANTASM is an evidence-logging platform. It reads your phone's magnetic sensor (EMF), camera (movement) and microphone (audio) together, and records exactly what they detect — timestamped — so you can review it later. It never claims a ghost is present; it shows you the data and lets you decide.</p>
+  <h2>WELCOME TO Paranormal Pulse <button class="close" aria-label="Close" id="welcomeClose">×</button></h2>
+  <p class="m">Paranormal Pulse is an evidence-logging platform. It reads your phone's magnetic sensor (EMF), camera (movement) and microphone (audio) together, and records exactly what they detect — timestamped — so you can review it later. It never claims a ghost is present; it shows you the data and lets you decide.</p>
   <h3>How to use it — 4 steps</h3>
   <ol class="steplist">
     <li><b>Calibrate.</b> Stand still and tap CALIBRATE so it learns your spot's normal EMF baseline. (Or tap ■ Quick Investigate to do everything at once.)</li>
@@ -702,8 +707,8 @@ body{
 
 <!-- About -->
 <div class="modal" id="infoModal"><div class="sheet" role="dialog" aria-modal="true">
-  <h2>HOW PHANTASM WORKS <button class="close" aria-label="Close" id="closeBtn">×</button></h2>
-  <p class="m">Most paranormal apps are random-number generators. PHANTASM is built on provable cause and effect: sensor changes drive the readings, events are timestamped, and you can review the data afterward.</p>
+  <h2>HOW Paranormal Pulse WORKS <button class="close" aria-label="Close" id="closeBtn">×</button></h2>
+  <p class="m">Most paranormal apps are random-number generators. Paranormal Pulse is built on provable cause and effect: sensor changes drive the readings, events are timestamped, and you can review the data afterward.</p>
   <h3>What each sensor does</h3>
   <ul class="trust">
     <li><b>Magnetometer →</b> detects magnetic-field (EMF) changes, in milliGauss</li>
@@ -768,7 +773,7 @@ body{
     <button type="submit" class="contact-send" id="cSend">Send inquiry</button>
     <div class="contact-msg" id="cMsg"></div>
   </form>
-  <p class="contact-note">We never share your details. Replies come from PHANTASM support.</p>
+  <p class="contact-note">We never share your details. Replies come from Paranormal Pulse support.</p>
 </div></div>
 
 <!-- Session Report -->
@@ -786,7 +791,7 @@ body{
 <!-- Achievements -->
 <div class="modal" id="achModal"><div class="sheet" role="dialog" aria-modal="true">
   <h2>ACHIEVEMENTS <button class="close" aria-label="Close" id="achClose">×</button></h2>
-  <p class="m">The 🏅 badge button up top opens this screen. Badges are just-for-fun rewards you earn as you use PHANTASM — each one unlocks when you do the thing it describes (calibrate, log an event, record an EVP, and so on).</p>
+  <p class="m">The 🏅 badge button up top opens this screen. Badges are just-for-fun rewards you earn as you use Paranormal Pulse — each one unlocks when you do the thing it describes (calibrate, log an event, record an EVP, and so on).</p>
   <p class="m" style="font-size:12px">A <b>🔒 lock</b> = not earned yet. A <b style="color:var(--green)">✓</b> = unlocked. They're saved on your device only and don't affect your investigations.</p>
   <div class="ach-head"><span>Your progress</span><b id="achCount">0 / 8</b></div>
   <div class="ach-grid" id="achGrid"></div>
@@ -798,7 +803,7 @@ body{
   <canvas id="lvOverlay"></canvas>
   <div class="lv-crt"></div><div class="lv-vig"></div><div class="lv-scan"></div>
   <div class="lv-recdot" id="lvRecDot">REC</div>
-  <div class="lv-top"><div class="lv-brand">PHANTASM <span>· LIVE SPECTRUM</span></div><button class="cam-x" id="lvClose" aria-label="Close live view">×</button></div>
+  <div class="lv-top"><div class="lv-brand">Paranormal Pulse <span>· LIVE SPECTRUM</span></div><button class="cam-x" id="lvClose" aria-label="Close live view">×</button></div>
   <div class="hud emf-hud">
     <div class="hud-k">EMF</div><div class="hud-v"><span id="lvEmf">0.0</span><i>mG</i></div>
     <div class="hud-threat" id="lvThreat">BASELINE</div><canvas class="spark" id="lvSpark"></canvas>
@@ -1160,7 +1165,7 @@ el("exportBtn").addEventListener("click",()=>{
 
   const html=`<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
-<title>PHANTASM Session Report — ${dateStr}</title>
+<title>Paranormal Pulse Session Report — ${dateStr}</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:#08080d;color:#f4f1e8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:32px 24px;max-width:800px;margin:0 auto}
@@ -1179,7 +1184,7 @@ el("exportBtn").addEventListener("click",()=>{
   .corr p{font-size:13px;color:#d7d7e2;line-height:1.6}
   footer{margin-top:28px;font-size:10px;color:#54546a;text-align:center;border-top:1px solid rgba(255,255,255,.06);padding-top:16px}
 </style></head><body>
-<h1>PHANTASM</h1>
+<h1>Paranormal Pulse</h1>
 <div class="sub">INVESTIGATION SESSION REPORT</div>
 <div class="stats">
   <div class="stat"><div class="k">Date</div><div class="v" style="font-size:13px;color:#f4f1e8">${dateStr}</div></div>
@@ -1195,7 +1200,7 @@ ${corrEvents.length?`<div class="corr"><h2>⚡ Correlated Events (${corrEvents.l
   <tr><th>Time</th><th>Level</th><th>Event</th><th>EMF</th></tr>
   ${rows}
 </table>
-<footer>PHANTASM v2.1 · Evidence-logging platform · Exported ${timeStr} on ${dateStr}<br>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.</footer>
+<footer>Paranormal Pulse v2.1 · Evidence-logging platform · Exported ${timeStr} on ${dateStr}<br>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.</footer>
 </body></html>`;
 
   const blob=new Blob([html],{type:"text/html"});
@@ -1567,7 +1572,7 @@ function renderEvidenceCard(e){
   const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,"#0F172A"); g.addColorStop(1,"#070B14"); x.fillStyle=g; x.fillRect(0,0,W,H);
   const rg=x.createRadialGradient(W/2,H*0.40,120,W/2,H*0.40,H*0.7); rg.addColorStop(0,"rgba(94,234,212,0.10)"); rg.addColorStop(1,"rgba(94,234,212,0)"); x.fillStyle=rg; x.fillRect(0,0,W,H);
   x.textAlign="left";
-  x.fillStyle="#5EEAD4"; x.font="700 52px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("PHANTASM",90,160);
+  x.fillStyle="#5EEAD4"; x.font="700 52px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",90,160);
   x.fillStyle="#94A3B8"; x.font="600 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("EVIDENCE LOG",92,206);
   const dt=new Date(e.time);
   x.fillStyle="#F8FAFC"; x.font="500 34px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(dt.toLocaleDateString([],{year:'numeric',month:'long',day:'numeric'}),90,300);
@@ -1595,7 +1600,7 @@ function renderEvidenceCard(e){
   x.fillStyle="#CBD5E1"; x.font="400 30px -apple-system,Segoe UI,Roboto,sans-serif"; wrapText(x,e.message||"",90,1210,900,42);
   x.fillStyle="rgba(255,255,255,0.05)"; x.fillRect(0,H-210,W,210);
   x.textAlign="center";
-  x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("PHANTASM",W/2,H-130);
+  x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",W/2,H-130);
   x.fillStyle="#94A3B8"; x.font="400 24px -apple-system,Segoe UI,Roboto,sans-serif";
   x.fillText("For entertainment — not proof of the paranormal.",W/2,H-86);
   x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
@@ -1611,7 +1616,7 @@ async function shareEvent(e){
     try{
       const file=new File([blob],"phantasm-evidence.png",{type:"image/png"});
       if(navigator.canShare&&navigator.canShare({files:[file]})){
-        await navigator.share({files:[file],title:"PHANTASM Evidence",text:"Logged with PHANTASM — for entertainment."}); return;
+        await navigator.share({files:[file],title:"Paranormal Pulse Evidence",text:"Logged with Paranormal Pulse — for entertainment."}); return;
       }
     }catch(_){}
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="phantasm-evidence-"+Date.now()+".png"; a.click();
@@ -1673,7 +1678,7 @@ el("contactForm").addEventListener("submit",async(e)=>{
   send.disabled=true; send.textContent="Sending…";
   try{
     const r=await fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
-      body:JSON.stringify({access_key:SUPPORT_KEY,subject:"PHANTASM support — "+(subject||"Inquiry"),from_name:"PHANTASM Support",name:name,email:email,message:message,botcheck:""})});
+      body:JSON.stringify({access_key:SUPPORT_KEY,subject:"Paranormal Pulse support — "+(subject||"Inquiry"),from_name:"Paranormal Pulse Support",name:name,email:email,message:message,botcheck:""})});
     const j=await r.json();
     if(j&&j.success){ msg.className="contact-msg ok"; msg.textContent="Thanks, "+name+" — your message was sent. We'll reply by email."; el("contactForm").reset(); }
     else { msg.className="contact-msg err"; msg.textContent="Couldn't send right now — please try again in a moment."; }
@@ -1702,7 +1707,7 @@ function investigationSummary(log){
   log=log||S.log; const s=sessionStats(log);
   if(!log.length) return "No events were logged in this session.";
   const first=log[log.length-1].display, last=log[0].display;
-  let t="During this "+(s.durMin?s.durMin+"-minute ":"")+"session, PHANTASM logged "+s.emfEvents+" electromagnetic event"+(s.emfEvents===1?"":"s");
+  let t="During this "+(s.durMin?s.durMin+"-minute ":"")+"session, Paranormal Pulse logged "+s.emfEvents+" electromagnetic event"+(s.emfEvents===1?"":"s");
   if(s.correlated) t+=" ("+s.correlated+" correlated with audio/motion)";
   t+=", "+s.evp+" EVP "+(s.evp===1?"capture":"captures")+", and "+s.motion+" motion event"+(s.motion===1?"":"s")+". ";
   t+="Peak EMF reached "+s.peak+" mG. Activity ran from "+first+" to "+last+". ";
@@ -1724,7 +1729,7 @@ function renderReportCard(){
   const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,"#0F172A"); g.addColorStop(1,"#070B14"); x.fillStyle=g; x.fillRect(0,0,W,H);
   const rg=x.createRadialGradient(W/2,440,80,W/2,440,780); rg.addColorStop(0,"rgba(94,234,212,0.12)"); rg.addColorStop(1,"rgba(94,234,212,0)"); x.fillStyle=rg; x.fillRect(0,0,W,H);
   x.textAlign="center";
-  x.fillStyle="#5EEAD4"; x.font="700 56px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("PHANTASM",W/2,150);
+  x.fillStyle="#5EEAD4"; x.font="700 56px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",W/2,150);
   x.fillStyle="#94A3B8"; x.font="600 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("INVESTIGATION REPORT",W/2,196);
   const cx=W/2,cy=440,r=150, sc=s.score, col=sc>=70?"#22C55E":sc>=40?"#F59E0B":"#5EEAD4";
   x.lineWidth=22; x.strokeStyle="rgba(255,255,255,0.08)"; x.beginPath(); x.arc(cx,cy,r,0,Math.PI*2); x.stroke();
@@ -1740,7 +1745,7 @@ function renderReportCard(){
     x.fillStyle="#F8FAFC"; x.font="700 58px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(String(t[1]),tx+28,ty+118); });
   x.fillStyle="#CBD5E1"; x.font="400 28px -apple-system,Segoe UI,Roboto,sans-serif"; wrapText(x,investigationSummary(),90,1320,900,40);
   x.fillStyle="rgba(255,255,255,0.05)"; x.fillRect(0,H-210,W,210); x.textAlign="center";
-  x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("PHANTASM",W/2,H-130);
+  x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",W/2,H-130);
   x.fillStyle="#94A3B8"; x.font="400 24px -apple-system,Segoe UI,Roboto,sans-serif";
   x.fillText("For entertainment — not proof of the paranormal.",W/2,H-86);
   x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
@@ -1752,7 +1757,7 @@ async function shareReport(){
   let c; try{ c=renderReportCard(); }catch(_){ return; }
   c.toBlob(async(blob)=>{ if(!blob) return;
     try{ const file=new File([blob],"phantasm-report.png",{type:"image/png"});
-      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:"PHANTASM Investigation Report",text:"My PHANTASM session — for entertainment."}); return; } }catch(_){}
+      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:"Paranormal Pulse Investigation Report",text:"My Paranormal Pulse session — for entertainment."}); return; } }catch(_){}
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="phantasm-report-"+Date.now()+".png"; a.click();
   },"image/png");
 }
@@ -1763,7 +1768,7 @@ el("rpShare").addEventListener("click",shareReport);
 
 // ── ACHIEVEMENTS ──────────────────────────────────────────
 const ACH=[
-  {id:"first",t:"First Investigation",d:"Calibrate and arm PHANTASM",i:"🛰️"},
+  {id:"first",t:"First Investigation",d:"Calibrate and arm Paranormal Pulse",i:"🛰️"},
   {id:"evidence",t:"Evidence Logged",d:"Record your first timeline event",i:"📍"},
   {id:"corr",t:"Correlator",d:"Capture a correlated (Medium+) event",i:"⚡"},
   {id:"high",t:"Strong Signal",d:"Log a HIGH-confidence event",i:"🔺"},

@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "PHANTASM — Paranormal Investigation Platform",
-  "short_name": "PHANTASM",
+  "name": "Paranormal Pulse — Investigation Platform",
+  "short_name": "Paranormal Pulse",
   "description": "Evidence-logging paranormal investigation platform: live EMF, camera anomaly detection, and EVP audio — timestamped and reviewable.",
   "start_url": "./index.html",
   "scope": "./",
