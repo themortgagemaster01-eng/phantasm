@@ -188,6 +188,21 @@ footer{margin-top:24px;text-align:center;font-size:9.5px;color:#54546a;letter-sp
   border-radius:50%;background:var(--gold);color:#171206;font-weight:700;display:grid;place-items:center;font-size:13px}
 .steplist b{color:var(--gold-soft)}
 .startnow{margin-top:18px;background:linear-gradient(120deg,var(--gold),#b8932b);color:#171206;border:none}
+/* ── TUTORIAL CAROUSEL ─────────────────────────────────── */
+.tut{overflow:hidden;margin:4px 0 2px;border-radius:14px}
+.tut-track{display:flex;transition:transform .32s cubic-bezier(.4,0,.2,1);will-change:transform}
+.tut-slide{flex:0 0 100%;min-width:100%;box-sizing:border-box;padding:14px 16px 4px;text-align:center}
+.tut-ic{font-size:46px;line-height:1;margin:6px 0 12px}
+.tut-t{font-size:17px;font-weight:700;color:var(--gold-soft);letter-spacing:.3px;margin-bottom:9px}
+.tut-d{font-size:13.5px;line-height:1.55;color:var(--ink)}
+.tut-d b{color:var(--gold-soft)}
+.tut-dots{display:flex;justify-content:center;gap:7px;margin:14px 0 2px}
+.tut-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);transition:.2s;display:block}
+.tut-dots i.on{background:var(--gold);width:18px;border-radius:4px}
+.tut-nav{display:flex;gap:10px;margin-top:14px}
+.tut-nav .startnow{margin-top:0;flex:1}
+.tut-nav #tutBack{flex:0 0 92px;visibility:hidden}
+.tut-nav #tutBack.show{visibility:visible}
 
 /* ── FULL SPECTRUM ─────────────────────────────────────── */
 #liveView{display:none;position:fixed;inset:0;z-index:90;background:#000;overflow:hidden}
@@ -694,24 +709,22 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>Paranormal Pulse v4.8 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v4.9 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
 <div class="modal" id="welcomeModal"><div class="sheet" role="dialog" aria-modal="true">
-  <h2>WELCOME TO Paranormal Pulse <button class="close" aria-label="Close" id="welcomeClose">×</button></h2>
-  <p class="m">Paranormal Pulse is an evidence-logging platform. It reads your phone's magnetic sensor (EMF), camera (movement) and microphone (audio) together, and records exactly what they detect — timestamped — so you can review it later. It never claims a ghost is present; it shows you the data and lets you decide.</p>
-  <h3>How to use it — 4 steps</h3>
-  <ol class="steplist">
-    <li><b>Calibrate.</b> Stand still and tap CALIBRATE so it learns your spot's normal EMF baseline. (Or tap ■ Quick Investigate to do everything at once.)</li>
-    <li><b>Full Spectrum.</b> Opens the live view — camera, EMF and audio together, with on-screen markers when signals spike.</li>
-    <li><b>Watch the Activity Index &amp; Evidence.</b> Activity Index (0–100) reflects the room only. Evidence Confidence rises to Medium/High only when signals <em>correlate</em> (e.g. EMF + audio within seconds) — that's the honest part.</li>
-    <li><b>Review &amp; Export.</b> Everything lands in the timeline. EXPORT saves the session as a formatted report.</li>
-  </ol>
-  <h3>After the session</h3>
-  <p class="m" style="font-size:12.5px">Get a <b>Session Activity Score</b>, an auto-written <b>summary</b>, and a shareable <b>report card</b> — and unlock <b>achievements</b> as you investigate.</p>
-  <p class="m" style="margin-top:12px;font-size:12px">It reads real sensor data. It can't confirm a ghost — it's for investigation and entertainment.</p>
-  <button class="startnow" id="welcomeStart">GOT IT — LET'S GO</button>
+  <h2>HOW IT WORKS <button class="close" aria-label="Close" id="welcomeClose">×</button></h2>
+  <div class="tut"><div class="tut-track" id="tutTrack">
+    <div class="tut-slide"><div class="tut-ic">🛰️</div><div class="tut-t">Welcome to Paranormal Pulse</div><div class="tut-d">An honest, evidence-logging investigation tool. It reads your phone's <b>real sensors</b> — magnetic field (EMF), microphone and camera — and timestamps anything unusual. It never claims a ghost; it shows you the data and lets you decide.</div></div>
+    <div class="tut-slide"><div class="tut-ic">🎯</div><div class="tut-t">1 · Calibrate</div><div class="tut-d">Stand still in a quiet spot and tap <b>Start Session</b>. Paranormal Pulse learns your area's normal EMF baseline, so it can spot real changes instead of random noise.</div></div>
+    <div class="tut-slide"><div class="tut-ic">📡</div><div class="tut-t">2 · Full Spectrum</div><div class="tut-d">Opens the live view — camera, EMF and audio together. Record <b>EVP</b> audio, switch on the <b>thermal</b> camera, and the <b>skeleton</b> body tracker (real pose detection — it finds people, not ghosts).</div></div>
+    <div class="tut-slide"><div class="tut-ic">⚡</div><div class="tut-t">3 · Read the evidence</div><div class="tut-d">The <b>Activity Index</b> (0–100) reflects the room. <b>Evidence Confidence</b> rises to Medium/High only when signals <b>correlate</b> within seconds (e.g. EMF + audio together). Single spikes are treated as noise — that's the honest part.</div></div>
+    <div class="tut-slide"><div class="tut-ic">📋</div><div class="tut-t">4 · Review &amp; share</div><div class="tut-d">Everything lands in the <b>timeline</b>. Get a <b>Session Score</b>, an auto <b>summary</b>, a shareable <b>report card</b>, save named <b>sessions</b>, and unlock <b>achievements</b>.</div></div>
+    <div class="tut-slide"><div class="tut-ic">🛡️</div><div class="tut-t">Stay safe &amp; have fun</div><div class="tut-d">Don't investigate alone in unsafe places, and get permission before entering private property. Paranormal Pulse is for <b>investigation &amp; entertainment</b> — not scientific proof of the paranormal.</div></div>
+  </div></div>
+  <div class="tut-dots" id="tutDots"></div>
+  <div class="tut-nav"><button class="btn-quick" id="tutBack">Back</button><button class="startnow" id="welcomeStart">Next</button></div>
 </div></div>
 
 <!-- About -->
@@ -1228,11 +1241,29 @@ const infoModal=el("infoModal"), welcomeModal=el("welcomeModal");
 const openM=m=>m.classList.add("open"), closeM=m=>m.classList.remove("open");
 el("infoBtn").addEventListener("click",()=>openM(infoModal)); el("closeBtn").addEventListener("click",()=>closeM(infoModal));
 infoModal.addEventListener("click",e=>{ if(e.target===infoModal) closeM(infoModal); });
-el("helpBtn").addEventListener("click",()=>openM(welcomeModal));
-el("welcomeClose").addEventListener("click",()=>closeM(welcomeModal)); el("welcomeStart").addEventListener("click",()=>closeM(welcomeModal));
+/* Tutorial carousel controller */
+const tutTrack=el("tutTrack"), tutDots=el("tutDots"), tutNext=el("welcomeStart"), tutBack=el("tutBack");
+const tutCount=tutTrack.children.length; let tutIdx=0;
+for(let i=0;i<tutCount;i++){ const d=document.createElement("i"); tutDots.appendChild(d); }
+function tutRender(){
+  tutTrack.style.transform="translateX("+(-tutIdx*100)+"%)";
+  [...tutDots.children].forEach((d,i)=>d.classList.toggle("on",i===tutIdx));
+  tutBack.classList.toggle("show",tutIdx>0);
+  tutNext.textContent = tutIdx===tutCount-1 ? "GOT IT — LET'S GO" : "Next";
+}
+function tutGo(n){ tutIdx=Math.max(0,Math.min(tutCount-1,n)); tutRender(); }
+function tutOpen(){ tutGo(0); openM(welcomeModal); }
+tutNext.addEventListener("click",()=>{ if(tutIdx===tutCount-1) closeM(welcomeModal); else tutGo(tutIdx+1); });
+tutBack.addEventListener("click",()=>tutGo(tutIdx-1));
+el("helpBtn").addEventListener("click",tutOpen);
+el("welcomeClose").addEventListener("click",()=>closeM(welcomeModal));
 welcomeModal.addEventListener("click",e=>{ if(e.target===welcomeModal) closeM(welcomeModal); });
+/* swipe */
+let tutX0=null;
+tutTrack.addEventListener("touchstart",e=>{ tutX0=e.changedTouches[0].clientX; },{passive:true});
+tutTrack.addEventListener("touchend",e=>{ if(tutX0===null) return; const dx=e.changedTouches[0].clientX-tutX0; if(Math.abs(dx)>42){ tutGo(tutIdx+(dx<0?1:-1)); } tutX0=null; },{passive:true});
 let seen=false; try{ seen=localStorage.getItem("phantasm_seen21")==="1"; }catch(_){}
-if(!seen){ openM(welcomeModal); try{ localStorage.setItem("phantasm_seen21","1"); }catch(_){} }
+if(!seen){ tutOpen(); try{ localStorage.setItem("phantasm_seen21","1"); }catch(_){} }
 
 // ── FULL SPECTRUM VIEW ─────────────────────────────────────
 const liveView=el("liveView"), video=el("lvVideo"), overlay=el("lvOverlay"), lvMsg=el("lvMsg");
