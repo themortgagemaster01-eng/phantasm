@@ -709,7 +709,7 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>Paranormal Pulse v4.9 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v5.0 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -1633,8 +1633,8 @@ function chord(freqs,dur,type,vol){ freqs.forEach(f=>tone(f,dur,type,vol)); }
 function clickSound(vol){
   if(!sfxCtx) return; const t=sfxCtx.currentTime;
   const o=sfxCtx.createOscillator(), g=sfxCtx.createGain();
-  o.type="square"; o.frequency.setValueAtTime(1500,t);
-  g.gain.setValueAtTime(vol||0.18,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.03);
+  o.type="triangle"; o.frequency.setValueAtTime(1250,t);
+  g.gain.setValueAtTime(vol||0.14,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.03);
   o.connect(g); g.connect(master); o.start(t); o.stop(t+0.04);
 }
 function noiseBurst(dur,freq,vol){
@@ -1660,8 +1660,8 @@ function clickLoop(){
   clearTimeout(clickTimer); let interval=1500;
   if(sfxCtx&&soundOn&&S.armed){
     const base=S.baseline==null?30:S.baseline, dev=base>0?Math.max(0,(S.current-base)/base*100):0;
-    interval=Math.max(80,1500-dev*14);
-    clickSound(Math.min(0.5,0.12+dev/400));
+    interval=Math.max(130,1500-dev*14);
+    clickSound(Math.min(0.3,0.10+dev/500));
   }
   clickTimer=setTimeout(clickLoop,interval);
 }
@@ -1671,11 +1671,29 @@ function soundPoll(){
   if(S.armed){ const t=S.lastThreat; if(t!==sndPrevThreat){ if(soundOn&&["LOW","MEDIUM","HIGH","CRITICAL"].indexOf(t)>=0) sfxAlert(t); sndPrevThreat=t; } }
   if(S.lastCorrT&&S.lastCorrT!==sndPrevCorr){ sndPrevCorr=S.lastCorrT; if(soundOn) sfxChime(); }
 }
-function setMuted(m){ soundOn=!m; if(master) master.gain.value=soundOn?0.85:0; const b=el("soundBtn"); if(b){ b.textContent=soundOn?"🔊":"🔇"; b.classList.toggle("muted",!soundOn); } }
-function unlockAudio(){ initAudio(); acResume(); if(!clickTimer) clickLoop(); }
+function stopHum(){ if(hum){ try{ hum.o.stop(); }catch(_){}; try{ hum.o.disconnect(); hum.g.disconnect(); }catch(_){}; hum=null; } }
+function setMuted(m){
+  soundOn=!m;
+  try{ localStorage.setItem("phantasm_muted", soundOn?"0":"1"); }catch(_){}
+  if(master) try{ master.gain.value=soundOn?0.85:0; }catch(_){}
+  if(!soundOn){
+    // hard stop: kill the continuous hum, halt the click loop, suspend the whole audio engine
+    stopHum();
+    clearTimeout(clickTimer); clickTimer=null;
+    if(sfxCtx && sfxCtx.state==="running"){ try{ sfxCtx.suspend(); }catch(_){} }
+  }else{
+    if(sfxCtx && sfxCtx.state==="suspended"){ try{ sfxCtx.resume(); }catch(_){} }
+    if(!clickTimer) clickLoop();
+    if(S.armed) startHum();
+  }
+  const b=el("soundBtn"); if(b){ b.textContent=soundOn?"🔊":"🔇"; b.classList.toggle("muted",!soundOn); }
+}
+function unlockAudio(){ if(!soundOn) return; initAudio(); acResume(); if(!clickTimer) clickLoop(); }
 document.addEventListener("click", function(){ unlockAudio(); }, {once:true});
 setInterval(soundPoll,150);
-el("soundBtn").addEventListener("click",e=>{ e.stopPropagation(); initAudio(); acResume(); setMuted(soundOn); });
+el("soundBtn").addEventListener("click",e=>{ e.stopPropagation(); initAudio(); setMuted(soundOn); });
+// restore the user's saved sound preference
+try{ if(localStorage.getItem("phantasm_muted")==="1"){ soundOn=true; setMuted(true); } }catch(_){}
 el("markBtn2").addEventListener("click",()=>{ if(soundOn) noiseBurst(0.18,900,0.24); });
 el("lvFlag").addEventListener("click",()=>{ if(soundOn) noiseBurst(0.18,900,0.24); });
 el("spectrumBtn").addEventListener("click",()=>{ initAudio(); acResume(); if(soundOn) sfxSweep(); });
