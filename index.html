@@ -722,7 +722,7 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>Paranormal Pulse v5.2 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v5.3 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -1006,7 +1006,10 @@ async function initSoundFromStream(stream){
 }
 function readSound(){ if(!analyser) return; analyser.getByteTimeDomainData(soundBuf);
   let sum=0; for(let i=0;i<soundBuf.length;i++){ const v=(soundBuf[i]-128)/128; sum+=v*v; } const rms=Math.sqrt(sum/soundBuf.length);
-  S.soundDb=rms>0?Math.max(0,Math.round(20*Math.log10(rms)+90)):0; }
+  const raw=rms>0?Math.max(0,20*Math.log10(rms)+90):0;
+  // low-pass smooth so the dB readout glides instead of strobing frame-to-frame
+  S._dbEma=(S._dbEma==null)?raw:S._dbEma+(raw-S._dbEma)*0.15;
+  S.soundDb=Math.round(S._dbEma); }
 
 async function ensureSensors(){
   if(S.mode!=="none") return;
@@ -1049,7 +1052,10 @@ function metrics(){
   const agree=(emfN>0.25?1:0)+(audioN>0.25?1:0)+(motionN>0.25?1:0);
   let idx=0.45*emfN+0.35*audioN+0.20*motionN;
   if(agree>=2) idx*=1.15;
-  S.activity=Math.min(100,Math.round(idx*100));
+  const rawAct=Math.min(100,idx*100);
+  // low-pass smooth so the Activity Index glides instead of flickering
+  S._actEma=(S._actEma==null)?rawAct:S._actEma+(rawAct-S._actEma)*0.10;
+  S.activity=Math.round(S._actEma);
   const now=Date.now(), base=S.baseline==null?30:S.baseline, dev=base>0?(S.current-base)/base*100:0;
   if(dev>=15) S.spikeT=now; if(audioN>0.55) S.audioT=now; if(motionN>0.45) S.motionT=now;
   const W=5000, e=now-S.spikeT<W, a=now-S.audioT<W, m=now-S.motionT<W; S.corrFlags={e,a,m};
@@ -1102,8 +1108,10 @@ function homeLoop(){
   const v=S.current; if(v>S.peak) S.peak=v;
   el("reading").textContent=v.toFixed(1);
   const base=S.baseline==null?30:S.baseline, dev=base>0?Math.max(0,(v-base)/base*100):0;
-  el("activity").innerHTML=S.activity+'<small> /100</small>';
-  el("sound").innerHTML=(S.soundDb==null?'—':S.soundDb)+'<small> dB</small>';
+  if(!S._numT || Date.now()-S._numT>200){ S._numT=Date.now();
+    el("activity").innerHTML=S.activity+'<small> /100</small>';
+    el("sound").innerHTML=(S.soundDb==null?'—':S.soundDb)+'<small> dB</small>';
+  }
   const ev=el("evidence"); ev.textContent=S.confidence; ev.style.color=confColor(S.confidence);
   const lv=threatFor(dev), frac=Math.min(1,dev/150);
   el("ringFg").style.strokeDashoffset=RING*(1-frac); el("ringFg").style.stroke=lv.c; el("reading").style.color=lv.c;
@@ -1371,9 +1379,11 @@ function liveLoop(){
   const base=S.baseline==null?30:S.baseline,dev=base>0?Math.max(0,(S.current-base)/base*100):0;
   const lv=threatFor(dev);
   el("lvThreat").textContent=lv.n; el("lvThreat").style.color=lv.c;
-  el("lvAct").textContent=S.activity;
   el("lvEvid").textContent=S.confidence; el("lvEvid").style.color=confColor(S.confidence);
-  el("lvDb").textContent=S.soundDb==null?'—':S.soundDb;
+  if(!S._lvNumT || Date.now()-S._lvNumT>200){ S._lvNumT=Date.now();
+    el("lvAct").textContent=S.activity;
+    el("lvDb").textContent=S.soundDb==null?'—':S.soundDb;
+  }
   // waveform
   if(analyser){ const wave=el("lvWave"); const wc=wave.getContext("2d"); const ww=wave.width,wh=wave.height;
     wc.fillStyle="rgba(8,10,16,.6)"; wc.fillRect(0,0,ww,wh);

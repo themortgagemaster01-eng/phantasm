@@ -1,5 +1,5 @@
 /* PHANTASM service worker — network-first so updates always show, cache as offline fallback */
-const CACHE = "phantasm-v50";
+const CACHE = "phantasm-v51";
 const ASSETS = [
   "./", "./index.html", "./manifest.json",
   "./icon-192.png", "./icon-512.png", "./phantasm_landing_page.html", "./bg.jpg", "./gaugebg.jpg", "./privacy.html"
