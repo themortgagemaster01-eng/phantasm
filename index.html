@@ -723,7 +723,7 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>Paranormal Pulse v5.4 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v5.5 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -1419,7 +1419,11 @@ async function ensurePoseModel(){
   try{
     if(!window.tf) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js");
     if(!window.poseDetection) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js");
+    try{ await window.tf.setBackend("webgl"); }catch(_){}
+    try{ await window.tf.ready(); }catch(_){}
     poseDetector=await window.poseDetection.createDetector(window.poseDetection.SupportedModels.MoveNet,{modelType:window.poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING});
+    // warm up the model on a blank frame so the first LIVE frame doesn't freeze the UI
+    try{ const wu=document.createElement("canvas"); wu.width=192; wu.height=192; await poseDetector.estimatePoses(wu); }catch(_){}
   }catch(e){ poseDetector=null; }
   poseLoading=false; return poseDetector;
 }
@@ -1428,6 +1432,7 @@ async function setSkel(on){
   const b=el("lvSkelBtn");
   if(on){
     if(b){ b.classList.add("on"); b.textContent="🦴 LOADING…"; }
+    if(!poseDetector) skelMsg("Loading body tracker… first time only — it downloads a few MB, so give it a few seconds.");
     const det=await ensurePoseModel();
     if(!det){ if(b){ b.classList.remove("on"); b.textContent="🦴 SKELETON"; } skelMsg("Body tracker needs a connection to load. Try again online."); return; }
     skelOn=true; if(b) b.textContent="🦴 SKELETON";
