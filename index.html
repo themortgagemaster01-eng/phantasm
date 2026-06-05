@@ -692,6 +692,14 @@ body{
     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="18" r="1.6" fill="currentColor" stroke="none"/><path d="M9.5 6H20M9.5 12H20M9.5 18h7"/></svg></span>
     <span class="tt">Evidence Timeline</span><span class="ts" id="tsTimeline">Timestamped session log</span>
   </button>
+  <button class="tool" id="thermalCard">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.6V5a2 2 0 0 0-4 0v9.6a4 4 0 1 0 4 0z"/><path d="M12 8.5v6.5"/></svg></span>
+    <span class="tt">Thermal Cam</span><span class="ts">Heat-map camera view</span>
+  </button>
+  <button class="tool" id="skelCard">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.4" r="2.1"/><path d="M12 6.6v6.2M12 9l-4 2M12 9l4 2M12 12.8l-3 6.6M12 12.8l3 6.6"/></svg></span>
+    <span class="tt">Skeleton Tracker</span><span class="ts">Real human pose — not ghosts</span>
+  </button>
 </div>
 
 <button id="calBtn" style="display:none">CALIBRATE</button>
@@ -714,7 +722,7 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>Paranormal Pulse v5.1 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v5.2 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -1500,6 +1508,8 @@ el("lvFlip").addEventListener("click",()=>{
 el("lvClose").addEventListener("click",closeLive);
 el("spectrumBtn").addEventListener("click",openLive);
 { const _evp=el("evpCard"); if(_evp) _evp.addEventListener("click",openLive); }
+{ const _t=el("thermalCard"); if(_t) _t.addEventListener("click",()=>{ openLive(); setTimeout(()=>{ try{ setThermal(true); }catch(_){}}, 450); }); }
+{ const _s=el("skelCard"); if(_s) _s.addEventListener("click",()=>{ openLive(); setTimeout(()=>{ try{ setSkel(true); }catch(_){}}, 650); }); }
 { const _tl=el("timelineCard"); if(_tl) _tl.addEventListener("click",()=>{ const l=document.querySelector(".log"); if(l) l.scrollIntoView({behavior:"smooth",block:"start"}); }); }
 
 // ── AI EVP TRANSCRIPTION (Web Speech API) ────────────────
@@ -1630,7 +1640,7 @@ let sndPrevThreat="BASELINE", sndPrevArmed=false, sndPrevCorr=0;
 function initAudio(){
   if(sfxCtx) return;
   try{ sfxCtx=new (window.AudioContext||window.webkitAudioContext)();
-    master=sfxCtx.createGain(); master.gain.value=soundOn?0.85:0; master.connect(sfxCtx.destination);
+    master=sfxCtx.createGain(); master.gain.value=soundOn?0.55:0; master.connect(sfxCtx.destination);
   }catch(_){}
 }
 function acResume(){ if(sfxCtx&&sfxCtx.state==="suspended") sfxCtx.resume(); }
@@ -1659,36 +1669,41 @@ function noiseBurst(dur,freq,vol){
   const g=sfxCtx.createGain(); g.gain.setValueAtTime(vol||0.22,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
   src.connect(bp); bp.connect(g); g.connect(master); src.start(t); src.stop(t+dur);
 }
-function sfxAlert(level){ const m={LOW:[440,880],MEDIUM:[554,1108],HIGH:[659,1318],CRITICAL:[880,1760]}; if(m[level]) chord(m[level],0.45,"sawtooth",0.16); }
-function sfxChime(){ if(!sfxCtx) return; const b=sfxCtx.currentTime; [523,659,784,1047].forEach((f,i)=>tone(f,0.5,"sine",0.2,b+i*0.12)); }
-function sfxCalib(){ if(!sfxCtx) return; const b=sfxCtx.currentTime; [392,523,659,784].forEach((f,i)=>tone(f,0.4,"triangle",0.18,b+i*0.1)); }
+function sfxAlert(level){ const m={LOW:[440,880],MEDIUM:[554,1108],HIGH:[659,1318],CRITICAL:[880,1760]}; if(m[level]) chord(m[level],0.4,"sine",0.10); }
+function sfxChime(){ if(!sfxCtx) return; const b=sfxCtx.currentTime; [523,659,784,1047].forEach((f,i)=>tone(f,0.5,"sine",0.13,b+i*0.12)); }
+function sfxCalib(){ if(!sfxCtx) return; const b=sfxCtx.currentTime; [392,523,659,784].forEach((f,i)=>tone(f,0.4,"triangle",0.13,b+i*0.1)); }
 function sfxSweep(){ if(!sfxCtx) return; const t=sfxCtx.currentTime, o=sfxCtx.createOscillator(), g=sfxCtx.createGain();
   o.type="sawtooth"; o.frequency.setValueAtTime(80,t); o.frequency.exponentialRampToValueAtTime(1200,t+0.6);
   g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.16,t+0.05); g.gain.exponentialRampToValueAtTime(0.0001,t+0.66);
   o.connect(g); g.connect(master); o.start(t); o.stop(t+0.72);
 }
 function startHum(){ if(!sfxCtx||hum) return; const o=sfxCtx.createOscillator(), g=sfxCtx.createGain();
-  o.type="sine"; o.frequency.value=55; g.gain.value=0.035; o.connect(g); g.connect(master); o.start(); hum={o,g}; }
+  o.type="sine"; o.frequency.value=55; g.gain.value=0.016; o.connect(g); g.connect(master); o.start(); hum={o,g}; }
 function clickLoop(){
-  clearTimeout(clickTimer); let interval=1500;
+  clearTimeout(clickTimer); let interval=2600;
   if(sfxCtx&&soundOn&&S.armed){
-    const base=S.baseline==null?30:S.baseline, dev=base>0?Math.max(0,(S.current-base)/base*100):0;
-    interval=Math.max(130,1500-dev*14);
-    clickSound(Math.min(0.3,0.10+dev/500));
+    const base=S.baseline==null?30:S.baseline; let dev=base>0?Math.max(0,(S.current-base)/base*100):0;
+    if(dev<10) dev=0; // deadzone: ignore baseline noise so it doesn't get twitchy
+    if(dev>0){
+      interval=Math.max(320,2600-dev*9);
+      clickSound(Math.min(0.16,0.06+dev/900));
+    }else{
+      interval=2600; clickSound(0.035); // calm resting heartbeat tick
+    }
   }
   clickTimer=setTimeout(clickLoop,interval);
 }
 function soundPoll(){
   if(!sfxCtx) return;
   if(S.armed&&!sndPrevArmed){ sndPrevArmed=true; if(soundOn){ sfxCalib(); startHum(); } }
-  if(S.armed){ const t=S.lastThreat; if(t!==sndPrevThreat){ if(soundOn&&["LOW","MEDIUM","HIGH","CRITICAL"].indexOf(t)>=0) sfxAlert(t); sndPrevThreat=t; } }
+  if(S.armed){ const t=S.lastThreat; if(t!==sndPrevThreat){ const rank={BASELINE:0,LOW:1,MEDIUM:2,HIGH:3,CRITICAL:4}; if(soundOn && (rank[t]||0)>=2 && (rank[t]||0)>(rank[sndPrevThreat]||0)) sfxAlert(t); sndPrevThreat=t; } }
   if(S.lastCorrT&&S.lastCorrT!==sndPrevCorr){ sndPrevCorr=S.lastCorrT; if(soundOn) sfxChime(); }
 }
 function stopHum(){ if(hum){ try{ hum.o.stop(); }catch(_){}; try{ hum.o.disconnect(); hum.g.disconnect(); }catch(_){}; hum=null; } }
 function setMuted(m){
   soundOn=!m;
   try{ localStorage.setItem("phantasm_muted", soundOn?"0":"1"); }catch(_){}
-  if(master) try{ master.gain.value=soundOn?0.85:0; }catch(_){}
+  if(master) try{ master.gain.value=soundOn?0.55:0; }catch(_){}
   if(!soundOn){
     // hard stop: kill the continuous hum, halt the click loop, suspend the whole audio engine
     stopHum();
