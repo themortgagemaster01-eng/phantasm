@@ -566,6 +566,13 @@ body{
   animation:pulseRing 2.6s ease-in-out infinite}
 @keyframes pulseRing{0%,100%{opacity:.55}50%{opacity:1}}
 @media (prefers-reduced-motion: reduce){ .fx-scan{display:none} .gauge .pulse-ring{animation:none} }
+
+/* ===== v4.7 — thermal camera filter ===== */
+#lvThermalCv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;filter:contrast(1.06) saturate(1.18)}
+#liveView.thermal #lvThermalCv{display:block}
+#liveView.thermal #lvVideo{visibility:hidden}
+.lv-actions{flex-wrap:wrap}
+.lv-actions .thermal.on{background:linear-gradient(120deg,#7a1020,#c8364a);color:#fff;border-color:rgba(255,83,102,.5)}
 </style>
 </head>
 <body>
@@ -685,7 +692,7 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>Paranormal Pulse v4.6 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v4.7 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -800,6 +807,7 @@ body{
 <!-- Full Spectrum -->
 <div id="liveView">
   <video id="lvVideo" playsinline muted></video>
+  <canvas id="lvThermalCv" width="192" height="144"></canvas>
   <canvas id="lvOverlay"></canvas>
   <div class="lv-crt"></div><div class="lv-vig"></div><div class="lv-scan"></div>
   <div class="lv-recdot" id="lvRecDot">REC</div>
@@ -820,6 +828,7 @@ body{
     <div class="lv-actions">
       <button class="rec" id="lvRec" aria-label="Record EVP audio clip">● REC EVP</button>
       <button class="ears" id="lvEars" aria-label="AI Ears — transcribe audible speech" title="AI-assisted audio analysis — transcribes audible speech to text. It does not generate or invent speech.">👂 AI EARS</button>
+      <button class="thermal" id="lvThermal" aria-label="Thermal camera view">🌡 THERMAL</button>
       <button id="lvFlag" aria-label="Flag this moment in the timeline">■ FLAG</button>
       <button id="lvFlip" aria-label="Flip camera">■ FLIP</button>
     </div>
@@ -1266,7 +1275,7 @@ function closeLive(){
   if(mediaRec&&mediaRec.state!=="inactive"){ mediaRec.stop(); }
   if(recTimer){ clearInterval(recTimer); recTimer=null; }
   if(listening){ stopListen(); }
-  S.camActive=false; updateSensors();
+  S.camActive=false; updateSensors(); if(typeof setThermal==="function") setThermal(false);
   el("lvRecDot").classList.remove("on"); prevFrame=null;
 }
 
@@ -1285,6 +1294,13 @@ function liveLoop(){
       S.presence=Math.min(100,diff/(SW*SH*3)*100*8);
     }
     prevFrame=Array.from(cur.data);
+  }
+  // thermal filter — color-map the live camera by brightness (honest: real camera, recolored)
+  if(thermalOn && tctx && video.readyState>=2){
+    tctx.drawImage(video,0,0,192,144);
+    const id=tctx.getImageData(0,0,192,144), d=id.data;
+    for(let i=0;i<d.length;i+=4){ const l=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114)|0; d[i]=TLR[l]; d[i+1]=TLG[l]; d[i+2]=TLB[l]; }
+    tctx.putImageData(id,0,0);
   }
   // detection overlay — single targeting reticle (decorative grid removed)
   const ctx=overlay.getContext("2d"); ctx.clearRect(0,0,overlay.width,overlay.height);
@@ -1318,6 +1334,19 @@ function liveLoop(){
     wc.stroke();
   }
 }
+
+// ── THERMAL CAMERA FILTER (real: recolors the live camera by brightness) ──
+const TLR=new Uint8Array(256),TLG=new Uint8Array(256),TLB=new Uint8Array(256);
+(function(){ const stops=[[0,0,0,20],[35,40,0,120],[80,0,120,200],[120,0,190,120],[160,150,220,40],[200,245,180,30],[230,245,90,20],[255,255,230,200]];
+  for(let l=0;l<256;l++){ let a=stops[0],b=stops[stops.length-1];
+    for(let s=0;s<stops.length-1;s++){ if(l>=stops[s][0]&&l<=stops[s+1][0]){ a=stops[s]; b=stops[s+1]; break; } }
+    const f=(l-a[0])/((b[0]-a[0])||1);
+    TLR[l]=a[1]+(b[1]-a[1])*f; TLG[l]=a[2]+(b[2]-a[2])*f; TLB[l]=a[3]+(b[3]-a[3])*f; }
+})();
+const lvTherm=el("lvThermalCv"); const tctx=lvTherm?lvTherm.getContext("2d",{willReadFrequently:true}):null;
+let thermalOn=false;
+function setThermal(on){ thermalOn=on; liveView.classList.toggle("thermal",on); const b=el("lvThermal"); if(b) b.classList.toggle("on",on); }
+{ const b=el("lvThermal"); if(b) b.addEventListener("click",()=>setThermal(!thermalOn)); }
 
 // ── FLAG BUTTON (FIXED) ───────────────────────────────────
 el("lvFlag").addEventListener("click",()=>{
