@@ -437,6 +437,9 @@ body{
 .disclaimer-ribbon{margin-top:10px;text-align:center;font-size:10.5px;letter-spacing:.03em;color:var(--muted);
   background:rgba(255,255,255,.04);border:1px solid var(--panel-line);border-radius:10px;padding:8px 13px;line-height:1.55}
 .disclaimer-ribbon b{color:var(--gold-soft);font-weight:600}
+.offline-badge{margin-top:12px;text-align:center;font-size:11px;letter-spacing:.04em;color:var(--gold-soft);
+  background:linear-gradient(120deg,rgba(212,175,55,.10),rgba(118,211,255,.06));
+  border:1px solid rgba(212,175,55,.22);border-radius:999px;padding:7px 14px;font-weight:600}
 .corr-break{margin-top:6px;font-size:11px;color:var(--muted);min-height:14px;letter-spacing:.02em}
 .corr-break b{color:var(--gold)}
 #driftBanner{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);max-width:92vw;
@@ -646,6 +649,8 @@ body{
   <div class="corr-break" id="corrBreak"></div>
 </div>
 
+<div class="offline-badge">🔒 Fully offline · all data stays on your device · no accounts, no tracking</div>
+
 <div class="disclaimer-ribbon"><b>For entertainment &amp; EMF education</b> — Paranormal Pulse logs real sensor data and never claims a ghost is present. Not proof of the paranormal.</div>
 
 <div class="metrics">
@@ -709,7 +714,7 @@ body{
 <details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
   <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
 
-<footer>Paranormal Pulse v5.0 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v5.1 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
@@ -1427,12 +1432,20 @@ function drawSkeleton(){
   const vW=video.videoWidth, vH=video.videoHeight, cW=sk.width, cH=sk.height; if(!vW||!vH) return;
   const scale=Math.max(cW/vW,cH/vH), dx=(cW-vW*scale)/2, dy=(cH-vH*scale)/2;
   const kp=latestPoses[0].keypoints; const P=p=>({x:p.x*scale+dx,y:p.y*scale+dy,s:p.score});
-  c.strokeStyle="#10F0C0"; c.lineWidth=4; c.lineCap="round"; c.shadowBlur=12; c.shadowColor="#10F0C0";
-  SKEL_PAIRS.forEach(pr=>{ const A=P(kp[pr[0]]),B=P(kp[pr[1]]); if(A.s>0.3&&B.s>0.3){ c.beginPath(); c.moveTo(A.x,A.y); c.lineTo(B.x,B.y); c.stroke(); } });
-  c.shadowBlur=0; c.fillStyle="#eafff8";
-  kp.forEach(p=>{ if(p.score>0.3){ const q=P(p); c.beginPath(); c.arc(q.x,q.y,5,0,Math.PI*2); c.fill(); } });
-  c.fillStyle="rgba(16,240,192,.95)"; c.font="700 15px -apple-system,Segoe UI,Roboto,sans-serif"; c.textAlign="center";
-  c.fillText("● BODY DETECTED",cW/2,48); c.textAlign="left";
+  const drawBones=()=>SKEL_PAIRS.forEach(pr=>{ const A=P(kp[pr[0]]),B=P(kp[pr[1]]); if(A.s>0.3&&B.s>0.3){ c.beginPath(); c.moveTo(A.x,A.y); c.lineTo(B.x,B.y); c.stroke(); } });
+  // ethereal flicker: gentle breathing alpha + occasional dropouts
+  const flick=Math.min(1, 0.60 + 0.32*(0.5+0.5*Math.sin(Date.now()/130)) ) * (Math.random()>0.05?1:0.45);
+  c.save(); c.globalAlpha=flick; c.lineCap="round"; c.lineJoin="round"; c.shadowColor="#10F0C0";
+  // outer halo
+  c.strokeStyle="rgba(16,240,192,0.16)"; c.lineWidth=15; c.shadowBlur=28; drawBones();
+  // bright core
+  c.strokeStyle="rgba(180,255,240,0.95)"; c.lineWidth=3; c.shadowBlur=14; drawBones();
+  // glowing joints
+  c.fillStyle="rgba(234,255,248,0.95)"; c.shadowBlur=16;
+  kp.forEach(p=>{ if(p.score>0.3){ const q=P(p); c.beginPath(); c.arc(q.x,q.y,4.5,0,Math.PI*2); c.fill(); } });
+  c.restore();
+  c.shadowBlur=0; c.fillStyle="rgba(16,240,192,.95)"; c.font="700 15px -apple-system,Segoe UI,Roboto,sans-serif"; c.textAlign="center";
+  c.fillText("● BODY DETECTED — REAL HUMAN, NOT A GHOST",cW/2,48); c.textAlign="left";
 }
 { const b=el("lvSkelBtn"); if(b) b.addEventListener("click",()=>setSkel(!skelOn)); }
 
@@ -1737,8 +1750,8 @@ function renderEvidenceCard(e){
   x.textAlign="center";
   x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",W/2,H-130);
   x.fillStyle="#94A3B8"; x.font="400 24px -apple-system,Segoe UI,Roboto,sans-serif";
-  x.fillText("For entertainment — not proof of the paranormal.",W/2,H-86);
-  x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
+  x.font="400 21px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Real sensor data, shared for investigation & entertainment — not proof of the paranormal.",W/2,H-86);
+  x.fillStyle="#5EEAD4"; x.font="600 24px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
   x.textAlign="left";
   return c;
 }
@@ -1882,8 +1895,8 @@ function renderReportCard(){
   x.fillStyle="rgba(255,255,255,0.05)"; x.fillRect(0,H-210,W,210); x.textAlign="center";
   x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",W/2,H-130);
   x.fillStyle="#94A3B8"; x.font="400 24px -apple-system,Segoe UI,Roboto,sans-serif";
-  x.fillText("For entertainment — not proof of the paranormal.",W/2,H-86);
-  x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
+  x.font="400 21px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Real sensor data, shared for investigation & entertainment — not proof of the paranormal.",W/2,H-86);
+  x.fillStyle="#5EEAD4"; x.font="600 24px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
   x.textAlign="left"; return c;
 }
 async function shareReport(){
