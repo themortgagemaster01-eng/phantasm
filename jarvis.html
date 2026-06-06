@@ -103,18 +103,21 @@
     <p>This is a test build. JARVIS uses your browser's voice. Connect a backend later for the full Claude brain.</p>
     <label>JARVIS voice</label>
     <select id="voiceSel"></select>
-    <label>Backend URL (optional — for the real Claude brain)</label>
+    <label>Groq API key — free real brain (paste your gsk_… key)</label>
+    <input id="groqIn" type="password" placeholder="gsk_…">
+    <p style="margin-top:8px">Paste a free Groq key and JARVIS thinks for real. Leave blank to use the built-in local brain (speed, time, navigation, music, modes, banter).</p>
+    <label>Backend URL (optional — for a server-side Claude/ElevenLabs brain)</label>
     <input id="backendIn" type="text" placeholder="https://your-jarvis-backend.example.com">
-    <p style="margin-top:10px">Leave backend blank to use the built-in local brain (handles speed, time, navigation, music, mode switching, and banter).</p>
     <button class="save" id="settingsSave">Save</button>
   </div></div>
 
 <script>
 const $ = id => document.getElementById(id);
-const S = { mode:'driving', listening:false, speaking:false, speedMph:0, heading:'—', backend:'', voiceURI:'' };
+const S = { mode:'driving', listening:false, speaking:false, speedMph:0, heading:'—', backend:'', voiceURI:'', groqKey:'' };
+let history=[];
 
 // ---------- persistence ----------
-try{ S.backend = localStorage.getItem('jarvis_backend')||''; S.voiceURI = localStorage.getItem('jarvis_voice')||''; }catch(e){}
+try{ S.backend = localStorage.getItem('jarvis_backend')||''; S.voiceURI = localStorage.getItem('jarvis_voice')||''; S.groqKey = localStorage.getItem('jarvis_groq')||''; }catch(e){}
 
 // ---------- clock ----------
 function tickClock(){ const d=new Date(); $('clock').textContent = d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
@@ -245,11 +248,42 @@ async function handleInput(text){
       const d=await r.json(); reply=d.reply || "(empty reply from backend)";
       if(d.audioUrl){ addMsg(reply,'jarvis'); const a=new Audio(d.audioUrl); setState('speaking'); a.onended=()=>setState('idle'); await a.play().catch(()=>speak(reply)); return; }
     }catch(e){ reply = "I couldn't reach the backend — falling back to my local brain. "+localBrain(text); }
+  } else if(S.groqKey){
+    try{ reply = await groqBrain(text); }
+    catch(e){ reply = "I couldn't reach my brain just now (" + (e.message||'network') + "). Falling back: " + localBrain(text); }
   } else {
     await new Promise(r=>setTimeout(r, 280)); // small think delay
     reply = localBrain(text);
   }
   addMsg(reply, 'jarvis'); await speak(reply);
+}
+
+// Real brain via Groq (free, fast, OpenAI-compatible). Direct browser call — CORS confirmed.
+async function groqBrain(text){
+  const sys = ({
+    driving:"You are JARVIS — a calm, capable, slightly witty British AI co-pilot riding in the user's car. Reply in 1–2 short sentences. Prioritise safety and brevity. Occasionally address them as 'sir'.",
+    home:"You are JARVIS — a refined, warm British AI assistant. Give thorough, helpful answers.",
+    work:"You are JARVIS — a professional, concise British AI assistant focused on tasks, email and calendar.",
+    travel:"You are JARVIS — a British AI co-pilot. Give rich, useful context: weather, traffic, logistics."
+  })[S.mode] || "You are JARVIS, a witty British AI co-pilot.";
+  history.push({role:'user', content:text});
+  if(history.length>10) history = history.slice(-10);
+  const body = {
+    model: S.mode==='driving' ? 'llama-3.1-8b-instant' : 'llama-3.3-70b-versatile',
+    messages: [{role:'system', content:sys}, ...history],
+    max_tokens: S.mode==='driving' ? 120 : 500,
+    temperature: 0.7
+  };
+  const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+S.groqKey },
+    body: JSON.stringify(body)
+  });
+  if(!r.ok){ const t=await r.text().catch(()=> ''); throw new Error(r.status+' '+t.slice(0,80)); }
+  const d = await r.json();
+  const reply = (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content || '').trim() || "(no reply)";
+  history.push({role:'assistant', content:reply});
+  return reply;
 }
 
 function localBrain(raw){
@@ -297,12 +331,12 @@ $('textIn').addEventListener('keydown', e=>{ if(e.key==='Enter'){ unlockTTS(); c
 // ---------- settings ----------
 $('gearBtn').addEventListener('click', ()=>$('settings').classList.add('open'));
 $('settingsClose').addEventListener('click', ()=>$('settings').classList.remove('open'));
-$('backendIn').value = S.backend;
+$('backendIn').value = S.backend; $('groqIn').value = S.groqKey;
 $('settingsSave').addEventListener('click', ()=>{
-  S.backend = $('backendIn').value.trim(); S.voiceURI = $('voiceSel').value;
-  try{ localStorage.setItem('jarvis_backend', S.backend); localStorage.setItem('jarvis_voice', S.voiceURI); }catch(e){}
+  S.backend = $('backendIn').value.trim(); S.voiceURI = $('voiceSel').value; S.groqKey = $('groqIn').value.trim();
+  try{ localStorage.setItem('jarvis_backend', S.backend); localStorage.setItem('jarvis_voice', S.voiceURI); localStorage.setItem('jarvis_groq', S.groqKey); }catch(e){}
   $('settings').classList.remove('open');
-  addMsg(S.backend? "Backend connected. I'll route through the real brain now." : "Using my local brain. Tap me and let's talk.", 'jarvis');
+  addMsg(S.backend ? "Backend connected — routing through the server brain." : (S.groqKey ? "Real brain connected, sir. Ask me anything." : "Using my local brain. Tap me and let's talk."), 'jarvis');
 });
 
 // ---------- boot ----------
