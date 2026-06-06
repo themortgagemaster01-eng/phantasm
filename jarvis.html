@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#05060a">
+<title>JARVIS — Co-Pilot (Test Run)</title>
+<style>
+  :root{ --bg:#05060a; --ink:#eaf2ff; --muted:#7f8aa3; --cyan:#39d6ff; --blue:#3a7bff; --panel:rgba(255,255,255,.04); --line:rgba(255,255,255,.09); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{background:radial-gradient(1200px 800px at 50% -10%,#0c1430 0%,#05060a 60%); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif; min-height:100%;
+    display:flex; flex-direction:column; align-items:center; padding:18px 16px 28px; gap:12px}
+  .top{width:100%; max-width:520px; display:flex; align-items:center; justify-content:space-between}
+  .brand{font-weight:800; letter-spacing:.34em; font-size:15px}
+  .brand small{display:block; letter-spacing:.22em; font-size:8.5px; color:var(--muted); font-weight:600; margin-top:3px}
+  .gear{background:var(--panel); border:1px solid var(--line); color:var(--muted); width:34px;height:34px;border-radius:50%;
+    display:grid;place-items:center;cursor:pointer;font-size:15px}
+  .dash{width:100%;max-width:520px;display:flex;gap:10px}
+  .stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+  .stat .k{font-size:9px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  .stat .v{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:22px;font-weight:700;margin-top:3px}
+  .stat .v small{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.05em}
+  .pills{width:100%;max-width:520px;display:flex;gap:8px}
+  .pill{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:999px;
+    padding:9px 4px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-align:center;cursor:pointer;transition:.18s}
+  .pill.on{background:linear-gradient(120deg,var(--blue),var(--cyan));color:#04101f;border-color:transparent}
+  .orbwrap{position:relative;width:260px;height:260px;display:grid;place-items:center;margin:6px 0 2px}
+  #orb{width:260px;height:260px;cursor:pointer}
+  .orb-hint{position:absolute;bottom:-2px;left:0;right:0;text-align:center;font-size:11px;color:var(--muted);letter-spacing:.06em;pointer-events:none}
+  .state{font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);font-weight:700;min-height:16px}
+  .log{width:100%;max-width:520px;flex:1;min-height:120px;background:var(--panel);border:1px solid var(--line);
+    border-radius:16px;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:9px}
+  .row{display:flex;gap:9px;align-items:flex-start;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+  .who{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800}
+  .who.you{background:rgba(255,255,255,.08);color:var(--ink)}
+  .who.jarvis{background:linear-gradient(120deg,var(--blue),var(--cyan));color:#04101f}
+  .msg{font-size:14px;line-height:1.5} .msg .nm{font-size:9.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:1px}
+  .launch{width:100%;max-width:520px;display:flex;gap:8px}
+  .launch a{flex:1;text-decoration:none;text-align:center;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);border-radius:12px;padding:11px 4px;font-size:12px;font-weight:600}
+  .composer{width:100%;max-width:520px;display:flex;gap:8px}
+  .composer input{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:12px 14px;font-size:14px}
+  .composer button{flex:0 0 auto;background:linear-gradient(120deg,var(--blue),var(--cyan));color:#04101f;border:none;border-radius:12px;padding:0 16px;font-weight:800;cursor:pointer}
+  .note{max-width:520px;font-size:10.5px;color:var(--muted);text-align:center;line-height:1.5}
+  .modal{position:fixed;inset:0;background:rgba(2,4,10,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+  .modal.open{display:flex}
+  .sheet{background:#0b1020;border:1px solid var(--line);border-radius:18px;max-width:440px;width:100%;padding:20px}
+  .sheet h2{margin:0 0 6px;font-size:15px;letter-spacing:.04em}
+  .sheet p{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .sheet label{display:block;font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin:12px 0 5px}
+  .sheet input,.sheet select{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:13px}
+  .sheet .x{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+  .sheet .save{margin-top:16px;width:100%;background:linear-gradient(120deg,var(--blue),var(--cyan));color:#04101f;border:none;border-radius:12px;padding:13px;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="brand">J A R V I S<small>CO-PILOT · TEST RUN</small></div>
+    <button class="gear" id="gearBtn" aria-label="Settings">⚙</button>
+  </div>
+
+  <div class="dash">
+    <div class="stat"><div class="k">Speed</div><div class="v" id="speed">0<small> mph</small></div></div>
+    <div class="stat"><div class="k">Heading</div><div class="v" id="heading">—</div></div>
+    <div class="stat"><div class="k">Clock</div><div class="v" id="clock" style="font-size:18px">--:--</div></div>
+  </div>
+
+  <div class="pills" id="pills">
+    <div class="pill on" data-mode="driving">DRIVING</div>
+    <div class="pill" data-mode="home">HOME</div>
+    <div class="pill" data-mode="work">WORK</div>
+    <div class="pill" data-mode="travel">TRAVEL</div>
+  </div>
+
+  <div class="orbwrap">
+    <canvas id="orb" width="520" height="520"></canvas>
+    <div class="orb-hint" id="orbHint">tap to talk</div>
+  </div>
+  <div class="state" id="stateLabel">idle</div>
+
+  <div class="log" id="log"></div>
+
+  <div class="launch">
+    <a href="https://maps.apple.com/" id="navBtn">🧭 Navigate</a>
+    <a href="music://" id="musicBtn">🎵 Music</a>
+    <a href="tel:" id="phoneBtn">📞 Phone</a>
+  </div>
+
+  <div class="composer">
+    <input id="textIn" type="text" placeholder="…or type to JARVIS" autocomplete="off">
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <div class="note" id="note"></div>
+
+  <!-- Settings -->
+  <div class="modal" id="settings"><div class="sheet">
+    <button class="x" id="settingsClose">×</button>
+    <h2>Settings</h2>
+    <p>This is a test build. JARVIS uses your browser's voice. Connect a backend later for the full Claude brain.</p>
+    <label>JARVIS voice</label>
+    <select id="voiceSel"></select>
+    <label>Backend URL (optional — for the real Claude brain)</label>
+    <input id="backendIn" type="text" placeholder="https://your-jarvis-backend.example.com">
+    <p style="margin-top:10px">Leave backend blank to use the built-in local brain (handles speed, time, navigation, music, mode switching, and banter).</p>
+    <button class="save" id="settingsSave">Save</button>
+  </div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const S = { mode:'driving', listening:false, speaking:false, speedMph:0, heading:'—', backend:'', voiceURI:'' };
+
+// ---------- persistence ----------
+try{ S.backend = localStorage.getItem('jarvis_backend')||''; S.voiceURI = localStorage.getItem('jarvis_voice')||''; }catch(e){}
+
+// ---------- clock ----------
+function tickClock(){ const d=new Date(); $('clock').textContent = d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+setInterval(tickClock, 1000); tickClock();
+
+// ---------- GPS speed ----------
+function startGPS(){
+  if(!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(p=>{
+    const mps = p.coords.speed; // m/s or null
+    S.speedMph = (mps==null || isNaN(mps)) ? 0 : Math.max(0, Math.round(mps*2.23694));
+    $('speed').innerHTML = S.speedMph + '<small> mph</small>';
+    if(p.coords.heading!=null && !isNaN(p.coords.heading)){
+      const dirs=['N','NE','E','SE','S','SW','W','NW']; S.heading = dirs[Math.round(p.coords.heading/45)%8];
+      $('heading').textContent = S.heading;
+    }
+  }, ()=>{}, {enableHighAccuracy:true, maximumAge:1000, timeout:10000});
+}
+
+// ---------- orb ----------
+const orb = $('orb'), octx = orb.getContext('2d'); let t0 = performance.now();
+function drawOrb(now){
+  const t=(now-t0)/1000; const W=orb.width, H=orb.height, cx=W/2, cy=H/2;
+  octx.clearRect(0,0,W,H);
+  let pulse = 0.5+0.5*Math.sin(t*1.6);
+  let baseR = 150;
+  if(S.listening) baseR = 150 + 18*Math.abs(Math.sin(t*7));
+  if(S.speaking) baseR = 150 + 26*pulse;
+  const col1 = S.listening ? '#39d6ff' : (S.speaking ? '#7aa2ff' : '#2b5bd0');
+  const col2 = S.listening ? '#0a6cff' : (S.speaking ? '#39d6ff' : '#0b1740');
+  // glow
+  let g = octx.createRadialGradient(cx,cy,20,cx,cy,baseR+90);
+  g.addColorStop(0,col1+'cc'); g.addColorStop(0.5,col2+'66'); g.addColorStop(1,'#05060a00');
+  octx.fillStyle=g; octx.beginPath(); octx.arc(cx,cy,baseR+90,0,7); octx.fill();
+  // core
+  let cg = octx.createRadialGradient(cx-40,cy-40,10,cx,cy,baseR);
+  cg.addColorStop(0,'#dff3ff'); cg.addColorStop(0.35,col1); cg.addColorStop(1,col2);
+  octx.fillStyle=cg; octx.beginPath(); octx.arc(cx,cy,baseR,0,7); octx.fill();
+  // rings
+  for(let i=0;i<3;i++){
+    octx.strokeStyle='rgba(255,255,255,'+(0.10-i*0.03)+')'; octx.lineWidth=2;
+    octx.beginPath(); octx.arc(cx,cy,baseR+18+i*16+6*Math.sin(t*1.3+i),0,7); octx.stroke();
+  }
+  requestAnimationFrame(drawOrb);
+}
+requestAnimationFrame(drawOrb);
+
+function setState(s){
+  S.listening = (s==='listening'); S.speaking = (s==='speaking');
+  $('stateLabel').textContent = s;
+  $('orbHint').textContent = s==='idle' ? 'tap to talk' : (s==='listening'?'listening…':(s==='thinking'?'thinking…':'speaking…'));
+}
+
+// ---------- log ----------
+function addMsg(text, who){ // who: 'you' | 'jarvis'
+  const row=document.createElement('div'); row.className='row';
+  row.innerHTML = `<div class="who ${who}">${who==='you'?'YOU':'J'}</div>
+    <div class="msg"><span class="nm">${who==='you'?'You':'JARVIS'}</span>${text}</div>`;
+  $('log').appendChild(row); $('log').scrollTop = $('log').scrollHeight;
+}
+
+// ---------- TTS (British JARVIS voice) ----------
+let voices=[];
+function loadVoices(){
+  voices = speechSynthesis.getVoices();
+  const sel=$('voiceSel'); sel.innerHTML='';
+  // prefer British male
+  const pref = voices.find(v=>/Daniel/i.test(v.name)) ||
+               voices.find(v=>/UK English Male|British.*Male|en-GB/i.test(v.name+v.lang) && /male/i.test(v.name)) ||
+               voices.find(v=>/en-GB/i.test(v.lang)) || voices[0];
+  voices.forEach(v=>{ const o=document.createElement('option'); o.value=v.voiceURI; o.textContent=`${v.name} (${v.lang})`; sel.appendChild(o); });
+  if(S.voiceURI && voices.some(v=>v.voiceURI===S.voiceURI)){ sel.value=S.voiceURI; }
+  else if(pref){ sel.value=pref.voiceURI; S.voiceURI=pref.voiceURI; }
+}
+speechSynthesis.onvoiceschanged = loadVoices; loadVoices();
+
+function speak(text){
+  return new Promise(res=>{
+    try{ speechSynthesis.cancel(); }catch(e){}
+    const u=new SpeechSynthesisUtterance(text);
+    const v=voices.find(x=>x.voiceURI===S.voiceURI); if(v) u.voice=v;
+    u.rate=1.02; u.pitch=0.92;
+    setState('speaking');
+    u.onend=()=>{ setState('idle'); res(); };
+    u.onerror=()=>{ setState('idle'); res(); };
+    speechSynthesis.speak(u);
+  });
+}
+
+// ---------- speech recognition (push to talk) ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, recSupported=!!SR;
+if(recSupported){
+  rec=new SR(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
+  rec.onresult=e=>{ const txt=e.results[0][0].transcript; handleInput(txt); };
+  rec.onerror=e=>{ setState('idle'); if(e.error==='not-allowed') addMsg("I need microphone permission — enable it and tap me again.", 'jarvis'); };
+  rec.onend=()=>{ if(S.listening) setState('idle'); };
+}
+function toggleListen(){
+  if(S.speaking){ try{speechSynthesis.cancel();}catch(e){} setState('idle'); return; }
+  if(!recSupported){ addMsg("Voice input isn't supported in this browser — use Chrome on a laptop/Android, or type to me below. (This is exactly why the real app goes native on iPhone.)", 'jarvis'); return; }
+  if(S.listening){ try{rec.stop();}catch(e){} setState('idle'); return; }
+  try{ rec.start(); setState('listening'); }catch(e){ setState('idle'); }
+}
+orb.addEventListener('click', toggleListen);
+
+// ---------- brain ----------
+async function handleInput(text){
+  if(!text || !text.trim()) return;
+  addMsg(text, 'you'); setState('thinking');
+  let reply;
+  if(S.backend){
+    try{
+      const r=await fetch(S.backend.replace(/\/$/,'')+'/api/chat', {method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({text, mode:S.mode, memory:{}})});
+      const d=await r.json(); reply=d.reply || "(empty reply from backend)";
+      if(d.audioUrl){ addMsg(reply,'jarvis'); const a=new Audio(d.audioUrl); setState('speaking'); a.onended=()=>setState('idle'); await a.play().catch(()=>speak(reply)); return; }
+    }catch(e){ reply = "I couldn't reach the backend — falling back to my local brain. "+localBrain(text); }
+  } else {
+    await new Promise(r=>setTimeout(r, 280)); // small think delay
+    reply = localBrain(text);
+  }
+  addMsg(reply, 'jarvis'); await speak(reply);
+}
+
+function localBrain(raw){
+  const t = raw.toLowerCase().trim();
+  const driving = S.mode==='driving';
+  const brief = s => driving ? s.split('. ').slice(0,2).join('. ') : s;
+  // mode switching
+  let m = t.match(/\b(driving|home|work|travel)\b mode|switch to (driving|home|work|travel)|(driving|home|work|travel) mode/);
+  if(m){ const md=(m[1]||m[2]||m[3]); setMode(md); return `Switched to ${md} mode, sir.`; }
+  if(/\b(hello|hey|hi|jarvis|you there|wake up)\b/.test(t)) return brief("At your service. Where are we headed?");
+  if(/how are you|how's it going|status/.test(t)) return brief("All systems nominal and rather enjoying the drive. How can I help?");
+  if(/your name|who are you/.test(t)) return "I'm JARVIS — your co-pilot. Think of me as the calm voice that handles the small stuff so you can keep your eyes on the road.";
+  if(/time|what time/.test(t)) return `It's ${new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}.`;
+  if(/date|what day|today/.test(t)) return `Today is ${new Date().toLocaleDateString([], {weekday:'long',month:'long',day:'numeric'})}.`;
+  if(/speed|how fast|mph/.test(t)) return S.speedMph>0 ? `We're doing about ${S.speedMph} miles an hour.` : "We're stationary — or the GPS hasn't caught our motion yet. Give it a few seconds once we're moving.";
+  if(/navigate|directions|take me|drive to|go to/.test(t)){
+    const dest=(raw.match(/(?:to|toward[s]?)\s+(.+)/i)||[])[1];
+    if(dest){ const q=encodeURIComponent(dest.replace(/[.?!]+$/,'')); setTimeout(()=>{ location.href='https://maps.apple.com/?daddr='+q; },900);
+      return brief(`Pulling up directions to ${dest.replace(/[.?!]+$/,'')}. Opening Maps now.`); }
+    return "Where to? Say, for example, 'navigate to the office.'";
+  }
+  if(/home/.test(t) && /take|drive|navigate|go/.test(t)){ return "Set your home address in the real app and I'll route us there in one word. For now, tap Navigate."; }
+  if(/play|music|siriusxm|sirius|tunes|song/.test(t)){ setTimeout(()=>{ $('musicBtn').click(); },700); return brief("Queuing up the music."); }
+  if(/call|phone|dial/.test(t)) return "Once we connect contacts in the full build, I'll dial for you. For now, tap Phone.";
+  if(/weather|rain|temperature|forecast/.test(t)) return brief("Live weather needs my full brain online — once the backend's wired up I'll pull the forecast and traffic for you.");
+  if(/email|unread|messages|inbox/.test(t)) return brief("Reading your email comes online with the backend + Gmail connection. Soon I'll summarize your unread on the drive in.");
+  if(/joke|funny|make me laugh/.test(t)) return brief("I'd tell you a UDP joke, but you might not get it.");
+  if(/thank|cheers|appreciate/.test(t)) return brief("Always a pleasure.");
+  if(/what can you do|help|commands/.test(t)) return "Right now I can give your speed, the time and date, open navigation if you say 'navigate to' somewhere, start music, and switch modes. Connect the backend and I'll actually think — full conversation, email, briefings, the lot.";
+  // fallback, in character + honest
+  return brief("My full reasoning brain isn't connected yet, so I can't properly answer that one. Wire up the Claude backend and I'll handle anything. For now try: your speed, the time, 'navigate to…', or 'play music.'");
+}
+
+// ---------- modes ----------
+function setMode(md){
+  S.mode=md;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.toggle('on', p.dataset.mode===md));
+}
+document.querySelectorAll('.pill').forEach(p=>p.addEventListener('click', ()=>setMode(p.dataset.mode)));
+
+// ---------- composer ----------
+$('sendBtn').addEventListener('click', ()=>{ const v=$('textIn').value; $('textIn').value=''; if(v) handleInput(v); });
+$('textIn').addEventListener('keydown', e=>{ if(e.key==='Enter'){ const v=$('textIn').value; $('textIn').value=''; if(v) handleInput(v); } });
+
+// ---------- settings ----------
+$('gearBtn').addEventListener('click', ()=>$('settings').classList.add('open'));
+$('settingsClose').addEventListener('click', ()=>$('settings').classList.remove('open'));
+$('backendIn').value = S.backend;
+$('settingsSave').addEventListener('click', ()=>{
+  S.backend = $('backendIn').value.trim(); S.voiceURI = $('voiceSel').value;
+  try{ localStorage.setItem('jarvis_backend', S.backend); localStorage.setItem('jarvis_voice', S.voiceURI); }catch(e){}
+  $('settings').classList.remove('open');
+  addMsg(S.backend? "Backend connected. I'll route through the real brain now." : "Using my local brain. Tap me and let's talk.", 'jarvis');
+});
+
+// ---------- boot ----------
+startGPS();
+$('note').textContent = recSupported
+  ? "Test build · browser voice. Tap the orb and speak, or type below. Connect the backend later for the full Claude brain."
+  : "Voice input isn't available in this browser — type to JARVIS below, or open this on Chrome (laptop/Android) to talk. iPhone Safari blocks web speech — the real app fixes that natively.";
+setTimeout(()=>{ addMsg("JARVIS online. Tap me and say hello — try 'what's my speed', 'navigate to downtown', or 'play music.'", 'jarvis'); }, 500);
+</script>
+</body>
+</html>
