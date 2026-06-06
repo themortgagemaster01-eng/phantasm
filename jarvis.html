@@ -178,18 +178,27 @@ function addMsg(text, who){ // who: 'you' | 'jarvis'
 
 // ---------- TTS (British JARVIS voice) ----------
 let voices=[];
+function pickBritishMale(){
+  // priority list of British male voices across iOS / Android / desktop
+  const names=['Daniel','Arthur','Oliver','Google UK English Male','UK English Male'];
+  for(const n of names){
+    const exact=voices.find(v=>v.name===n); if(exact) return exact;
+    const re=voices.find(v=>new RegExp(n,'i').test(v.name)); if(re) return re;
+  }
+  return voices.find(v=>/en-GB/i.test(v.lang)) || voices.find(v=>/en[-_]/i.test(v.lang)) || voices[0];
+}
 function loadVoices(){
   voices = speechSynthesis.getVoices();
+  if(!voices.length) return;
   const sel=$('voiceSel'); sel.innerHTML='';
-  // prefer British male
-  const pref = voices.find(v=>/Daniel/i.test(v.name)) ||
-               voices.find(v=>/UK English Male|British.*Male|en-GB/i.test(v.name+v.lang) && /male/i.test(v.name)) ||
-               voices.find(v=>/en-GB/i.test(v.lang)) || voices[0];
   voices.forEach(v=>{ const o=document.createElement('option'); o.value=v.voiceURI; o.textContent=`${v.name} (${v.lang})`; sel.appendChild(o); });
   if(S.voiceURI && voices.some(v=>v.voiceURI===S.voiceURI)){ sel.value=S.voiceURI; }
-  else if(pref){ sel.value=pref.voiceURI; S.voiceURI=pref.voiceURI; }
+  else { const pref=pickBritishMale(); if(pref){ sel.value=pref.voiceURI; S.voiceURI=pref.voiceURI; } }
 }
-speechSynthesis.onvoiceschanged = loadVoices; loadVoices();
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+// iOS often returns no voices on the first call — re-try after the list loads
+setTimeout(loadVoices, 300); setTimeout(loadVoices, 1200);
 
 // iOS needs speech "unlocked" by a user gesture before it'll play after an await/timeout
 let ttsUnlocked=false;
@@ -198,8 +207,8 @@ function speak(text){
   return new Promise(res=>{
     try{ speechSynthesis.cancel(); }catch(e){}
     const u=new SpeechSynthesisUtterance(text);
-    const v=voices.find(x=>x.voiceURI===S.voiceURI); if(v) u.voice=v;
-    u.rate=1.02; u.pitch=0.92;
+    let v=voices.find(x=>x.voiceURI===S.voiceURI) || pickBritishMale(); if(v) u.voice=v;
+    u.rate=0.98; u.pitch=0.8;   // measured + deeper = closer to JARVIS
     setState('speaking');
     u.onend=()=>{ setState('idle'); res(); };
     u.onerror=()=>{ setState('idle'); res(); };
