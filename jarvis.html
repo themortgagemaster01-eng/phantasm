@@ -191,6 +191,9 @@ function loadVoices(){
 }
 speechSynthesis.onvoiceschanged = loadVoices; loadVoices();
 
+// iOS needs speech "unlocked" by a user gesture before it'll play after an await/timeout
+let ttsUnlocked=false;
+function unlockTTS(){ if(ttsUnlocked) return; ttsUnlocked=true; try{ const u=new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); }catch(e){} }
 function speak(text){
   return new Promise(res=>{
     try{ speechSynthesis.cancel(); }catch(e){}
@@ -219,7 +222,7 @@ function toggleListen(){
   if(S.listening){ try{rec.stop();}catch(e){} setState('idle'); return; }
   try{ rec.start(); setState('listening'); }catch(e){ setState('idle'); }
 }
-orb.addEventListener('click', toggleListen);
+orb.addEventListener('click', ()=>{ unlockTTS(); toggleListen(); });
 
 // ---------- brain ----------
 async function handleInput(text){
@@ -279,8 +282,8 @@ function setMode(md){
 document.querySelectorAll('.pill').forEach(p=>p.addEventListener('click', ()=>setMode(p.dataset.mode)));
 
 // ---------- composer ----------
-$('sendBtn').addEventListener('click', ()=>{ const v=$('textIn').value; $('textIn').value=''; if(v) handleInput(v); });
-$('textIn').addEventListener('keydown', e=>{ if(e.key==='Enter'){ const v=$('textIn').value; $('textIn').value=''; if(v) handleInput(v); } });
+$('sendBtn').addEventListener('click', ()=>{ unlockTTS(); const v=$('textIn').value; $('textIn').value=''; if(v) handleInput(v); });
+$('textIn').addEventListener('keydown', e=>{ if(e.key==='Enter'){ unlockTTS(); const v=$('textIn').value; $('textIn').value=''; if(v) handleInput(v); } });
 
 // ---------- settings ----------
 $('gearBtn').addEventListener('click', ()=>$('settings').classList.add('open'));
