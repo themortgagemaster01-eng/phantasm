@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dicyanin Vision</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<style>
+  :root {
+    --indigo: #4b2fb3;
+    --violet: #8a5cff;
+    --glow: #b39dff;
+    --ink: #07060f;
+    --line: rgba(138,92,255,0.45);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--ink); overflow: hidden;
+    font-family: "Courier New", ui-monospace, monospace; color: var(--glow); }
+  #stage { position: fixed; inset: 0; }
+  video { display: none; }
+  canvas { width: 100vw; height: 100vh; object-fit: cover; display: block; background: #000; }
+
+  /* idle / start screen */
+  #idle { position: fixed; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px; text-align: center;
+    background: radial-gradient(circle at 50% 40%, #15103a 0%, var(--ink) 70%); padding: 24px; }
+  #idle h1 { margin: 0; font-size: clamp(28px, 9vw, 56px); letter-spacing: 0.18em;
+    font-weight: 700; color: var(--violet); text-shadow: 0 0 24px var(--indigo); }
+  #idle p { margin: 0; max-width: 30ch; line-height: 1.6; font-size: 13px;
+    letter-spacing: 0.12em; color: rgba(179,157,255,0.7); text-transform: uppercase; }
+  .hidden { display: none !important; }
+
+  /* readout strip */
+  #hud { position: fixed; top: 0; left: 0; right: 0; padding: 10px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(179,157,255,0.85); pointer-events: none;
+    background: linear-gradient(180deg, rgba(7,6,15,0.7), transparent); }
+  #hud .dot { color: #ff5a7a; }
+  #hud .dot.live { color: #6dffb0; }
+
+  /* controls */
+  .controls { position: fixed; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(0deg, rgba(7,6,15,0.92), rgba(7,6,15,0.55));
+    border-top: 1px solid var(--line); padding: 14px 12px calc(14px + env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
+  button { flex: 1 1 auto; min-width: 92px; background: rgba(75,47,179,0.18);
+    color: var(--glow); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 10px; font: inherit; font-size: 13px; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer; transition: background 0.12s, transform 0.06s; }
+  button:active { transform: scale(0.97); }
+  button.on { background: var(--violet); color: #0a0820; border-color: var(--violet);
+    box-shadow: 0 0 16px rgba(138,92,255,0.5); }
+  button[disabled] { opacity: 0.35; pointer-events: none; }
+  .sliders { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .sliders label { flex: 1 1 130px; display: flex; flex-direction: column; gap: 5px;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(179,157,255,0.75); }
+  input[type=range] { width: 100%; accent-color: var(--violet); }
+  #flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none;
+    transition: opacity 0.4s; }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+</div>
+
+<div id="hud" class="hidden">
+  <span><span id="recDot" class="dot">●</span> <span id="status">STANDBY</span></span>
+  <span id="fps">-- FPS</span>
+</div>
+
+<div id="idle">
+  <h1>DICYANIN<br>VISION</h1>
+  <p>Violet-spectrum camera filter. Point at low-contrast space and watch the edges.</p>
+  <button id="bootBtn" style="flex:0 0 auto; min-width:180px;">Start Camera</button>
+</div>
+
+<div class="controls hidden" id="controls">
+  <div class="sliders">
+    <label>Violet Boost <input type="range" id="blueBoost" min="1" max="4" step="0.05" value="2.2"></label>
+    <label>Contrast <input type="range" id="contrast" min="0.5" max="2.5" step="0.05" value="1.5"></label>
+    <label>Glow <input type="range" id="glow" min="0" max="1" step="0.02" value="0.45"></label>
+    <label>Low-Light Lift <input type="range" id="lift" min="0" max="1" step="0.02" value="0.3"></label>
+  </div>
+  <div class="row">
+    <button id="filterBtn" class="on">Filter On</button>
+    <button id="flipBtn">Flip Cam</button>
+    <button id="snapBtn">Snapshot</button>
+    <button id="stopBtn">Stop</button>
+  </div>
+</div>
+
+<div id="flash"></div>
+
+<script>
+const video   = document.getElementById('video');
+const canvas  = document.getElementById('canvas');
+const idle    = document.getElementById('idle');
+const hud     = document.getElementById('hud');
+const controls= document.getElementById('controls');
+const statusEl= document.getElementById('status');
+const recDot  = document.getElementById('recDot');
+const fpsEl   = document.getElementById('fps');
+const flash   = document.getElementById('flash');
+
+let stream = null, gl = null, prog = null, tex = null, rafId = null;
+let filterOn = true, facing = 'environment';
+let lastDraw = 0, fpsSamples = [], lastFpsShow = 0;
+const FPS_CAP = 30;
+
+// ---- WebGL setup (GPU does the per-pixel work) ----
+const VERT = `
+  attribute vec2 p; varying vec2 uv;
+  void main(){ uv = vec2(p.x*0.5+0.5, 1.0-(p.y*0.5+0.5)); gl_Position = vec4(p,0.0,1.0); }`;
+
+const FRAG = `
+  precision mediump float;
+  varying vec2 uv;
+  uniform sampler2D img;
+  uniform vec2 texel;
+  uniform float boost, contrast, glowAmt, lift, enabled;
+  void main(){
+    vec3 c = texture2D(img, uv).rgb;
+    if(enabled < 0.5){ gl_FragColor = vec4(c,1.0); return; }
+
+    // low-light lift (gamma-ish brighten of darks)
+    c = mix(c, pow(c, vec3(0.6)), lift);
+
+    // contrast around mid
+    c = (c - 0.5) * contrast + 0.5;
+
+    // dicyanin channel map: suppress green, hold some red, push blue -> violet/indigo
+    float r = c.r * 0.55;
+    float g = c.g * 0.18;
+    float b = clamp(c.b * boost, 0.0, 1.0);
+    vec3 col = vec3(r + b*0.35, g, b);          // red bleeds into blue = violet, not pure blue
+
+    // edge detection (Sobel-lite) -> glow on boundaries
+    float l  = dot(texture2D(img, uv).rgb, vec3(0.299,0.587,0.114));
+    float lx = dot(texture2D(img, uv+vec2(texel.x,0.0)).rgb, vec3(0.299,0.587,0.114));
+    float ly = dot(texture2D(img, uv+vec2(0.0,texel.y)).rgb, vec3(0.299,0.587,0.114));
+    float edge = clamp(abs(l-lx)+abs(l-ly), 0.0, 1.0);
+    col += vec3(0.55,0.4,1.0) * edge * glowAmt * 2.0;   // indigo bloom on edges
+
+    gl_FragColor = vec4(clamp(col,0.0,1.0), 1.0);
+  }`;
+
+function compile(type, src){
+  const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+
+function initGL(){
+  gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
+  if(!gl){ alert('WebGL not supported on this device.'); return false; }
+  prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(prog); gl.useProgram(prog);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'p');
+  gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  return true;
+}
+
+const val = id => parseFloat(document.getElementById(id).value);
+
+function draw(t){
+  rafId = requestAnimationFrame(draw);
+  if(!stream || video.readyState < 2) return;
+
+  // FPS cap
+  if(t - lastDraw < 1000/FPS_CAP) return;
+  const dt = t - lastDraw; lastDraw = t;
+
+  if(canvas.width !== video.videoWidth){
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    gl.viewport(0,0,canvas.width,canvas.height);
+  }
+
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+  gl.uniform2f(gl.getUniformLocation(prog,'texel'), 1/canvas.width, 1/canvas.height);
+  gl.uniform1f(gl.getUniformLocation(prog,'boost'), val('blueBoost'));
+  gl.uniform1f(gl.getUniformLocation(prog,'contrast'), val('contrast'));
+  gl.uniform1f(gl.getUniformLocation(prog,'glowAmt'), val('glow'));
+  gl.uniform1f(gl.getUniformLocation(prog,'lift'), val('lift'));
+  gl.uniform1f(gl.getUniformLocation(prog,'enabled'), filterOn ? 1 : 0);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  // fps readout (smoothed, updated ~3x/sec)
+  fpsSamples.push(1000/dt); if(fpsSamples.length > 20) fpsSamples.shift();
+  if(t - lastFpsShow > 350){
+    const avg = fpsSamples.reduce((a,b)=>a+b,0)/fpsSamples.length;
+    fpsEl.textContent = Math.round(avg) + ' FPS'; lastFpsShow = t;
+  }
+}
+
+async function startCamera(){
+  if(stream) return;
+  if(!gl && !initGL()) return;
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: facing, width:{ideal:1280}, height:{ideal:720} }
+    });
+    video.srcObject = stream;
+    await video.play();
+    idle.classList.add('hidden');
+    hud.classList.remove('hidden');
+    controls.classList.remove('hidden');
+    statusEl.textContent = 'LIVE'; recDot.classList.add('live');
+    if(!rafId) draw(0);
+  }catch(e){
+    alert('Camera unavailable: ' + e.message);
+  }
+}
+
+function stopCamera(){
+  if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
+  video.srcObject = null;
+  if(gl) gl.clear(gl.COLOR_BUFFER_BIT);
+  statusEl.textContent = 'STANDBY'; recDot.classList.remove('live');
+  fpsEl.textContent = '-- FPS';
+  idle.classList.remove('hidden');
+  hud.classList.add('hidden');
+  controls.classList.add('hidden');
+}
+
+async function flipCamera(){
+  facing = facing === 'environment' ? 'user' : 'environment';
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
+  if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+  await startCamera();
+}
+
+function toggleFilter(){
+  filterOn = !filterOn;
+  const b = document.getElementById('filterBtn');
+  b.classList.toggle('on', filterOn);
+  b.textContent = filterOn ? 'Filter On' : 'Filter Off';
+}
+
+async function snapshot(){
+  if(!stream) return;
+  // composite frame + metadata stamp onto a 2D canvas
+  const out = document.createElement('canvas');
+  out.width = canvas.width; out.height = canvas.height;
+  const c = out.getContext('2d');
+  c.drawImage(canvas, 0, 0);
+
+  let coords = 'GPS: n/a';
+  try{
+    const pos = await new Promise((res,rej)=>navigator.geolocation
+      .getCurrentPosition(res, rej, { timeout: 2500 }));
+    coords = `GPS ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+  }catch(_){}
+
+  const stamp = [ new Date().toLocaleString(), coords,
+    `Violet ${val('blueBoost').toFixed(2)}  Contrast ${val('contrast').toFixed(2)}` ];
+  c.font = `${Math.round(out.height*0.022)}px "Courier New", monospace`;
+  c.textBaseline = 'bottom';
+  const pad = out.height*0.02, lh = out.height*0.03;
+  stamp.forEach((line,i)=>{
+    const y = out.height - pad - (stamp.length-1-i)*lh;
+    c.fillStyle = 'rgba(0,0,0,0.6)'; c.fillText(line, pad+1, y+1);
+    c.fillStyle = '#b39dff'; c.fillText(line, pad, y);
+  });
+
+  const link = document.createElement('a');
+  link.download = `dicyanin-${Date.now()}.png`;
+  link.href = out.toDataURL('image/png'); link.click();
+
+  flash.style.opacity = '0.85';
+  setTimeout(()=>flash.style.opacity = '0', 60);
+}
+
+document.getElementById('bootBtn').onclick   = startCamera;
+document.getElementById('filterBtn').onclick = toggleFilter;
+document.getElementById('flipBtn').onclick   = flipCamera;
+document.getElementById('snapBtn').onclick   = snapshot;
+document.getElementById('stopBtn').onclick   = stopCamera;
+window.addEventListener('beforeunload', stopCamera);
+</script>
+</body>
+</html>
