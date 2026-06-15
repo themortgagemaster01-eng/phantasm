@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Paranormal Pulse" />
 <link rel="manifest" href="manifest.json" />
+<script>/* TEMP iOS diagnostic: surface JS errors on screen */(function(){function show(m){try{var d=document.getElementById("__err");if(!d){d=document.createElement("div");d.id="__err";d.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:2147483647;background:#c0152f;color:#fff;font:12px/1.4 monospace;padding:8px;max-height:45vh;overflow:auto;white-space:pre-wrap";(document.body||document.documentElement).appendChild(d);}d.textContent="JS ERROR: "+m;}catch(_){}}window.addEventListener("error",function(e){show((e.message||(e.error&&e.error.message)||"error")+"  @ "+(e.filename||"").split("/").pop()+":"+(e.lineno||"")+":"+(e.colno||""));});window.addEventListener("unhandledrejection",function(e){show("promise: "+((e.reason&&(e.reason.message||e.reason))||"rejection"));});})();</script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
 <title>Paranormal Pulse — Paranormal Investigation Platform</title>
 <style>
