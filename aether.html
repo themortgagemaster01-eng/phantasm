@@ -29,9 +29,9 @@ body{
   letter-spacing:.01em;
 }
 #app{position:absolute;inset:0;display:flex;flex-direction:column}
-.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:max(54px,env(safe-area-inset-top)) 20px calc(108px + env(safe-area-inset-bottom))}
-.screen{display:none;animation:fade .45s ease}
-.screen.active{display:block}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:max(54px,env(safe-area-inset-top)) 20px calc(108px + env(safe-area-inset-bottom))}
+.screen{display:none;animation:fade .45s ease;flex:1;min-height:0}
+.screen.active{display:flex;flex-direction:column}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* brand */
@@ -752,7 +752,4 @@ window.addEventListener("load",()=>{
   if(localStorage.getItem("aether.ack")){ document.getElementById("gate").style.display="none"; boot(); }
 });
 // safety: if load already fired
-if(document.readyState==="complete"){ if(localStorage.getItem("aether.ack")){ document.getElementById("gate").style.display="none"; boot(); } }
-</script>
-</body>
-</html>
+if(document.readyState==="complete"){ if(localStorage.getItem("aether.ack")){ document.getElementById("gate").style.
