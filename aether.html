@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>ÆTHER — Precision Sound for Deep Restoration</title>
+<meta name="theme-color" content="#000000"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ÆTHER"/>
+<meta name="description" content="A guided sound wellness app for sleep, calm, and focus. For personal wellness only — not medical advice."/>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+:root{
+  --bg:#000000; --bg2:#06070b; --panel:#0c0e15; --panel2:#11141d;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.12);
+  --txt:#eef2f7; --mut:#8b93a7; --mut2:#5b6275;
+  --cy:#00D4FF; --cy-dim:rgba(0,212,255,.14); --cy-glow:rgba(0,212,255,.45);
+  --vio:#7c6cff; --warm:#ffb27a; --green:#42e29b;
+  --r:22px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 80% at 50% -10%, #0a0d16 0%, #000 60%) fixed, #000;
+  color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased; overflow:hidden; position:fixed; inset:0;
+  letter-spacing:.01em;
+}
+#app{position:absolute;inset:0;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:max(54px,env(safe-area-inset-top)) 20px calc(108px + env(safe-area-inset-bottom))}
+.screen{display:none;animation:fade .45s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* brand */
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,#0c0f18,#05060a);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.brand .mark::after{content:"";position:absolute;width:14px;height:14px;border-radius:50%;background:var(--cy);filter:blur(6px);opacity:.7;animation:pulseGlow 3.4s ease-in-out infinite}
+.brand .mark i{position:relative;color:var(--cy);font-size:14px;text-shadow:0 0 10px var(--cy-glow)}
+@keyframes pulseGlow{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:.85;transform:scale(1.1)}}
+.brand .wm{font-size:15px;font-weight:700;letter-spacing:.32em}
+.tag{color:var(--mut2);font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;margin:2px 0 22px;font-weight:600}
+
+h1.q{font-size:30px;font-weight:700;line-height:1.15;letter-spacing:-.02em;margin-bottom:6px}
+.sub{color:var(--mut);font-size:14px;margin-bottom:20px;line-height:1.5}
+.eyebrow{color:var(--cy);font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+/* featured card */
+.featured{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line2);padding:22px;margin-bottom:26px;
+  background:linear-gradient(135deg,#0e1422 0%,#0a0d16 55%,#0c1018 100%)}
+.featured::before{content:"";position:absolute;inset:0;background:radial-gradient(80% 120% at 100% 0%, rgba(0,212,255,.18), transparent 60%);pointer-events:none}
+.featured .shine{position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.07),transparent);animation:shine 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes shine{0%{left:-60%}55%,100%{left:130%}}
+.featured .lab{color:var(--cy);font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px}
+.featured h2{font-size:23px;font-weight:700;margin-bottom:6px;position:relative}
+.featured p{color:var(--mut);font-size:13px;position:relative;margin-bottom:16px}
+.featured .go{position:relative;display:inline-flex;align-items:center;gap:9px;background:var(--cy);color:#001016;font-weight:700;font-size:14px;padding:12px 20px;border-radius:14px;border:none;box-shadow:0 8px 26px -8px var(--cy-glow)}
+
+/* mood grid */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:8px}
+.mood{position:relative;border-radius:18px;border:1px solid var(--line);background:var(--panel);padding:18px 16px 16px;text-align:left;color:var(--txt);overflow:hidden;transition:transform .15s ease,border-color .2s}
+.mood:active{transform:scale(.97)}
+.mood .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:30px;background:var(--cy-dim);color:var(--cy)}
+.mood .nm{font-weight:700;font-size:15.5px;margin-bottom:3px}
+.mood .ds{color:var(--mut);font-size:11.5px;line-height:1.35}
+.mood .glow{position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;filter:blur(34px);opacity:.5}
+
+/* list rows */
+.row{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:11px;color:var(--txt);width:100%;text-align:left;transition:transform .15s}
+.row:active{transform:scale(.985)}
+.row .ic{width:42px;height:42px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--cy-dim);color:var(--cy)}
+.row .meta{flex:1;min-width:0}
+.row .meta .t{font-weight:700;font-size:15px}
+.row .meta .s{color:var(--mut);font-size:12px;margin-top:2px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row .chev{color:var(--mut2);font-size:13px}
+.section-h{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--mut2);margin:26px 2px 14px}
+
+/* generic card / pills / buttons */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:15px;padding:14px 18px;border-radius:15px;border:1px solid var(--line2);background:var(--panel2);color:var(--txt);width:100%}
+.btn.primary{background:var(--cy);color:#001016;border:none;box-shadow:0 10px 30px -10px var(--cy-glow)}
+.btn.ghost{background:transparent}
+.muted{color:var(--mut);font-size:13px;line-height:1.55}
+.tiny{color:var(--mut2);font-size:11.5px;line-height:1.5}
+
+/* guide input */
+.guide{display:flex;gap:10px;margin-bottom:8px}
+.guide input{flex:1;background:var(--panel);border:1px solid var(--line2);border-radius:14px;color:var(--txt);padding:13px 15px;font-size:14px;outline:none}
+.guide input::placeholder{color:var(--mut2)}
+.guide button{flex:none;background:var(--cy);color:#001016;border:none;border-radius:14px;width:50px;font-size:16px}
+
+/* ===== PLAYER ===== */
+#screen-player .scrollx{padding-top:max(40px,env(safe-area-inset-top))}
+.player-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.player-top .nm{font-weight:700;font-size:14px;letter-spacing:.04em}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:15px}
+.orbwrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 4px}
+#orb{width:300px;max-width:78vw;height:300px;max-height:78vw}
+.ptitle{text-align:center;font-size:22px;font-weight:700;margin-top:4px}
+.psub{text-align:center;color:var(--mut);font-size:12.5px;margin-top:4px;padding:0 18px;line-height:1.45}
+.timer{text-align:center;font-size:46px;font-weight:300;letter-spacing:.04em;font-variant-numeric:tabular-nums;margin:14px 0 2px}
+.timer small{font-size:15px;color:var(--mut)}
+#viz{width:100%;height:54px;display:block;margin:6px 0 14px;opacity:.9}
+.transport{display:flex;align-items:center;justify-content:center;gap:26px;margin-bottom:18px}
+.tbtn{width:54px;height:54px;border-radius:50%;border:1px solid var(--line2);background:var(--panel);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:18px}
+.tbtn.play{width:74px;height:74px;background:var(--cy);color:#001016;border:none;font-size:26px;box-shadow:0 12px 36px -10px var(--cy-glow)}
+.mixer{margin-top:8px}
+.mix-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.mix-row .lbl{width:96px;font-size:12.5px;color:var(--mut);flex:none}
+.mix-row input[type=range]{flex:1}
+input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radius:4px;background:var(--line2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--cy);box-shadow:0 0 10px var(--cy-glow);cursor:pointer}
+.adv-only{display:none}
+body.adv .adv-only{display:block}
+body.adv .adv-only.flex{display:flex}
+
+/* journal */
+.j-empty{text-align:center;color:var(--mut);padding:50px 20px}
+.j-empty i{font-size:34px;color:var(--mut2);margin-bottom:14px;display:block}
+.j-entry{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px 16px;margin-bottom:11px}
+.j-entry .jh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.j-entry .jh .jm{font-weight:700;font-size:14px}
+.j-entry .jh .jd{color:var(--mut2);font-size:11px}
+.j-entry .stars{color:var(--cy);font-size:12px;margin-bottom:6px;letter-spacing:2px}
+.j-entry .jn{color:var(--mut);font-size:13px;line-height:1.5}
+
+/* settings */
+.set-group{margin-bottom:22px}
+.set-group .gh{font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--cy);margin:0 4px 11px}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--panel);border:1px solid var(--line);padding:15px 16px;margin-bottom:1px}
+.set-row:first-of-type{border-radius:14px 14px 0 0}
+.set-row:last-of-type{border-radius:0 0 14px 14px}
+.set-row.solo{border-radius:14px}
+.set-row .sl{font-size:14px;font-weight:600}
+.set-row .sd{font-size:11.5px;color:var(--mut2);margin-top:2px}
+.set-row .sv{display:flex;align-items:center;gap:10px}
+.switch{width:50px;height:30px;border-radius:30px;background:var(--line2);position:relative;flex:none;transition:background .2s}
+.switch.on{background:var(--cy)}
+.switch .k{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
+.switch.on .k{left:23px}
+
+/* bottom nav */
+#nav{position:absolute;left:0;right:0;bottom:0;height:calc(78px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
+  background:linear-gradient(to top,#05060acc, #05060aee 60%, #05060a00);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-around;padding-top:11px;z-index:40}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--mut2);font-size:10px;font-weight:600;letter-spacing:.04em;width:60px;background:none;border:none;padding:5px 0}
+.tab i{font-size:18px}
+.tab.on{color:var(--cy)}
+.tab.on i{text-shadow:0 0 14px var(--cy-glow)}
+.tab .pill{position:absolute;top:-11px;width:30px;height:3px;border-radius:3px;background:var(--cy);box-shadow:0 0 12px var(--cy-glow);opacity:0;transition:opacity .25s}
+.tab.on .pill{opacity:1}
+
+/* gate / modal */
+.overlay{position:absolute;inset:0;z-index:80;background:rgba(2,3,6,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;padding:0}
+.overlay.show{display:flex;animation:fade .3s ease}
+.sheet{background:var(--bg2);border:1px solid var(--line2);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:26px 22px calc(28px + env(safe-area-inset-bottom))}
+.sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--line2);margin:0 auto 18px}
+.sheet h3{font-size:21px;font-weight:700;margin-bottom:6px}
+.warn-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.warn-item i{color:var(--cy);font-size:15px;margin-top:2px;flex:none;width:18px;text-align:center}
+.warn-item div{font-size:13.5px;color:var(--mut);line-height:1.5}
+.warn-item b{color:var(--txt);font-weight:600}
+
+/* full-screen gate */
+#gate{position:absolute;inset:0;z-index:100;background:radial-gradient(120% 80% at 50% 0%, #0a0d16, #000 70%);display:flex;flex-direction:column;justify-content:center;padding:34px 26px calc(34px + env(safe-area-inset-bottom));overflow-y:auto}
+#gate .gmark{width:62px;height:62px;border-radius:18px;background:linear-gradient(160deg,#0c0f18,#05060a);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;margin-bottom:22px;position:relative;overflow:hidden}
+#gate .gmark::after{content:"";position:absolute;width:30px;height:30px;border-radius:50%;background:var(--cy);filter:blur(13px);opacity:.7;animation:pulseGlow 3.4s ease-in-out infinite}
+#gate .gmark i{position:relative;color:var(--cy);font-size:26px;text-shadow:0 0 16px var(--cy-glow)}
+#gate h2{font-size:27px;font-weight:700;letter-spacing:.18em;margin-bottom:4px}
+#gate .gt{color:var(--mut2);font-size:11px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:26px;font-weight:600}
+.chip{display:inline-block;background:var(--cy-dim);color:var(--cy);font-size:11px;font-weight:700;letter-spacing:.05em;padding:5px 11px;border-radius:20px;margin-bottom:18px}
+.toast{position:absolute;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(14px);background:var(--panel2);border:1px solid var(--line2);color:var(--txt);font-size:13px;font-weight:600;padding:11px 18px;border-radius:14px;opacity:0;pointer-events:none;transition:.3s;z-index:60;white-space:nowrap;box-shadow:0 10px 30px -10px #000}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.dur-pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:6px}
+.dur-pill{border:1px solid var(--line2);background:var(--panel);color:var(--mut);font-size:13px;font-weight:600;padding:9px 15px;border-radius:12px}
+.dur-pill.on{background:var(--cy-dim);border-color:var(--cy);color:var(--cy)}
+a{color:var(--cy);text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- FIRST-RUN SAFETY GATE -->
+<div id="gate">
+  <div class="gmark"><i class="fa-solid fa-wave-square"></i></div>
+  <h2>ÆTHER</h2>
+  <div class="gt">Precision Sound · Deep Restoration</div>
+  <span class="chip">Before you begin</span>
+  <div class="warn-item"><i class="fa-solid fa-heart"></i><div>This app is for <b>relaxation and personal wellness only</b>. It doesn't diagnose, treat, or cure anything.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-bolt"></i><div><b>Seizure warning.</b> Sessions use rhythmic sound pulses. If you have epilepsy, photosensitivity, or a seizure history, talk to a doctor before using.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-user-doctor"></i><div>Consult a healthcare professional before use if you have any medical condition.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-volume-low"></i><div>Start at <b>low volume</b> with short sessions. Stop if you feel unwell or get a headache.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-headphones"></i><div>Use <b>stereo headphones</b> — binaural and isochronic tones need them.</div></div>
+  <button class="btn primary" style="margin-top:14px" onclick="acknowledge()">I understand</button>
+  <p class="tiny" style="text-align:center;margin-top:14px">Wellness &amp; relaxation tool · Not medical advice</p>
+</div>
+
+<!-- APP -->
+<div id="app" style="visibility:hidden">
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home"><div class="scroll">
+    <div class="brand"><div class="mark"><i class="fa-solid fa-wave-square"></i></div><div class="wm">ÆTHER</div></div>
+    <div class="tag">Luxury Neuroscience Wellness</div>
+    <h1 class="q" id="greeting">What do you want today?</h1>
+    <div class="sub">Choose how you'd like to feel. We'll build you a curated sound session.</div>
+
+    <div class="featured" id="featured" onclick="openSession(featuredKey)">
+      <div class="shine"></div>
+      <div class="lab"><i class="fa-solid fa-star"></i>&nbsp; Recommended for tonight</div>
+      <h2 id="feat-name">Sleep Deep</h2>
+      <p id="feat-copy">Delta-range tones to help you wind down.</p>
+      <button class="go">Begin session <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <div class="eyebrow"><i class="fa-solid fa-compass"></i> Pick a feeling</div>
+    <div class="grid" id="mood-grid"></div>
+
+    <div class="section-h">Ask the Guide</div>
+    <div class="guide">
+      <input id="guide-input" placeholder="e.g. I'm wired and can't sleep" onkeydown="if(event.key==='Enter')askGuide()"/>
+      <button onclick="askGuide()"><i class="fa-solid fa-arrow-up"></i></button>
+    </div>
+    <p class="tiny" id="guide-out" style="margin:2px 2px 0"></p>
+  </div></div>
+
+  <!-- SESSIONS -->
+  <div class="screen" id="screen-sessions"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-layer-group"></i> Library</div>
+    <h1 class="q" style="font-size:26px">Sessions</h1>
+    <div class="sub">Curated by how you want to feel.</div>
+    <div id="sessions-list"></div>
+    <div class="section-h">The Sound Library</div>
+    <div id="library-list"></div>
+    <button class="btn ghost" style="margin-top:8px" onclick="showSources()"><i class="fa-solid fa-book-open"></i> Sources &amp; honest limitations</button>
+  </div></div>
+
+  <!-- PLAYER -->
+  <div class="screen" id="screen-player"><div class="scroll scrollx">
+    <div class="player-top">
+      <button class="iconbtn" onclick="go('home')"><i class="fa-solid fa-chevron-down"></i></button>
+      <div class="nm" id="p-band">—</div>
+      <button class="iconbtn" id="voice-toggle" onclick="toggleVoice()"><i class="fa-solid fa-comment"></i></button>
+    </div>
+    <div class="orbwrap"><canvas id="orb" width="600" height="600"></canvas></div>
+    <div class="ptitle" id="p-title">Session</div>
+    <div class="psub" id="p-copy">—</div>
+    <div class="timer"><span id="p-time">00:00</span></div>
+    <canvas id="viz" width="800" height="108"></canvas>
+    <div class="transport">
+      <button class="tbtn" onclick="addTime(-5)" title="-5 min"><span style="font-size:13px;font-weight:700">-5</span></button>
+      <button class="tbtn play" id="play-btn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
+      <button class="tbtn" onclick="addTime(5)" title="+5 min"><span style="font-size:13px;font-weight:700">+5</span></button>
+    </div>
+    <div class="mixer adv-only">
+      <div class="section-h" style="margin-top:6px">Layer Mixer <span class="tiny" style="text-transform:none;letter-spacing:0">· Advanced</span></div>
+      <div id="mix-rows"></div>
+    </div>
+    <p class="tiny adv-only" id="adv-detail" style="text-align:center;margin-top:10px"></p>
+  </div></div>
+
+  <!-- JOURNAL -->
+  <div class="screen" id="screen-journal"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-feather"></i> Reflections</div>
+    <h1 class="q" style="font-size:26px">Journal</h1>
+    <div class="sub">Private to this device. Nothing is uploaded.</div>
+    <div id="journal-list"></div>
+  </div></div>
+
+  <!-- SETTINGS -->
+  <div class="screen" id="screen-settings"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-sliders"></i> Tune</div>
+    <h1 class="q" style="font-size:26px">Settings</h1>
+    <div class="sub" style="margin-bottom:24px">ÆTHER · v1.2</div>
+
+    <div class="set-group">
+      <div class="gh">Sound</div>
+      <div class="set-row solo">
+        <div><div class="sl">Master volume</div><div class="sd" id="vol-val">70%</div></div>
+        <div class="sv" style="width:130px"><input type="range" min="0" max="100" value="70" id="vol-slider" style="width:100%" oninput="setVol(this.value)"/></div>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <div class="gh">Voice Guidance</div>
+      <div class="set-row">
+        <div><div class="sl">Spoken guidance</div><div class="sd">Gentle cues during sessions</div></div>
+        <div class="sv"><div class="switch on" id="sw-voice" onclick="toggleVoiceSetting()"><div class="k"></div></div></div>
+      </div>
+      <div class="set-row">
+        <div style="flex:1"><div class="sl">Speed</div><div class="sd" id="rate-val">0.92×</div></div>
+        <div class="sv" style="width:120px"><input type="range" min="70" max="110" value="92" id="rate-slider" style="width:100%" oninput="setRate(this.value)"/></div>
+      </div>
+      <div class="set-row">
+        <div style="flex:1"><div class="sl">Pitch</div><div class="sd" id="pitch-val">0.95</div></div>
+        <div class="sv" style="width:120px"><input type="range" min="70" max="120" value="95" id="pitch-slider" style="width:100%" oninput="setPitch(this.value)"/></div>
+      </div>
+      <div class="set-row">
+        <div><div class="sl">Test voice</div><div class="sd">Hear the current setting</div></div>
+        <div class="sv"><button class="iconbtn" onclick="testVoice()"><i class="fa-solid fa-play"></i></button></div>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <div class="gh">Experience</div>
+      <div class="set-row solo">
+        <div><div class="sl">Advanced mode</div><div class="sd">Show frequencies &amp; the layer mixer</div></div>
+        <div class="sv"><div class="switch" id="sw-adv" onclick="toggleAdv()"><div class="k"></div></div></div>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <div class="gh">About &amp; Data</div>
+      <div class="set-row" onclick="showSources()"><div><div class="sl">Sources &amp; honest limitations</div><div class="sd">How these tones are framed</div></div><div class="sv"><i class="fa-solid fa-chevron-right" style="color:var(--mut2)"></i></div></div>
+      <div class="set-row" onclick="showSafety()"><div><div class="sl">Safety &amp; disclaimer</div><div class="sd">Review the first-run notice</div></div><div class="sv"><i class="fa-solid fa-chevron-right" style="color:var(--mut2)"></i></div></div>
+      <div class="set-row" onclick="clearData()"><div><div class="sl" style="color:#ff6b81">Clear all data</div><div class="sd">Erase journal &amp; settings on this device</div></div><div class="sv"><i class="fa-solid fa-trash" style="color:#ff6b81"></i></div></div>
+    </div>
+    <p class="tiny" style="text-align:center;margin:8px 0 4px">For personal wellness only · Not medical advice<br/>Effects of sound tones are subjective and exploratory.</p>
+  </div></div>
+
+  <!-- NAV -->
+  <div id="nav">
+    <button class="tab on" data-s="home" onclick="go('home')"><div class="pill"></div><i class="fa-solid fa-house"></i>Home</button>
+    <button class="tab" data-s="sessions" onclick="go('sessions')"><div class="pill"></div><i class="fa-solid fa-compact-disc"></i>Sessions</button>
+    <button class="tab" data-s="player" onclick="go('player')"><div class="pill"></div><i class="fa-solid fa-circle-play"></i>Player</button>
+    <button class="tab" data-s="journal" onclick="go('journal')"><div class="pill"></div><i class="fa-solid fa-feather"></i>Journal</button>
+    <button class="tab" data-s="settings" onclick="go('settings')"><div class="pill"></div><i class="fa-solid fa-sliders"></i>Settings</button>
+  </div>
+</div>
+
+<!-- bottom sheet (sources / safety / session detail / journal prompt) -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" id="sheet"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* =================== DATA =================== */
+// Mood-based protocols. Labels are feelings/activities — never conditions.
+const PROTOCOLS = {
+  sleep_deep:   {name:"Sleep Deep", icon:"fa-moon", color:"#5b6cff",
+    primary:{freq:2.5,type:"binaural",carrier:174}, layers:[{freq:7.83,type:"pure",volume:.25,label:"7.83 Hz grounding"}],
+    duration:60, copy:"Delta-range tones to help you wind down.",
+    adv:"Delta-range tones with a soft 7.83 Hz grounding layer.", guide:"Let your breath slow. Nothing to do now but rest."},
+  unwind_relax: {name:"Unwind & Relax", icon:"fa-mug-hot", color:"#42e29b",
+    primary:{freq:10,type:"binaural",carrier:220}, layers:[{freq:136.1,type:"pure",volume:.18,label:"Warm pad"}],
+    duration:30, copy:"Alpha-range tones with a gentle ambient texture.",
+    adv:"Alpha-range tones with gentle ambient texture.", guide:"Soften your shoulders. Let the day settle."},
+  focus_clarity:{name:"Sharpen Focus", icon:"fa-bolt", color:"#00D4FF",
+    primary:{freq:40,type:"isochronic",carrier:200}, layers:[{freq:7.83,type:"pure",volume:.3,label:"7.83 Hz grounding"}],
+    duration:45, copy:"Stereo headphones. A 40 Hz focus session.",
+    adv:"40 Hz gamma isochronic pulses — a focus & concentration session.", guide:"One thing at a time. Settle into the work."},
+  find_calm:    {name:"Find Calm", icon:"fa-spa", color:"#7c6cff",
+    primary:{freq:6,type:"binaural",carrier:210}, layers:[{freq:528,type:"pure",volume:.12,label:"528 Hz harmony tone"}],
+    duration:25, copy:"Theta-range tones paced to slow breathing.",
+    adv:"Theta-range tones paced to slow breathing.", guide:"Breathe in for four. Out for six. Let it lengthen."},
+  ease_comfort: {name:"Ease & Comfort", icon:"fa-feather", color:"#ffb27a",
+    primary:{freq:3.5,type:"pure",carrier:285}, layers:[{freq:174,type:"pure",volume:.3,label:"174 Hz grounding"}],
+    duration:30, copy:"Low pure tones with a warm pad underneath.",
+    adv:"Low pure tones with a warm pad underneath.", guide:"Find a comfortable position. Let warmth gather."},
+  deep_meditation:{name:"Deep Meditation", icon:"fa-om", color:"#9b8cff",
+    primary:{freq:5,type:"binaural",carrier:136.1}, layers:[{freq:7.83,type:"pure",volume:.28,label:"Schumann 7.83 Hz"}],
+    duration:40, copy:"Theta tones with a Schumann grounding layer.",
+    adv:"Theta tones with a 7.83 Hz Schumann grounding layer.", guide:"Rest your attention on the sound. Let thoughts pass through."}
+};
+const ORDER = ["sleep_deep","unwind_relax","focus_clarity","find_calm","ease_comfort","deep_meditation"];
+
+const LIBRARY = [
+  {t:"174 Hz — Solfeggio", s:"Traditionally associated with grounding and a sense of security."},
+  {t:"285 Hz — Solfeggio", s:"Traditionally associated with renewal and restoration."},
+  {t:"528 Hz — Solfeggio", s:"The 'harmony' tone; traditionally linked with transformation."},
+  {t:"963 Hz — Solfeggio", s:"Traditionally associated with stillness and a sense of unity."},
+  {t:"Delta · 0.5–4 Hz", s:"Deep rest and winding down."},
+  {t:"Theta · 4–8 Hz", s:"Meditation and creativity."},
+  {t:"Alpha · 8–12 Hz", s:"Relaxed, calm focus."},
+  {t:"Gamma · 40 Hz", s:"Concentration. The 40 Hz focus session (research is early-stage)."}
+];
+
+/* =================== STATE =================== */
+const LS = "aether.v1";
+let S = {voiceOn:true, vol:70, rate:92, pitch:95, adv:false, journal:[]};
+try{ const saved=JSON.parse(localStorage.getItem(LS)); if(saved) S=Object.assign(S,saved); }catch(e){}
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
+
+let featuredKey = pickFeatured();
+let cur = null;          // current protocol key
+let curDur = 0;          // seconds total
+let remain = 0;          // seconds left
+let playing = false;
+let tick = null;
+
+function pickFeatured(){
+  const h = new Date().getHours();
+  if(h>=21 || h<5) return "sleep_deep";
+  if(h>=5 && h<11) return "focus_clarity";
+  if(h>=11 && h<15) return "unwind_relax";
+  if(h>=15 && h<19) return "find_calm";
+  return "deep_meditation";
+}
+function greet(){
+  const h=new Date().getHours();
+  return h<5?"Still awake?":h<12?"Good morning.":h<18?"Good afternoon.":"Winding down?";
+}
+
+/* =================== WEB AUDIO ENGINE =================== */
+let AC=null, master=null, analyser=null, nodes=[], mixGains={};
+function audio(){
+  if(AC) return;
+  AC = new (window.AudioContext||window.webkitAudioContext)();
+  master = AC.createGain(); master.gain.value=0;
+  analyser = AC.createAnalyser(); analyser.fftSize=2048;
+  master.connect(analyser); analyser.connect(AC.destination);
+}
+function clearNodes(){ nodes.forEach(n=>{try{n.stop&&n.stop();}catch(e){}; try{n.disconnect&&n.disconnect();}catch(e){}}); nodes=[]; mixGains={}; }
+
+// build one tone-source (binaural / isochronic / pure) -> returns its output gain node
+function buildSource(spec, vol, key){
+  const out = AC.createGain(); out.gain.value=vol; out.connect(master);
+  if(spec.type==="binaural"){
+    const c=spec.carrier||200, beat=spec.freq;
+    const oL=AC.createOscillator(), oR=AC.createOscillator();
+    const pL=AC.createStereoPanner?AC.createStereoPanner():null, pR=AC.createStereoPanner?AC.createStereoPanner():null;
+    oL.frequency.value=c-beat/2; oR.frequency.value=c+beat/2; oL.type="sine"; oR.type="sine";
+    if(pL){pL.pan.value=-1;pR.pan.value=1; oL.connect(pL);pL.connect(out); oR.connect(pR);pR.connect(out);}
+    else { oL.connect(out); oR.connect(out); }
+    oL.start(); oR.start(); nodes.push(oL,oR); if(pL)nodes.push(pL,pR);
+  } else if(spec.type==="isochronic"){
+    const o=AC.createOscillator(); o.type="sine"; o.frequency.value=spec.carrier||200;
+    const g=AC.createGain(); g.gain.value=0;
+    // pulse the amplitude at spec.freq using an LFO -> shaped to 0..1
+    const lfo=AC.createOscillator(); lfo.type="square"; lfo.frequency.value=spec.freq;
+    const lg=AC.createGain(); lg.gain.value=.5;
+    lfo.connect(lg); lg.connect(g.gain); g.gain.value=.5; // square -0.5..0.5 around .5 => 0..1 gate
+    o.connect(g); g.connect(out); o.start(); lfo.start(); nodes.push(o,lfo,lg,g);
+  } else { // pure
+    const o=AC.createOscillator(); o.type="sine"; o.frequency.value=spec.carrier||spec.freq; o.connect(out); o.start(); nodes.push(o);
+  }
+  if(key) mixGains[key]=out;
+  return out;
+}
+
+function startAudio(p){
+  audio();
+  if(AC.state==="suspended") AC.resume();
+  clearNodes();
+  const v = (S.vol/100);
+  buildSource(p.primary, .9, "primary");
+  (p.layers||[]).forEach((L,i)=> buildSource(L, L.volume!=null?L.volume:.25, "layer"+i));
+  // fade in over 4s
+  const now=AC.currentTime;
+  master.gain.cancelScheduledValues(now);
+  master.gain.setValueAtTime(0.0001, now);
+  master.gain.exponentialRampToValueAtTime(Math.max(.02, v), now+4);
+}
+function stopAudio(fast){
+  if(!AC||!master) return;
+  const now=AC.currentTime, d=fast?0.4:4;
+  try{
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(master.gain.value||0.02, now);
+    master.gain.exponentialRampToValueAtTime(0.0001, now+d);
+  }catch(e){}
+  setTimeout(clearNodes, d*1000+60);
+}
+function setMasterLive(){ if(AC&&master&&playing){ const now=AC.currentTime; master.gain.cancelScheduledValues(now); master.gain.setValueAtTime(Math.max(.02,S.vol/100), now);} }
+
+// soft chime on start
+function chime(){
+  try{ audio(); const t=AC.currentTime; [528,792].forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=f;g.gain.value=0;o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(0,t+i*.08);g.gain.linearRampToValueAtTime(.12,t+i*.08+.03);g.gain.exponentialRampToValueAtTime(.0001,t+i*.08+1.1);o.start(t+i*.08);o.stop(t+i*.08+1.2);}); }catch(e){}
+}
+
+/* =================== VOICE (Web Speech) =================== */
+let voices=[];
+function loadVoices(){ try{ voices=speechSynthesis.getVoices()||[]; }catch(e){} }
+if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; }
+function pickVoice(){
+  if(!voices.length) loadVoices();
+  const pref=["Samantha","Google UK English Female","Google US English","Microsoft Aria","Microsoft Zira","Karen","Serena","Moira"];
+  for(const p of pref){ const v=voices.find(x=>x.name&&x.name.includes(p)); if(v) return v; }
+  return voices.find(v=>/en[-_]/i.test(v.lang)&&/female/i.test(v.name)) || voices.find(v=>/^en/i.test(v.lang)) || voices[0];
+}
+function speak(text){
+  if(!S.voiceOn || !("speechSynthesis" in window)) return;
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);
+    const v=pickVoice(); if(v)u.voice=v; u.rate=S.rate/100; u.pitch=S.pitch/100; u.volume=.9; speechSynthesis.speak(u);
+  }catch(e){}
+}
+function testVoice(){ const wasOn=S.voiceOn; S.voiceOn=true; speak("This is your guidance voice. Breathe, and let the sound settle."); S.voiceOn=wasOn; }
+
+/* =================== NAVIGATION =================== */
+function go(s){
+  document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));
+  document.getElementById("screen-"+s).classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.s===s));
+  document.querySelector("#screen-"+s+" .scroll").scrollTop=0;
+}
+
+/* =================== RENDER: HOME =================== */
+function renderHome(){
+  document.getElementById("greeting").textContent = greet()==="Still awake?"||greet()==="Winding down?" ? greet()+" What do you need?" : "What do you want today?";
+  const f=PROTOCOLS[featuredKey];
+  document.getElementById("feat-name").textContent=f.name;
+  document.getElementById("feat-copy").textContent=f.copy;
+  const g=document.getElementById("mood-grid"); g.innerHTML="";
+  ORDER.forEach(k=>{ const p=PROTOCOLS[k];
+    const b=document.createElement("button"); b.className="mood"; b.onclick=()=>openSession(k);
+    b.innerHTML=`<div class="glow" style="background:${p.color}"></div><div class="ic" style="background:${hex(p.color,.14)};color:${p.color}"><i class="fa-solid ${p.icon}"></i></div><div class="nm">${p.name}</div><div class="ds">${p.copy}</div>`;
+    g.appendChild(b);
+  });
+}
+function hex(c,a){ const n=parseInt(c.slice(1),16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
+
+/* =================== RENDER: SESSIONS + LIBRARY =================== */
+function renderSessions(){
+  const l=document.getElementById("sessions-list"); l.innerHTML="";
+  ORDER.forEach(k=>{ const p=PROTOCOLS[k];
+    const b=document.createElement("button"); b.className="row"; b.onclick=()=>openSession(k);
+    b.innerHTML=`<div class="ic" style="background:${hex(p.color,.14)};color:${p.color}"><i class="fa-solid ${p.icon}"></i></div><div class="meta"><div class="t">${p.name}</div><div class="s">${p.copy} · ${p.duration} min</div></div><i class="fa-solid fa-chevron-right chev"></i>`;
+    l.appendChild(b);
+  });
+  const lib=document.getElementById("library-list"); lib.innerHTML="";
+  LIBRARY.forEach(x=>{ const d=document.createElement("div"); d.className="row"; d.style.cursor="default";
+    d.innerHTML=`<div class="ic"><i class="fa-solid fa-wave-square"></i></div><div class="meta"><div class="t">${x.t}</div><div class="s">${x.s}</div></div>`;
+    lib.appendChild(d);
+  });
+}
+
+/* =================== SESSION DETAIL SHEET =================== */
+let pendingDur=null;
+function openSession(k){
+  const p=PROTOCOLS[k]; pendingDur=p.duration;
+  const durs=[10,20,p.duration,60].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b);
+  sheet(`
+    <div class="grab"></div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <div class="ic" style="width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:22px;background:${hex(p.color,.16)};color:${p.color}"><i class="fa-solid ${p.icon}"></i></div>
+      <div><h3 style="margin:0">${p.name}</h3><div class="muted" style="font-size:12.5px">${p.copy}</div></div>
+    </div>
+    <p class="muted" style="margin-bottom:8px">A curated session of layered tones with smooth fades and gentle guidance. Best with stereo headphones.</p>
+    <p class="tiny adv-only" style="margin-bottom:14px"><i class="fa-solid fa-circle-info"></i> ${p.adv}</p>
+    <div class="gh" style="font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mut2);margin:8px 2px 8px">Length</div>
+    <div class="dur-pills" id="dur-pills">${durs.map(d=>`<button class="dur-pill ${d===p.duration?'on':''}" data-d="${d}" onclick="setDur(this,${d})">${d} min</button>`).join("")}</div>
+    <button class="btn primary" style="margin-top:20px" onclick="launch('${k}')"><i class="fa-solid fa-play"></i> Begin session</button>
+    <p class="tiny" style="text-align:center;margin-top:12px">For relaxation only · Start at low volume</p>
+  `);
+}
+function setDur(el,d){ pendingDur=d; document.querySelectorAll("#dur-pills .dur-pill").forEach(x=>x.classList.remove("on")); el.classList.add("on"); }
+
+/* =================== LAUNCH / PLAYER =================== */
+function launch(k){
+  closeSheet();
+  cur=k; const p=PROTOCOLS[k];
+  curDur=(pendingDur||p.duration)*60; remain=curDur;
+  document.getElementById("p-title").textContent=p.name;
+  document.getElementById("p-copy").textContent=p.copy;
+  document.getElementById("p-band").textContent=p.name;
+  document.getElementById("adv-detail").textContent=p.adv;
+  buildMixer(p);
+  go("player");
+  updateTime();
+  orbColor=p.color;
+  setTimeout(()=>togglePlay(true),350);
+}
+function buildMixer(p){
+  const m=document.getElementById("mix-rows"); m.innerHTML="";
+  const rows=[{key:"primary",label:p.primary.type==="binaural"?`Binaural ${p.primary.freq}Hz`:p.primary.type==="isochronic"?`Isochronic ${p.primary.freq}Hz`:`Tone ${p.primary.carrier||p.primary.freq}Hz`,vol:90}];
+  (p.layers||[]).forEach((L,i)=>rows.push({key:"layer"+i,label:L.label||(`Layer ${L.freq}Hz`),vol:Math.round((L.volume!=null?L.volume:.25)*100)}));
+  rows.forEach(r=>{ const d=document.createElement("div"); d.className="mix-row";
+    d.innerHTML=`<div class="lbl">${r.label}</div><input type="range" min="0" max="100" value="${r.vol}" oninput="mixSet('${r.key}',this.value)"/>`;
+    m.appendChild(d);
+  });
+}
+function mixSet(key,v){ if(mixGains[key]&&AC){ const g=mixGains[key]; const now=AC.currentTime; g.gain.setTargetAtTime(v/100,now,.05);} }
+
+function togglePlay(forceStart){
+  const p=PROTOCOLS[cur]; if(!p) return;
+  if(playing && !forceStart){ // pause
+    playing=false; stopAudio(true); clearInterval(tick); try{speechSynthesis.cancel();}catch(e){}
+    document.querySelector("#play-btn i").className="fa-solid fa-play";
+  } else {
+    if(playing) return;
+    playing=true; chime(); startAudio(p);
+    document.querySelector("#play-btn i").className="fa-solid fa-pause";
+    if(S.voiceOn) setTimeout(()=>speak(p.guide), 1600);
+    clearInterval(tick); tick=setInterval(()=>{
+      remain--; updateTime();
+      if(remain<=0){ finishSession(); }
+    },1000);
+  }
+}
+function addTime(min){ remain=Math.max(60, remain+min*60); curDur=Math.max(curDur,remain); updateTime(); flash((min>0?"+":"")+min+" min"); }
+function updateTime(){ const m=Math.floor(remain/60), s=remain%60; document.getElementById("p-time").textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+function finishSession(){
+  playing=false; clearInterval(tick); stopAudio(false);
+  document.querySelector("#play-btn i").className="fa-solid fa-play";
+  if(S.voiceOn) setTimeout(()=>speak("Session complete. Take a moment before you return."),300);
+  setTimeout(()=>journalPrompt(cur), 900);
+}
+
+/* =================== ORB (canvas) =================== */
+let orbColor="#00D4FF", orbT=0, particles=[];
+const orb=document.getElementById("orb"), octx=orb.getContext("2d");
+for(let i=0;i<46;i++) particles.push({a:Math.random()*Math.PI*2, r:.62+Math.random()*.33, sp:.0015+Math.random()*.004, sz:.6+Math.random()*1.8, ph:Math.random()*6});
+function drawOrb(){
+  const w=orb.width,h=orb.height,cx=w/2,cy=h/2; octx.clearRect(0,0,w,h);
+  const amp = playing? (analyserLevel()*0.5+0.5) : 0.3;
+  const R=w*0.30*(0.9+amp*0.16+Math.sin(orbT*1.3)*0.02);
+  const col=orbColor; const rgb=parseInt(col.slice(1),16); const cr=rgb>>16&255,cg=rgb>>8&255,cb=rgb&255;
+  // outer volumetric glow
+  let g=octx.createRadialGradient(cx,cy,R*0.2,cx,cy,R*2.1);
+  g.addColorStop(0,`rgba(${cr},${cg},${cb},${0.30+amp*0.25})`); g.addColorStop(.4,`rgba(${cr},${cg},${cb},0.10)`); g.addColorStop(1,"rgba(0,0,0,0)");
+  octx.fillStyle=g; octx.beginPath(); octx.arc(cx,cy,R*2.1,0,7); octx.fill();
+  // glass sphere body
+  let g2=octx.createRadialGradient(cx-R*.4,cy-R*.45,R*.1,cx,cy,R);
+  g2.addColorStop(0,`rgba(${Math.min(255,cr+90)},${Math.min(255,cg+90)},${Math.min(255,cb+90)},.95)`);
+  g2.addColorStop(.5,`rgba(${cr},${cg},${cb},.5)`); g2.addColorStop(.85,`rgba(${cr>>1},${cg>>1},${cb>>1},.25)`); g2.addColorStop(1,"rgba(4,5,10,.6)");
+  octx.fillStyle=g2; octx.beginPath(); octx.arc(cx,cy,R,0,7); octx.fill();
+  // moving caustics rings
+  octx.save(); octx.globalCompositeOperation="screen";
+  for(let k=0;k<3;k++){ const rr=R*(0.5+k*0.18)+Math.sin(orbT*1.1+k)*R*0.04;
+    octx.strokeStyle=`rgba(${cr},${cg},${cb},${0.13-k*0.03})`; octx.lineWidth=2;
+    octx.beginPath(); for(let a=0;a<=6.3;a+=.18){ const rad=rr+Math.sin(a*3+orbT*1.6+k)*R*0.03; const x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad; a?octx.lineTo(x,y):octx.moveTo(x,y);} octx.closePath(); octx.stroke();
+  }
+  // particle halo
+  particles.forEach(pt=>{ pt.a+=pt.sp*(playing?1.6:.7); const rad=R*(1.18+pt.r*0.5)+Math.sin(orbT+pt.ph)*6; const x=cx+Math.cos(pt.a)*rad,y=cy+Math.sin(pt.a)*rad;
+    octx.fillStyle=`rgba(${cr},${cg},${cb},${(0.5+Math.sin(orbT*2+pt.ph)*0.4)*(playing?1:.5)})`; octx.beginPath(); octx.arc(x,y,pt.sz*(playing?1.3:1),0,7); octx.fill(); });
+  octx.restore();
+  // specular highlight
+  let hl=octx.createRadialGradient(cx-R*.4,cy-R*.5,1,cx-R*.4,cy-R*.5,R*.6);
+  hl.addColorStop(0,"rgba(255,255,255,.6)"); hl.addColorStop(1,"rgba(255,255,255,0)");
+  octx.fillStyle=hl; octx.beginPath(); octx.arc(cx-R*.4,cy-R*.5,R*.6,0,7); octx.fill();
+  orbT+=0.016; requestAnimationFrame(drawOrb);
+}
+let _adata=null;
+function analyserLevel(){ if(!analyser) return .3; if(!_adata)_adata=new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(_adata); let s=0; for(let i=0;i<40;i++)s+=_adata[i]; return Math.min(1,(s/40)/180); }
+drawOrb();
+
+/* =================== VISUALIZER =================== */
+const viz=document.getElementById("viz"), vctx=viz.getContext("2d"); let _vdata=null;
+function drawViz(){
+  const w=viz.width,h=viz.height; vctx.clearRect(0,0,w,h);
+  if(analyser&&playing){ if(!_vdata)_vdata=new Uint8Array(analyser.fftSize); analyser.getByteTimeDomainData(_vdata);
+    vctx.lineWidth=2.4; vctx.strokeStyle=orbColor; vctx.shadowBlur=12; vctx.shadowColor=orbColor; vctx.beginPath();
+    const step=w/_vdata.length; for(let i=0;i<_vdata.length;i++){ const x=i*step, y=h/2+((_vdata[i]-128)/128)*(h/2-6); i?vctx.lineTo(x,y):vctx.moveTo(x,y);} vctx.stroke();
+  } else { vctx.strokeStyle="rgba(255,255,255,.10)"; vctx.lineWidth=2; vctx.beginPath(); vctx.moveTo(0,h/2); vctx.lineTo(w,h/2); vctx.stroke(); }
+  requestAnimationFrame(drawViz);
+}
+drawViz();
+
+/* =================== GUIDE =================== */
+function askGuide(){
+  const q=(document.getElementById("guide-input").value||"").toLowerCase();
+  if(!q.trim()){ return; }
+  let k="find_calm";
+  if(/sleep|tired|insomnia|awake|night|bed|wired/.test(q)) k="sleep_deep";
+  else if(/focus|work|study|concentrat|distract|adhd|task/.test(q)) k="focus_clarity";
+  else if(/anx|stress|overwhelm|panic|nervous|calm|worry/.test(q)) k="find_calm";
+  else if(/relax|unwind|chill|decompress|rest/.test(q)) k="unwind_relax";
+  else if(/ache|sore|comfort|ease|tension|tense|headache/.test(q)) k="ease_comfort";
+  else if(/medit|spiritual|deep|breath|center/.test(q)) k="deep_meditation";
+  const p=PROTOCOLS[k];
+  document.getElementById("guide-out").innerHTML=`Try <b style="color:var(--cy)">${p.name}</b> — ${p.copy} <a onclick="openSession('${k}')">Open ›</a>`;
+}
+
+/* =================== JOURNAL =================== */
+function journalPrompt(k){
+  const p=PROTOCOLS[k]||{name:"Session"};
+  let stars=0;
+  sheet(`
+    <div class="grab"></div>
+    <h3>How was it?</h3>
+    <div class="muted" style="margin-bottom:16px">${p.name} · just now</div>
+    <div id="star-row" style="font-size:30px;color:var(--mut2);letter-spacing:8px;margin-bottom:16px">
+      ${[1,2,3,4,5].map(i=>`<i class="fa-regular fa-star" data-i="${i}" onclick="setStars(${i})" style="cursor:pointer"></i>`).join("")}
+    </div>
+    <textarea id="j-note" placeholder="A word on how you feel (optional)…" style="width:100%;min-height:80px;background:var(--panel);border:1px solid var(--line2);border-radius:14px;color:var(--txt);padding:13px;font-size:14px;font-family:inherit;outline:none;resize:none"></textarea>
+    <button class="btn primary" style="margin-top:16px" onclick="saveEntry('${k}')">Save reflection</button>
+    <button class="btn ghost" style="margin-top:9px" onclick="closeSheet()">Skip</button>
+  `);
+  window._stars=0;
+}
+function setStars(n){ window._stars=n; document.querySelectorAll("#star-row i").forEach(s=>{ const i=+s.dataset.i; s.className = i<=n?"fa-solid fa-star":"fa-regular fa-star"; s.style.color = i<=n?"var(--cy)":"var(--mut2)"; }); }
+function saveEntry(k){
+  const p=PROTOCOLS[k]||{name:"Session"};
+  const note=(document.getElementById("j-note").value||"").trim();
+  S.journal.unshift({mood:p.name, rating:window._stars||0, note, ts:Date.now()});
+  if(S.journal.length>200)S.journal.length=200; save(); closeSheet(); renderJournal(); flash("Saved to journal");
+}
+function renderJournal(){
+  const l=document.getElementById("journal-list");
+  if(!S.journal.length){ l.innerHTML=`<div class="j-empty"><i class="fa-regular fa-moon"></i>No reflections yet.<br/><span class="tiny">After a session, jot how you felt — it stays on this device.</span></div>`; return; }
+  l.innerHTML=S.journal.map(e=>`<div class="j-entry"><div class="jh"><div class="jm">${e.mood}</div><div class="jd">${rel(e.ts)}</div></div>${e.rating?`<div class="stars">${"★".repeat(e.rating)}${"☆".repeat(5-e.rating)}</div>`:""}${e.note?`<div class="jn">${esc(e.note)}</div>`:""}</div>`).join("");
+}
+function rel(ts){ const d=(Date.now()-ts)/1000; if(d<60)return"just now"; if(d<3600)return Math.floor(d/60)+"m ago"; if(d<86400)return Math.floor(d/3600)+"h ago"; return new Date(ts).toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
+function esc(s){ return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* =================== SHEETS =================== */
+function sheet(html){ document.getElementById("sheet").innerHTML=html; document.getElementById("overlay").classList.add("show"); }
+function closeSheet(){ document.getElementById("overlay").classList.remove("show"); }
+function showSources(){
+  sheet(`<div class="grab"></div><h3>Sources &amp; honest limitations</h3>
+    <p class="muted" style="margin:8px 0 14px">ÆTHER uses tones from sound-healing tradition and brainwave research. We describe them by what they're <b>traditionally associated with</b> — these are subjective and exploratory, not clinical effects.</p>
+    <div class="warn-item"><i class="fa-solid fa-flask"></i><div>The <b>40 Hz</b> research (MIT and others) is genuinely interesting and <b>ongoing</b> — but it's early-stage and <b>not an approved treatment</b>. In ÆTHER it's simply a focus &amp; concentration session.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-circle-half-stroke"></i><div>Tone effects are <b>subjective</b> and not clinically established for most claims. What helps is personal.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-leaf"></i><div>ÆTHER is a <b>wellness and relaxation tool</b> for personal exploration. That honesty is a feature, not a weakness.</div></div>
+    <p class="tiny" style="margin-top:12px">For personal wellness only · Not medical advice. ÆTHER does not diagnose, treat, or cure any condition.</p>
+    <button class="btn ghost" style="margin-top:16px" onclick="closeSheet()">Close</button>`);
+}
+function showSafety(){
+  sheet(`<div class="grab"></div><h3>Safety &amp; disclaimer</h3>
+    <div style="margin-top:12px"></div>
+    <div class="warn-item"><i class="fa-solid fa-heart"></i><div>For <b>relaxation and personal wellness only</b>. It doesn't diagnose, treat, or cure anything.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-bolt"></i><div><b>Seizure warning.</b> Sessions use rhythmic sound pulses. With epilepsy, photosensitivity, or a seizure history, talk to a doctor first.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-user-doctor"></i><div>Consult a healthcare professional before use if you have any medical condition.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-volume-low"></i><div>Start at <b>low volume</b> with short sessions. Stop if you feel unwell.</div></div>
+    <button class="btn ghost" style="margin-top:12px" onclick="closeSheet()">Close</button>`);
+}
+
+/* =================== SETTINGS =================== */
+function setVol(v){ S.vol=+v; document.getElementById("vol-val").textContent=v+"%"; setMasterLive(); save(); }
+function setRate(v){ S.rate=+v; document.getElementById("rate-val").textContent=(v/100).toFixed(2)+"×"; save(); }
+function setPitch(v){ S.pitch=+v; document.getElementById("pitch-val").textContent=(v/100).toFixed(2); save(); }
+function toggleVoiceSetting(){ S.voiceOn=!S.voiceOn; document.getElementById("sw-voice").classList.toggle("on",S.voiceOn); syncVoiceBtn(); save(); }
+function toggleVoice(){ S.voiceOn=!S.voiceOn; document.getElementById("sw-voice").classList.toggle("on",S.voiceOn); syncVoiceBtn(); if(!S.voiceOn)try{speechSynthesis.cancel();}catch(e){} flash(S.voiceOn?"Voice on":"Voice off"); save(); }
+function syncVoiceBtn(){ document.querySelector("#voice-toggle i").className = S.voiceOn?"fa-solid fa-comment":"fa-solid fa-comment-slash"; }
+function toggleAdv(){ S.adv=!S.adv; document.body.classList.toggle("adv",S.adv); document.getElementById("sw-adv").classList.toggle("on",S.adv); save(); }
+function clearData(){ if(confirm("Erase your journal and settings on this device?")){ localStorage.removeItem(LS); S={voiceOn:true,vol:70,rate:92,pitch:95,adv:false,journal:[]}; applySettings(); renderJournal(); closeSheet(); flash("Data cleared"); } }
+
+function applySettings(){
+  document.getElementById("vol-slider").value=S.vol; document.getElementById("vol-val").textContent=S.vol+"%";
+  document.getElementById("rate-slider").value=S.rate; document.getElementById("rate-val").textContent=(S.rate/100).toFixed(2)+"×";
+  document.getElementById("pitch-slider").value=S.pitch; document.getElementById("pitch-val").textContent=(S.pitch/100).toFixed(2);
+  document.getElementById("sw-voice").classList.toggle("on",S.voiceOn);
+  document.getElementById("sw-adv").classList.toggle("on",S.adv);
+  document.body.classList.toggle("adv",S.adv); syncVoiceBtn();
+}
+
+/* =================== TOAST =================== */
+let toastT=null;
+function flash(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1600); }
+
+/* =================== GATE / BOOT =================== */
+function acknowledge(){ localStorage.setItem("aether.ack","1"); document.getElementById("gate").style.display="none"; boot(); }
+function boot(){
+  document.getElementById("app").style.visibility="visible";
+  renderHome(); renderSessions(); renderJournal(); applySettings();
+}
+function showGateAgain(){ document.getElementById("gate").style.display="flex"; }
+window.addEventListener("load",()=>{
+  if(localStorage.getItem("aether.ack")){ document.getElementById("gate").style.display="none"; boot(); }
+});
+// safety: if load already fired
+if(document.readyState==="complete"){ if(localStorage.getItem("aether.ack")){ document.getElementById("gate").style.display="none"; boot(); } }
+</script>
+</body>
+</html>
