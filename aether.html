@@ -752,4 +752,7 @@ window.addEventListener("load",()=>{
   if(localStorage.getItem("aether.ack")){ document.getElementById("gate").style.display="none"; boot(); }
 });
 // safety: if load already fired
-if(document.readyState==="complete"){ if(localStorage.getItem("aether.ack")){ document.getElementById("gate").style.
+if(document.readyState==="complete"){ if(localStorage.getItem("aether.ack")){ document.getElementById("gate").style.display="none"; boot(); } }
+</script>
+</body>
+</html>
