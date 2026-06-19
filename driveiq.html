@@ -237,6 +237,59 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
 /* active nav tab + chips a touch brighter */
 .tab.on i{text-shadow:0 0 16px var(--blue-glow)}
 .chip{letter-spacing:.06em}
+
+/* ===================== AUTOMECH HOME ===================== */
+.am-hero{position:relative;overflow:hidden;border:1px solid var(--line2);border-radius:18px;padding:22px 20px;margin-bottom:20px;
+  background:linear-gradient(135deg, rgba(0,240,255,.10), rgba(12,22,44,.45) 60%, transparent);display:flex;align-items:center;gap:16px}
+.am-hero-glow{position:absolute;top:-45%;right:-12%;width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle, rgba(0,240,255,.28), transparent 65%);pointer-events:none}
+.am-hero-ic{position:relative;width:64px;height:64px;border-radius:16px;flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:29px;color:var(--blue);background:rgba(0,240,255,.10);border:1px solid rgba(0,240,255,.22);box-shadow:0 0 26px -6px var(--blue-glow)}
+.am-title{font-family:"Space Grotesk","Inter",sans-serif;font-size:30px;font-weight:700;letter-spacing:-.01em;line-height:1}
+.am-title b{color:var(--blue)}
+.am-tag{color:var(--mut);font-size:13px;margin-top:6px}
+.am-feat-h{font-size:15.5px;font-weight:700;margin:0 2px 13px}
+.am-feats{display:flex;gap:10px;margin-bottom:22px}
+.am-feat{flex:1;display:flex;flex-direction:column;gap:7px}
+.am-feat>i{color:var(--blue);font-size:17px}
+.am-feat b{font-size:12.5px;font-weight:700;display:block}
+.am-feat span{font-size:10.5px;color:var(--mut2);display:block;line-height:1.3}
+.am-status{padding:16px}
+.am-status-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.am-status-sub{font-size:15px;font-weight:700;margin-top:3px}
+.am-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(0,255,102,.12);border:1px solid rgba(0,255,102,.25);color:var(--green);
+  font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;white-space:nowrap}
+.am-pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+.am-pill.off{background:var(--panel2);border-color:var(--line2);color:var(--mut)}
+.am-status-body{display:flex;gap:14px;align-items:center}
+.am-car{width:92px;flex:none;aspect-ratio:1;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:38px;color:var(--blue);
+  background:radial-gradient(circle at 50% 40%, rgba(0,240,255,.16), rgba(255,255,255,.02));border:1px solid var(--line2)}
+.am-sys{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.am-sysrow{display:flex;align-items:center;gap:10px}
+.am-sic{width:30px;height:30px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px}
+.am-smeta{flex:1;min-width:0}
+.am-sn{font-size:13px;font-weight:700;line-height:1.1}
+.am-ss{font-size:11px;font-weight:700;margin-top:1px}
+.am-sv{font-size:10.5px;color:var(--mut2);font-family:"JetBrains Mono",monospace;white-space:nowrap}
+.am-empty{flex:1;text-align:center;color:var(--mut);font-size:13px;padding:6px 4px;line-height:1.5}
+.am-note{display:flex;gap:8px;align-items:flex-start;font-size:10.5px;color:var(--mut2);line-height:1.4;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.am-note i{color:var(--amber);margin-top:1px;flex:none}
+.am-row-h{display:flex;align-items:center;justify-content:space-between;margin:24px 2px 13px}
+.am-row-h a{font-size:12px;color:var(--blue)}
+.am-maint{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.am-mcard{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:13px 12px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.am-mic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:11px}
+.am-mt{font-size:12px;font-weight:700;line-height:1.15}
+.am-md{font-size:10px;color:var(--mut2);margin:3px 0 9px;line-height:1.2;min-height:24px}
+.am-bar{height:5px;border-radius:5px;background:var(--line2);overflow:hidden}
+.am-bar>i{display:block;height:100%;border-radius:5px}
+.am-mp{font-size:10px;color:var(--mut);font-weight:700;margin-top:5px;text-align:right;font-family:"JetBrains Mono",monospace}
+.am-qa{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}
+.am-qa-b{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;color:var(--txt);padding:0}
+.am-qa-b .qc{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);
+  background:rgba(0,240,255,.07);border:1px solid var(--line2);transition:transform .15s}
+.am-qa-b:active .qc{transform:scale(.92)}
+.am-qa-b span{font-size:10.5px;font-weight:600;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -267,21 +320,46 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
         <i class="fa-solid fa-chevron-down chev"></i>
       </button>
     </div>
-    <h1 class="h" id="home-greet">What's your car telling you?</h1>
-    <div class="sub">Run a quick check with your camera or microphone — no adapters, no dongles.</div>
 
-    <div class="hero" onclick="go('vision')">
-      <div class="hl"><i class="fa-solid fa-bolt"></i>&nbsp; Dashboard Vision</div>
-      <h2>Read a warning light</h2>
-      <p>Point your camera at the dashboard. We'll explain what's lit, how urgent it is, and a ballpark cost.</p>
-      <button class="go">Start a scan <i class="fa-solid fa-arrow-right"></i></button>
+    <!-- hero header -->
+    <div class="am-hero">
+      <div class="am-hero-glow"></div>
+      <div class="am-hero-ic"><i class="fa-solid fa-car-side"></i></div>
+      <div><h1 class="am-title">Drive<b>IQ</b></h1><div class="am-tag">Your car. In your hands.</div></div>
     </div>
 
-    <div class="qgrid">
-      <button class="qcard" onclick="go('sound')"><div class="ic"><i class="fa-solid fa-wave-square"></i></div><div class="qt">SoundPrint AI</div><div class="qd">Listen to an unusual noise</div></button>
-      <button class="qcard" onclick="openResults()"><div class="ic"><i class="fa-solid fa-heart-pulse"></i></div><div class="qt">Health Report</div><div class="qd">Vehicle health score</div></button>
-      <button class="qcard" onclick="go('garage')"><div class="ic"><i class="fa-solid fa-warehouse"></i></div><div class="qt">Garage</div><div class="qd">Your vehicles &amp; VIN</div></button>
-      <button class="qcard" onclick="openMaint()"><div class="ic"><i class="fa-solid fa-screwdriver-wrench"></i></div><div class="qt">Maintenance</div><div class="qd">What's due &amp; when</div></button>
+    <!-- feature trio -->
+    <div class="am-feat-h">Powerful diagnostics at your fingertips</div>
+    <div class="am-feats">
+      <div class="am-feat"><i class="fa-solid fa-shield-halved"></i><div><b>Diagnostics</b><span>Real-time insights</span></div></div>
+      <div class="am-feat"><i class="fa-solid fa-screwdriver-wrench"></i><div><b>Maintenance</b><span>Stay ahead of issues</span></div></div>
+      <div class="am-feat"><i class="fa-solid fa-clipboard-check"></i><div><b>Repairs</b><span>Fix it right</span></div></div>
+    </div>
+
+    <!-- vehicle status -->
+    <div class="card am-status">
+      <div class="am-status-head">
+        <div><div class="section-h" style="margin:0">Vehicle Status</div><div class="am-status-sub" id="am-veh">No vehicle linked</div></div>
+        <div class="am-pill off" id="am-pill"><span class="dot"></span><span id="am-pill-t">Add vehicle</span></div>
+      </div>
+      <div class="am-status-body">
+        <div class="am-car"><i class="fa-solid fa-car-side"></i></div>
+        <div class="am-sys" id="am-sys"></div>
+      </div>
+      <div class="am-note" id="am-note" style="display:none"><i class="fa-solid fa-circle-info"></i><div>Estimates from your vehicle's age &amp; mileage — <b>not a live OBD reading</b>. Run a scan to check what's actually lit.</div></div>
+    </div>
+
+    <!-- maintenance overview -->
+    <div class="am-row-h"><span class="section-h" style="margin:0">Maintenance Overview</span><a onclick="openMaint()">View all</a></div>
+    <div class="am-maint" id="am-maint"></div>
+
+    <!-- quick actions -->
+    <div class="section-h">Quick Actions</div>
+    <div class="am-qa">
+      <button class="am-qa-b" onclick="go('vision')"><div class="qc"><i class="fa-solid fa-magnifying-glass"></i></div><span>Scan Now</span></button>
+      <button class="am-qa-b" onclick="go('sound')"><div class="qc"><i class="fa-solid fa-wave-square"></i></div><span>SoundPrint</span></button>
+      <button class="am-qa-b" onclick="openResults()"><div class="qc"><i class="fa-solid fa-heart-pulse"></i></div><span>Health</span></button>
+      <button class="am-qa-b" onclick="openMaint()"><div class="qc"><i class="fa-solid fa-screwdriver-wrench"></i></div><span>Maintenance</span></button>
     </div>
 
     <div class="section-h">Recent</div>
@@ -525,10 +603,53 @@ function setActive(id){S.activeId=id;save();renderHome();renderGarage();flash("A
 function delVehicle(id){ if(confirm("Remove this vehicle?")){S.vehicles=S.vehicles.filter(v=>v.id!==id);if(S.activeId===id)S.activeId=S.vehicles[0]?S.vehicles[0].id:null;save();renderGarage();renderHome();} }
 
 /* ===================== RENDER HOME / GARAGE ===================== */
+function estSystems(v){
+  const age=Math.max(0,2026-(+v.year||2016)), mi=v.mileage||0;
+  const ce=(S.history||[]).some(h=>/engine|check/i.test(h.title||""));
+  const OK={s:"OK",c:"var(--green)"};
+  const eng = ce?{s:"Logged code",c:"var(--red)"} : (age>=13||mi>=160000?{s:"Monitor",c:"var(--amber)"}:OK);
+  const bat = age>=4?{s:"Test soon",c:"var(--amber)"}:OK;
+  const cool= mi>=60000?{s:"Service due",c:"var(--amber)"}:OK;
+  const tire= age>=6?{s:"Check age",c:"var(--amber)"}:OK;
+  return [
+    {name:"Engine", icon:"fa-gauge-high",  bg:"rgba(255,138,61,.16)", ic:"#FF8A3D", status:eng.s, col:eng.c, note:age+" yrs"},
+    {name:"Battery",icon:"fa-car-battery", bg:"rgba(0,255,102,.14)",  ic:"#00ff66", status:bat.s, col:bat.c, note:age+" yrs"},
+    {name:"Cooling",icon:"fa-temperature-half", bg:"rgba(47,155,255,.16)", ic:"#2F9BFF", status:cool.s,col:cool.c,note:mi?mi.toLocaleString()+" mi":"add mi"},
+    {name:"Tires",  icon:"fa-life-ring",   bg:"rgba(178,102,255,.16)",ic:"#B266FF", status:tire.s,col:tire.c,note:age+" yrs"}
+  ];
+}
+function estMaint(v){
+  const mi=(v&&v.mileage)||0;
+  const defs=[
+    {t:"Oil Change",interval:7500,icon:"fa-oil-can",bg:"rgba(255,183,0,.16)",ic:"#FFB54E"},
+    {t:"Tire Rotation",interval:7000,icon:"fa-rotate",bg:"rgba(0,255,102,.14)",ic:"#00ff66"},
+    {t:"Brake Inspection",interval:12000,icon:"fa-circle-stop",bg:"rgba(178,102,255,.16)",ic:"#B266FF"}
+  ];
+  return defs.map(d=>{
+    if(!mi) return {t:d.t,due:"Add mileage in Garage",pct:0,icon:d.icon,bg:d.bg,ic:d.ic};
+    const pos=mi%d.interval, dueIn=d.interval-pos, pct=Math.round(pos/d.interval*100);
+    return {t:d.t,due:"~"+dueIn.toLocaleString()+" mi to go",pct,icon:d.icon,bg:d.bg,ic:d.ic};
+  });
+}
 function renderHome(){
   const v=activeVehicle();
   document.getElementById("vp-a").textContent=v?`${v.year} ${v.make} ${v.model}`.trim():"Add a vehicle";
   document.getElementById("vp-b").textContent=v?(v.mileage?v.mileage.toLocaleString()+" mi":(v.vin?"VIN "+v.vin.slice(-6):"tap to manage")):"tap to set up";
+  // vehicle status card
+  const sys=document.getElementById("am-sys"), note=document.getElementById("am-note"),
+        pill=document.getElementById("am-pill"), pillT=document.getElementById("am-pill-t"), veh=document.getElementById("am-veh");
+  if(!v){
+    veh.textContent="No vehicle linked";
+    pill.className="am-pill off"; pillT.textContent="Add vehicle"; note.style.display="none";
+    sys.innerHTML=`<div class="am-empty">Add a vehicle by VIN to see a real status snapshot.<button class="btn primary" style="margin-top:12px" onclick="go('garage')"><i class="fa-solid fa-plus"></i> Add a vehicle</button></div>`;
+  }else{
+    veh.textContent=`${v.year} ${v.make} ${v.model}`.trim();
+    pill.className="am-pill on"; pillT.textContent=v.mileage?v.mileage.toLocaleString()+" mi":"Linked"; note.style.display="";
+    sys.innerHTML=estSystems(v).map(s=>`<div class="am-sysrow"><div class="am-sic" style="background:${s.bg};color:${s.ic}"><i class="fa-solid ${s.icon}"></i></div><div class="am-smeta"><div class="am-sn">${s.name}</div><div class="am-ss" style="color:${s.col}">${s.status}</div></div><div class="am-sv">${s.note}</div></div>`).join("");
+  }
+  // maintenance overview
+  document.getElementById("am-maint").innerHTML=estMaint(v).map(m=>`<div class="am-mcard"><div class="am-mic" style="background:${m.bg};color:${m.ic}"><i class="fa-solid ${m.icon}"></i></div><div class="am-mt">${m.t}</div><div class="am-md">${m.due}</div><div class="am-bar"><i style="width:${m.pct}%;background:${m.ic}"></i></div><div class="am-mp">${m.pct}%</div></div>`).join("");
+  // recent
   const rl=document.getElementById("recent-list");
   if(!S.history.length){rl.innerHTML=`<div class="muted" style="padding:8px 2px">No checks yet. Run a Dashboard Vision or SoundPrint scan to get started.</div>`;}
   else{rl.innerHTML=S.history.slice(0,5).map(h=>`<div class="row"><div class="ic" style="background:${hex(h.color||'#00f0ff',.14)};color:${h.color||'#00f0ff'}"><i class="fa-solid ${h.icon||'fa-bolt'}"></i></div><div class="meta"><div class="t">${h.title}</div><div class="s">${h.sub} · ${rel(h.ts)}</div></div></div>`).join("");}
