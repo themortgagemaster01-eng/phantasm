@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>ClamSight Pro — Long Island Sound</title>
+<meta name="theme-color" content="#0f766e"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ClamSight"/>
+<meta name="description" content="A clean field companion for clamming the Long Island Sound — identify, log your haul, and learn the legal sizes."/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"/>
+<style>
+:root{
+  --bg:#f4f7f5; --card:#ffffff; --ink:#102a26; --ink2:#3c5450; --mut:#6d827d; --line:#e4ebe7; --line2:#d4ddd9;
+  --teal:#0f766e; --teal2:#14b8a6; --teal-soft:#e6f4f1; --sand:#e8dcc0; --sand2:#f2ead7;
+  --green:#1f9d57; --amber:#d98a1f; --red:#d2503f;
+  --r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;position:fixed;inset:0}
+#app{position:absolute;inset:0;display:flex;flex-direction:column}
+.screen{display:none;flex:1;min-height:0;animation:fade .35s ease}
+.screen.active{display:flex;flex-direction:column}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(96px + env(safe-area-inset-bottom))}
+.pad{padding:0 18px}
+.serif{font-family:"Fraunces",Georgia,serif}
+h1.h{font-family:"Fraunces",serif;font-size:30px;font-weight:600;letter-spacing:-.01em;line-height:1.08}
+.eyebrow{color:var(--teal);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sub{color:var(--mut);font-size:14px;line-height:1.5}
+.section-h{font-family:"Fraunces",serif;font-size:19px;font-weight:600;margin:26px 2px 12px}
+
+/* hero with underwater light rays (pure CSS, no external images) */
+.hero{position:relative;overflow:hidden;padding:max(54px,env(safe-area-inset-top)) 20px 26px;
+  background:linear-gradient(160deg,#0f766e 0%,#0b5f59 45%,#0a4d50 100%)}
+.hero::before{content:"";position:absolute;inset:-20% -10% auto -10%;height:160%;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(108deg, rgba(255,255,255,.16) 0 2px, transparent 2px 26px);
+  -webkit-mask-image:linear-gradient(to bottom, #000, transparent 75%);mask-image:linear-gradient(to bottom, #000, transparent 75%)}
+.hero::after{content:"";position:absolute;top:-40%;right:-15%;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.28), transparent 65%);pointer-events:none}
+.hero .htop{position:relative;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.hero .logo{display:flex;align-items:center;gap:10px;color:#fff}
+.hero .logo .mk{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:16px}
+.hero .logo b{font-family:"Fraunces",serif;font-size:18px;font-weight:600;letter-spacing:.01em}
+.hero .pro{font-size:10px;font-weight:800;letter-spacing:.1em;color:#0f766e;background:#fff;border-radius:20px;padding:4px 9px}
+.hero h2{position:relative;color:#fff;font-family:"Fraunces",serif;font-size:27px;font-weight:600;line-height:1.12;margin-bottom:6px}
+.hero p{position:relative;color:rgba(255,255,255,.82);font-size:13.5px;line-height:1.5;max-width:30ch}
+.hero .cond{position:relative;display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.hero .pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:11.5px;font-weight:600;padding:7px 12px;border-radius:20px}
+
+/* quick actions */
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.qcard{text-align:left;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 6px 18px -12px rgba(16,42,38,.4);transition:transform .14s}
+.qcard:active{transform:scale(.97)}
+.qcard .ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:30px;background:var(--teal-soft);color:var(--teal)}
+.qcard .qt{font-weight:700;font-size:15px}
+.qcard .qd{color:var(--mut);font-size:11.5px;margin-top:2px;line-height:1.35}
+
+/* generic */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:0 6px 18px -14px rgba(16,42,38,.35)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:15px;padding:14px 18px;border-radius:14px;border:1px solid var(--line2);background:var(--card);color:var(--ink);width:100%;cursor:pointer;font-family:inherit}
+.btn.primary{background:var(--teal);color:#fff;border:none;box-shadow:0 10px 22px -12px rgba(15,118,110,.8)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--red);border-color:#eccfca}
+.muted{color:var(--mut);font-size:13.5px;line-height:1.55}
+.tiny{color:var(--mut);font-size:11.5px;line-height:1.5}
+.field{width:100%;background:var(--card);border:1px solid var(--line2);border-radius:13px;color:var(--ink);padding:13px 14px;font-size:15px;font-family:inherit;outline:none}
+.field:focus{border-color:var(--teal)}
+.field::placeholder{color:#a7b5b0}
+input,textarea,select{font-family:inherit}
+a{color:var(--teal);text-decoration:none}
+
+/* rows / list */
+.row{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:10px;width:100%;text-align:left;color:var(--ink);box-shadow:0 5px 16px -14px rgba(16,42,38,.35);transition:transform .14s}
+.row:active{transform:scale(.99)}
+.row .ic{width:46px;height:46px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--sand2);color:var(--teal)}
+.row .meta{flex:1;min-width:0}
+.row .meta .t{font-weight:700;font-size:15px}
+.row .meta .s{color:var(--mut);font-size:12px;margin-top:2px}
+.row .chev{color:#b9c6c1;font-size:13px}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px}
+.chip.legal{background:#e3f5ea;color:var(--green)}
+.chip.grade{background:var(--sand2);color:#8a6d28}
+.disc{display:flex;gap:11px;background:#fff8ec;border:1px solid #f0e2c4;border-radius:14px;padding:13px 14px;margin-top:16px}
+.disc i{color:var(--amber);font-size:15px;margin-top:1px;flex:none}
+.disc div{font-size:12px;color:#7a6630;line-height:1.5}.disc b{color:#5c4d24}
+
+/* camera */
+.viewfinder{position:relative;width:100%;aspect-ratio:3/4;max-height:52vh;background:#06231f;border-radius:18px;overflow:hidden;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.viewfinder video{width:100%;height:100%;object-fit:cover}
+.vf-frame{position:absolute;inset:14%;border:2px dashed rgba(255,255,255,.6);border-radius:16px;pointer-events:none}
+.vf-ph{color:#cfe;text-align:center;padding:20px}.vf-ph i{font-size:38px;display:block;margin-bottom:12px;color:#7fd8cd}
+.shutter{width:64px;height:64px;border-radius:50%;background:#fff;border:4px solid var(--teal);margin:16px auto 0;display:block;box-shadow:0 6px 18px -6px rgba(15,118,110,.7)}
+.pickgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+.pick{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line2);border-radius:14px;padding:13px;text-align:left;color:var(--ink);cursor:pointer}
+.pick .pic{width:40px;height:40px;border-radius:11px;background:var(--teal-soft);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+.pick .pn{font-size:13px;font-weight:700}.pick .pd{font-size:10.5px;color:var(--mut)}
+
+/* species detail bits */
+.spec-hero{border-radius:16px;overflow:hidden;background:linear-gradient(150deg,#0f766e,#0a4d50);padding:20px;color:#fff;position:relative;margin-bottom:14px}
+.spec-hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(108deg,rgba(255,255,255,.12) 0 2px,transparent 2px 24px);opacity:.5;-webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent)}
+.spec-hero .si{position:relative;font-size:30px;margin-bottom:8px}
+.spec-hero h3{position:relative;font-family:"Fraunces",serif;font-size:23px;font-weight:600}
+.spec-hero .sci{position:relative;font-style:italic;font-size:12.5px;opacity:.85;margin-top:2px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.kv:last-child{border-bottom:none}.kv .k{color:var(--mut)}.kv .v{font-weight:700;text-align:right;max-width:62%}
+.idlist{list-style:none;display:grid;gap:8px;margin-top:4px}
+.idlist li{display:flex;gap:10px;font-size:13.5px;line-height:1.45}.idlist li i{color:var(--teal);margin-top:3px;font-size:11px;flex:none}
+.gradeT{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+.gradeT td{padding:8px 6px;border-bottom:1px solid var(--line)}.gradeT td:first-child{font-weight:700}
+
+/* log form */
+.catch-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.catch-row select{flex:1}
+.catch-row .num{width:84px}
+.catch-row button{flex:none;background:none;border:none;color:var(--red);font-size:16px;padding:8px}
+.logthumb{width:100%;height:150px;object-fit:cover;border-radius:13px;border:1px solid var(--line2);margin-top:8px}
+.up-label{display:flex;align-items:center;justify-content:center;gap:9px;border:1.5px dashed var(--line2);border-radius:13px;padding:15px;color:var(--teal);font-weight:700;font-size:13.5px;cursor:pointer;margin-top:8px}
+.up-label input{display:none}
+
+/* bottom nav */
+#nav{position:absolute;left:0;right:0;bottom:0;height:calc(74px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);
+  display:flex;align-items:flex-start;justify-content:space-around;padding-top:10px;z-index:40}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;color:#9fb0ab;font-size:9.5px;font-weight:600;width:62px;background:none;border:none;cursor:pointer}
+.tab i{font-size:18px}.tab.on{color:var(--teal)}
+
+/* overlay sheet / modal */
+.overlay{position:absolute;inset:0;z-index:80;background:rgba(10,30,27,.5);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex;animation:fade .25s ease}
+.sheet{background:var(--bg);border-radius:24px 24px 0 0;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;padding:22px 18px calc(26px + env(safe-area-inset-bottom))}
+.sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--line2);margin:0 auto 16px}
+.sheet h3{font-family:"Fraunces",serif;font-size:21px;font-weight:600;margin-bottom:4px}
+.toast{position:absolute;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(14px);background:#102a26;color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:13px;opacity:0;pointer-events:none;transition:.3s;z-index:90;white-space:nowrap;box-shadow:0 12px 30px -10px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* gate */
+#gate{position:absolute;inset:0;z-index:100;background:linear-gradient(160deg,#0f766e,#0a4d50);display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+#gate::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(108deg,rgba(255,255,255,.13) 0 2px,transparent 2px 26px);opacity:.5;-webkit-mask-image:linear-gradient(#000,transparent 70%);mask-image:linear-gradient(#000,transparent 70%)}
+#gate .gwrap{position:relative;background:var(--bg);border-radius:26px 26px 0 0;padding:26px 22px calc(26px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto}
+#gate .gmk{width:56px;height:56px;border-radius:16px;background:var(--teal-soft);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:25px;margin-bottom:16px}
+#gate h2{font-family:"Fraunces",serif;font-size:27px;font-weight:600;margin-bottom:4px}
+.warn-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.warn-item i{color:var(--teal);font-size:15px;margin-top:2px;width:18px;text-align:center;flex:none}
+.warn-item div{font-size:13px;color:var(--ink2);line-height:1.5}.warn-item b{color:var(--ink)}
+.gcheck{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--line2);border-radius:13px;padding:13px;margin:8px 0 14px;cursor:pointer}
+.gcheck .box{width:22px;height:22px;border-radius:6px;border:2px solid var(--line2);flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
+.gcheck.on .box{background:var(--teal);border-color:var(--teal);color:#fff}
+.gcheck span{font-size:12.5px;color:var(--ink2);line-height:1.45}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);padding:15px 16px;margin-bottom:1px}
+.set-row:first-of-type{border-radius:14px 14px 0 0}.set-row:last-of-type{border-radius:0 0 14px 14px}
+.set-row .sl{font-size:14px;font-weight:600}.set-row .sd{font-size:11.5px;color:var(--mut);margin-top:2px}
+</style>
+</head>
+<body>
+
+<!-- GATE -->
+<div id="gate">
+  <div class="gwrap">
+    <div class="gmk"><i class="fa-solid fa-water"></i></div>
+    <h2>ClamSight <span style="color:var(--teal)">Pro</span></h2>
+    <div class="tiny" style="letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin:2px 0 18px">Long Island Sound field tool</div>
+    <div class="warn-item"><i class="fa-solid fa-circle-info"></i><div>ClamSight helps you <b>identify shellfish, learn the legal sizes, and log your haul</b>. It's a helpful companion — not an official authority.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-triangle-exclamation"></i><div><b>Only harvest from certified (open) waters.</b> Shellfish from closed or uncertified areas can carry bacteria or biotoxins and make you seriously ill. Always check current closures.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-ruler"></i><div>Size and limit info here is <b>general guidance</b>. Confirm current rules with <b>NY DEC</b> and <b>CT Dept. of Agriculture</b>, and your town — they change and vary by location.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-id-card"></i><div>Get any required <b>permit/license</b> for your town or state, and never sell or barter a recreational catch.</div></div>
+    <div class="gcheck" id="gcheck" onclick="toggleAck()"><div class="box"><i class="fa-solid fa-check"></i></div><span>I understand I must only harvest legal-size shellfish from certified open waters, and I'll verify current local regulations.</span></div>
+    <button class="btn primary" id="gate-btn" onclick="acknowledge()" style="opacity:.5">Start clamming</button>
+    <p class="tiny" style="text-align:center;margin-top:12px">Be safe out there 🐚</p>
+  </div>
+</div>
+
+<div id="app" style="visibility:hidden">
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home"><div class="scroll">
+    <div class="hero">
+      <div class="htop">
+        <div class="logo"><div class="mk"><i class="fa-solid fa-water"></i></div><b>ClamSight</b></div>
+        <div class="pro">PRO</div>
+      </div>
+      <h2 id="greet">Good day for a dig.</h2>
+      <p>Identify your catch, check the legal size, and log the haul — all from the flats.</p>
+      <div class="cond">
+        <div class="pill"><i class="fa-solid fa-location-dot"></i> Long Island Sound</div>
+        <div class="pill"><i class="fa-solid fa-water"></i> Best at low tide</div>
+      </div>
+    </div>
+    <div class="pad">
+      <div class="qgrid">
+        <button class="qcard" onclick="go('identify')"><div class="ic"><i class="fa-solid fa-camera"></i></div><div class="qt">Identify</div><div class="qd">What did you find?</div></button>
+        <button class="qcard" onclick="openLog()"><div class="ic"><i class="fa-solid fa-plus"></i></div><div class="qt">Log a haul</div><div class="qd">Record today's catch</div></button>
+        <button class="qcard" onclick="go('species')"><div class="ic"><i class="fa-solid fa-book-open"></i></div><div class="qt">Species guide</div><div class="qd">IDs &amp; legal sizes</div></button>
+        <button class="qcard" onclick="go('log')"><div class="ic"><i class="fa-solid fa-trophy"></i></div><div class="qt">My log</div><div class="qd">Sessions &amp; brag reports</div></button>
+      </div>
+      <div class="section-h">Recent sessions</div>
+      <div id="home-recent"></div>
+      <div class="disc"><i class="fa-solid fa-shield-halved"></i><div><b>Before you keep anything:</b> make sure the area is open/certified and your catch meets the legal size. Check closures with NY DEC or CT Dept. of Agriculture.</div></div>
+    </div>
+  </div></div>
+
+  <!-- IDENTIFY -->
+  <div class="screen" id="screen-identify"><div class="scroll"><div class="pad" style="padding-top:max(54px,env(safe-area-inset-top))">
+    <div class="eyebrow"><i class="fa-solid fa-camera"></i> Identify</div>
+    <h1 class="h" style="margin:8px 0 6px">What did you find?</h1>
+    <div class="sub" style="margin-bottom:16px">Frame your shell, then confirm the species below. Always measure to confirm it's legal size.</div>
+    <div class="viewfinder" id="viewfinder">
+      <div class="vf-ph" id="vf-ph"><i class="fa-solid fa-camera"></i>Tap below to open your camera<br/><span class="tiny" style="color:#bfe">or just pick the species</span></div>
+      <div class="vf-frame" style="display:none" id="vf-frame"></div>
+    </div>
+    <button class="shutter" id="shutter" style="display:none" onclick="flash('Snap! Now confirm the species below.')"></button>
+    <button class="btn primary" id="cam-btn" style="margin-top:14px" onclick="openCamera()"><i class="fa-solid fa-camera"></i> Open camera</button>
+    <div class="section-h">Pick the species</div>
+    <div class="pickgrid" id="id-pick"></div>
+    <div class="disc"><i class="fa-solid fa-circle-info"></i><div>This is a <b>guided ID helper</b>, not a certified identification. Confirm by sight and by measuring. When unsure, release it.</div></div>
+  </div></div></div>
+
+  <!-- SPECIES -->
+  <div class="screen" id="screen-species"><div class="scroll"><div class="pad" style="padding-top:max(54px,env(safe-area-inset-top))">
+    <div class="eyebrow"><i class="fa-solid fa-book-open"></i> Species guide</div>
+    <h1 class="h" style="margin:8px 0 6px">Know your shellfish</h1>
+    <div class="sub" style="margin-bottom:16px">Long Island Sound's common catch — how to ID them and the legal sizes.</div>
+    <div id="species-list"></div>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Sizes shown are <b>general guidance</b> for NY &amp; CT and can change. Always confirm current rules with the state and your town before keeping anything.</div></div>
+  </div></div></div>
+
+  <!-- LOG -->
+  <div class="screen" id="screen-log"><div class="scroll"><div class="pad" style="padding-top:max(54px,env(safe-area-inset-top))">
+    <div class="eyebrow"><i class="fa-solid fa-trophy"></i> My log</div>
+    <h1 class="h" style="margin:8px 0 6px">Your hauls</h1>
+    <div class="sub" style="margin-bottom:16px">Every session you log, with brag reports ready to share.</div>
+    <button class="btn primary" onclick="openLog()"><i class="fa-solid fa-plus"></i> Log a new haul</button>
+    <div id="log-list" style="margin-top:16px"></div>
+  </div></div></div>
+
+  <!-- MORE -->
+  <div class="screen" id="screen-more"><div class="scroll"><div class="pad" style="padding-top:max(54px,env(safe-area-inset-top))">
+    <div class="eyebrow"><i class="fa-solid fa-circle-info"></i> More</div>
+    <h1 class="h" style="margin:8px 0 16px">About &amp; safety</h1>
+    <div class="card" style="margin-bottom:16px">
+      <div class="serif" style="font-size:17px;font-weight:600;margin-bottom:8px">Harvest safely &amp; legally</div>
+      <p class="muted" style="margin-bottom:10px">Shellfish filter their surroundings, so they concentrate bacteria and biotoxins from polluted or uncertified water. Harvesting from closed areas can cause serious illness.</p>
+      <p class="muted">Always: harvest only from <b>certified/open</b> waters, check current <b>closures</b> (rain often triggers temporary closures), keep only <b>legal-size</b> shellfish, observe daily limits, and carry any required <b>permit</b>.</p>
+    </div>
+    <div class="section-h" style="margin-top:6px">Official resources</div>
+    <button class="row" onclick="extLink('https://dec.ny.gov/things-to-do/shellfishing')"><div class="ic"><i class="fa-solid fa-landmark"></i></div><div class="meta"><div class="t">NY DEC — Shellfishing</div><div class="s">Regulations, limits &amp; closures</div></div><i class="fa-solid fa-arrow-up-right-from-square chev"></i></button>
+    <button class="row" onclick="extLink('https://portal.ct.gov/doag/aquaculture1/aquaculture/recreational-shellfishing')"><div class="ic"><i class="fa-solid fa-landmark"></i></div><div class="meta"><div class="t">CT Dept. of Agriculture</div><div class="s">Recreational shellfishing &amp; maps</div></div><i class="fa-solid fa-arrow-up-right-from-square chev"></i></button>
+    <div class="section-h">App</div>
+    <div class="set-row" onclick="clearData()"><div><div class="sl" style="color:var(--red)">Clear all data</div><div class="sd">Erase your logged sessions on this device</div></div><i class="fa-solid fa-trash" style="color:var(--red)"></i></div>
+    <p class="tiny" style="text-align:center;margin:16px 0 4px">ClamSight Pro · v2 · field companion<br/>Not an official authority. Verify all rules locally.</p>
+  </div></div></div>
+
+  <div id="nav">
+    <button class="tab on" data-s="home" onclick="go('home')"><i class="fa-solid fa-house"></i>Home</button>
+    <button class="tab" data-s="identify" onclick="go('identify')"><i class="fa-solid fa-camera"></i>Identify</button>
+    <button class="tab" data-s="species" onclick="go('species')"><i class="fa-solid fa-book-open"></i>Species</button>
+    <button class="tab" data-s="log" onclick="go('log')"><i class="fa-solid fa-trophy"></i>Log</button>
+    <button class="tab" data-s="more" onclick="go('more')"><i class="fa-solid fa-ellipsis"></i>More</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeSheet()"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ===================== DATA ===================== */
+const SPECIES={
+  quahog:{name:"Hard Clam (Quahog)",sci:"Mercenaria mercenaria",icon:"fa-circle",tag:"The classic",
+    id:["Thick, heavy off-white shell","Concentric growth rings","Purple stain inside the rim","Rounded, slightly triangular"],
+    ny:"1 in. thick across the hinge",ct:"1 in. thick (or won't pass a 1.5 in. ring)",
+    grades:[["Littleneck","≈1–2 in","Best raw on the half shell"],["Topneck","≈2 in","Raw or grilled"],["Cherrystone","≈2.5–3 in","Grilled, stuffed"],["Chowder","3 in+","Chowder &amp; sauce"]],
+    habitat:"Sandy-mud bottoms, intertidal out to ~30 ft",
+    find:"Tread barefoot or rake the sandy mud at low tide — feel for the hard 'click'.",
+    eat:"Littlenecks raw; bigger ones for chowder, stuffies, or the grill."},
+  cherrystone:{name:"Cherrystone",sci:"Mercenaria mercenaria",icon:"fa-circle-dot",tag:"A quahog size grade",
+    id:["A hard clam — same animal as the quahog","Mid-size: roughly 2.5–3 in across","Thick shell, concentric rings","Purple interior margin"],
+    ny:"Legal (over the 1 in. hinge minimum)",ct:"Legal (over 1 in. / 1.5 in. ring)",
+    note:"\"Cherrystone\" isn't a separate species — it's a market size of the hard clam, bigger than a littleneck and smaller than a chowder.",
+    habitat:"Same as the quahog — sandy-mud bottoms",
+    find:"Same as quahogs; cherrystones are just the medium ones you'll pull up.",
+    eat:"Great grilled or baked — a bit big for raw."},
+  razor:{name:"Razor Clam",sci:"Ensis directus",icon:"fa-pen",tag:"Fast & sharp",
+    id:["Long, narrow, straight shell","Glossy olive-brown","Looks like an old straight razor","Edges are sharp — handle with care"],
+    ny:"No specific state minimum listed — check local rules",ct:"No specific state minimum listed — check local rules",
+    habitat:"Sandy intertidal flats",
+    find:"Spot the keyhole-shaped hole at low tide; a little salt in the hole brings them up — grab quick.",
+    eat:"Quick sauté or fry — don't overcook or they turn rubbery."},
+  oyster:{name:"Eastern Oyster",sci:"Crassostrea virginica",icon:"fa-water",tag:"Reef builder",
+    id:["Rough, irregular gray shell","Teardrop / elongated shape","Cemented to hard surfaces or each other","One flat valve, one cupped"],
+    ny:"Check local — commonly 3 in. length",ct:"3 in. length",
+    habitat:"Reefs, hard bottoms, brackish creek mouths",
+    find:"Found in clusters on hard structure — wear gloves, they're sharp.",
+    eat:"Raw on the half shell, roasted, or grilled."},
+  softshell:{name:"Soft-Shell Clam (Steamer)",sci:"Mya arenaria",icon:"fa-egg",tag:"The steamer",
+    id:["Thin, brittle, chalky-white shell","Oval, gaps at one end","A long 'neck' (siphon) sticks out","Shell flexes — easily chipped"],
+    ny:"Check local rules",ct:"1.5 in. in length",
+    habitat:"Soft mud flats, intertidal",
+    find:"Look for the squirt! They spit water as you walk; dig down with a clam fork.",
+    eat:"Steam them — the classic New England steamer with broth and butter."}
+};
+const SPEC_ORDER=["quahog","softshell","razor","oyster","cherrystone"];
+const ID_TARGETS=["quahog","cherrystone","razor","oyster"];
+
+const LS="clamsight.v1";
+let S={sessions:[],ack:false};
+try{const j=JSON.parse(localStorage.getItem(LS));if(j)S=Object.assign(S,j);}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+
+/* ===================== NAV ===================== */
+function go(s){
+  if(s!=="identify")stopCamera();
+  document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));
+  document.getElementById("screen-"+s).classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
+  const sc=document.querySelector("#screen-"+s+" .scroll"); if(sc)sc.scrollTop=0;
+  if(s==="home")renderHome(); if(s==="species")renderSpecies(); if(s==="identify")renderIdPick(); if(s==="log")renderLog();
+}
+
+/* ===================== GATE ===================== */
+let ack=false;
+function toggleAck(){ack=!ack;document.getElementById("gcheck").classList.toggle("on",ack);document.getElementById("gate-btn").style.opacity=ack?"1":".5";}
+function acknowledge(){ if(!ack){flash("Please confirm to continue");return;} S.ack=true;save();localStorage.setItem("clamsight.ack","1");document.getElementById("gate").style.display="none";boot(); }
+function boot(){ document.getElementById("app").style.visibility="visible"; const h=new Date().getHours(); document.getElementById("greet").textContent=h<11?"Morning tide, morning dig.":h<17?"Good day for a dig.":"Evening flats are calling."; renderHome(); renderSpecies(); renderIdPick(); }
+
+/* ===================== HOME / LOG LIST ===================== */
+function renderHome(){
+  const el=document.getElementById("home-recent"); if(!el)return;
+  if(!S.sessions.length){el.innerHTML=`<div class="muted" style="padding:4px 2px">No sessions yet. Tap <b>Log a haul</b> after your next dig.</div>`;return;}
+  el.innerHTML=S.sessions.slice(0,3).map(sessionRow).join("");
+}
+function renderLog(){
+  const el=document.getElementById("log-list"); if(!el)return;
+  if(!S.sessions.length){el.innerHTML=`<div class="muted" style="padding:8px 2px">No hauls logged yet.</div>`;return;}
+  el.innerHTML=S.sessions.map(sessionRow).join("");
+}
+function sessionRow(s){
+  const total=s.catches.reduce((a,c)=>a+(+c.count||0),0);
+  const names=s.catches.map(c=>SPECIES[c.species]?SPECIES[c.species].name.split(" (")[0]:c.species).join(", ");
+  return `<button class="row" onclick="viewSession('${s.id}')"><div class="ic">${s.photo?`<img src="${s.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:13px"/>`:'<i class="fa-solid fa-trophy"></i>'}</div><div class="meta"><div class="t">${total} shellfish · ${esc(s.location||"Long Island Sound")}</div><div class="s">${fmtDate(s.date)} · ${esc(names||"—")}</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`;
+}
+
+/* ===================== IDENTIFY ===================== */
+function renderIdPick(){
+  const el=document.getElementById("id-pick"); if(!el)return;
+  el.innerHTML=ID_TARGETS.map(k=>{const S2=SPECIES[k];return `<button class="pick" onclick="speciesSheet('${k}')"><div class="pic"><i class="fa-solid ${S2.icon}"></i></div><div><div class="pn">${S2.name.split(" (")[0]}</div><div class="pd">${S2.tag}</div></div></button>`;}).join("");
+}
+let camStream=null;
+async function openCamera(){
+  const vf=document.getElementById("viewfinder");
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+    let v=vf.querySelector("video"); if(!v){v=document.createElement("video");v.setAttribute("playsinline","");v.muted=true;vf.appendChild(v);}
+    v.srcObject=camStream; await v.play();
+    document.getElementById("vf-ph").style.display="none";
+    document.getElementById("vf-frame").style.display="block";
+    document.getElementById("shutter").style.display="block";
+    document.getElementById("cam-btn").innerHTML='<i class="fa-solid fa-xmark"></i> Close camera';
+    document.getElementById("cam-btn").onclick=stopCamera;
+  }catch(e){ flash("Camera unavailable — pick the species below instead."); }
+}
+function stopCamera(){
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
+  const vf=document.getElementById("viewfinder"); if(!vf)return;
+  const v=vf.querySelector("video"); if(v)v.remove();
+  const ph=document.getElementById("vf-ph"); if(ph)ph.style.display="";
+  const fr=document.getElementById("vf-frame"); if(fr)fr.style.display="none";
+  const sh=document.getElementById("shutter"); if(sh)sh.style.display="none";
+  const cb=document.getElementById("cam-btn"); if(cb){cb.innerHTML='<i class="fa-solid fa-camera"></i> Open camera';cb.onclick=openCamera;}
+}
+
+/* ===================== SPECIES ===================== */
+function renderSpecies(){
+  const el=document.getElementById("species-list"); if(!el)return;
+  el.innerHTML=SPEC_ORDER.map(k=>{const s=SPECIES[k];return `<button class="row" onclick="speciesSheet('${k}')"><div class="ic"><i class="fa-solid ${s.icon}"></i></div><div class="meta"><div class="t">${s.name}</div><div class="s">${s.tag} · legal ${s.ny.split(" (")[0]}</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`;}).join("");
+}
+function speciesSheet(k){
+  const s=SPECIES[k];
+  sheet(`<div class="grab"></div>
+    <div class="spec-hero"><div class="si"><i class="fa-solid ${s.icon}"></i></div><h3>${s.name}</h3><div class="sci">${s.sci}</div></div>
+    ${s.note?`<div class="disc" style="margin-top:0;margin-bottom:14px"><i class="fa-solid fa-circle-info"></i><div>${s.note}</div></div>`:""}
+    <div class="section-h" style="margin-top:0">How to ID it</div>
+    <ul class="idlist">${s.id.map(i=>`<li><i class="fa-solid fa-check"></i>${i}</li>`).join("")}</ul>
+    <div class="section-h">Legal size <span class="chip legal" style="margin-left:6px">keep only legal</span></div>
+    <div class="card">
+      <div class="kv"><span class="k">New York</span><span class="v">${s.ny}</span></div>
+      <div class="kv"><span class="k">Connecticut</span><span class="v">${s.ct}</span></div>
+    </div>
+    ${s.grades?`<div class="section-h">Size grades</div><table class="gradeT">${s.grades.map(g=>`<tr><td>${g[0]}</td><td>${g[1]}</td><td class="tiny">${g[2]}</td></tr>`).join("")}</table>`:""}
+    <div class="section-h">Where &amp; how to find</div>
+    <div class="card"><div class="kv"><span class="k">Habitat</span><span class="v" style="font-weight:500;color:var(--ink2)">${s.habitat}</span></div><div class="kv"><span class="k">Technique</span><span class="v" style="font-weight:500;color:var(--ink2)">${s.find}</span></div><div class="kv"><span class="k">Eating</span><span class="v" style="font-weight:500;color:var(--ink2)">${s.eat}</span></div></div>
+    <button class="btn primary" style="margin-top:16px" onclick="closeSheet();openLog('${k}')"><i class="fa-solid fa-plus"></i> Add to a haul log</button>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Measure before you keep it, and only from <b>certified open waters</b>. Sizes are general — verify current NY/CT &amp; town rules.</div></div>`);
+}
+
+/* ===================== LOG A HAUL ===================== */
+let logPhoto="", logCatches=[];
+function openLog(presetSpecies){
+  logPhoto=""; logCatches=[{species:presetSpecies||"quahog",count:"",}];
+  const today=new Date().toISOString().slice(0,10);
+  sheet(`<div class="grab"></div><h3>Log a haul</h3>
+    <p class="muted" style="margin:6px 0 14px">Record what you brought home. Keep it honest — keep it legal.</p>
+    <label class="tiny" style="font-weight:700;display:block;margin-bottom:5px">Date</label>
+    <input class="field" type="date" id="lg-date" value="${today}" style="margin-bottom:12px"/>
+    <label class="tiny" style="font-weight:700;display:block;margin-bottom:5px">Spot / location</label>
+    <input class="field" id="lg-loc" placeholder="e.g. Stony Brook flats" style="margin-bottom:14px"/>
+    <label class="tiny" style="font-weight:700;display:block;margin-bottom:6px">Catch</label>
+    <div id="lg-catches"></div>
+    <button class="btn ghost" style="margin:2px 0 14px" onclick="addCatch()"><i class="fa-solid fa-plus"></i> Add another species</button>
+    <label class="tiny" style="font-weight:700;display:block;margin-bottom:5px">Notes</label>
+    <textarea class="field" id="lg-notes" rows="2" placeholder="Tide, weather, who you were with…" style="margin-bottom:6px"></textarea>
+    <label class="up-label"><i class="fa-solid fa-camera"></i> <span id="lg-photo-t">Add a photo of the haul</span><input type="file" accept="image/*" onchange="logPhotoPick(this)"/></label>
+    <div id="lg-photo-prev"></div>
+    <button class="btn primary" style="margin-top:16px" onclick="saveLog()"><i class="fa-solid fa-check"></i> Save haul</button>`);
+  renderCatches();
+}
+function renderCatches(){
+  const el=document.getElementById("lg-catches"); if(!el)return;
+  el.innerHTML=logCatches.map((c,i)=>`<div class="catch-row">
+    <select class="field" onchange="logCatches[${i}].species=this.value">${SPEC_ORDER.map(k=>`<option value="${k}" ${c.species===k?'selected':''}>${SPECIES[k].name.split(" (")[0]}</option>`).join("")}</select>
+    <input class="field num" type="number" inputmode="numeric" placeholder="#" value="${c.count}" oninput="logCatches[${i}].count=this.value"/>
+    ${logCatches.length>1?`<button onclick="logCatches.splice(${i},1);renderCatches()"><i class="fa-solid fa-circle-minus"></i></button>`:''}
+  </div>`).join("");
+}
+function addCatch(){ logCatches.push({species:"quahog",count:""}); renderCatches(); }
+function logPhotoPick(input){
+  const f=input.files&&input.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{ downscale(rd.result,900,(d)=>{ logPhoto=d; document.getElementById("lg-photo-t").textContent="Photo added ✓"; document.getElementById("lg-photo-prev").innerHTML=`<img class="logthumb" src="${d}"/>`; }); };
+  rd.readAsDataURL(f);
+}
+function downscale(dataUrl,max,cb){
+  const img=new Image();
+  img.onload=()=>{ let w=img.width,h=img.height; if(w>max||h>max){ if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;} } const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h); cb(c.toDataURL("image/jpeg",0.82)); };
+  img.onerror=()=>cb(dataUrl); img.src=dataUrl;
+}
+function saveLog(){
+  const date=document.getElementById("lg-date").value||new Date().toISOString().slice(0,10);
+  const loc=document.getElementById("lg-loc").value.trim();
+  const notes=document.getElementById("lg-notes").value.trim();
+  const catches=logCatches.filter(c=>+c.count>0).map(c=>({species:c.species,count:+c.count}));
+  if(!catches.length){flash("Add at least one species with a count");return;}
+  S.sessions.unshift({id:"s"+Date.now(),date,location:loc,notes,catches,photo:logPhoto});
+  save(); closeSheet(); flash("Haul saved 🐚"); renderHome(); renderLog();
+}
+function viewSession(id){
+  const s=S.sessions.find(x=>x.id===id); if(!s)return;
+  const total=s.catches.reduce((a,c)=>a+c.count,0);
+  sheet(`<div class="grab"></div><h3>${fmtDate(s.date)}</h3>
+    <div class="tiny" style="margin-bottom:12px"><i class="fa-solid fa-location-dot"></i> ${esc(s.location||"Long Island Sound")}</div>
+    ${s.photo?`<img class="logthumb" style="height:190px;margin-bottom:14px" src="${s.photo}"/>`:""}
+    <div class="card" style="margin-bottom:14px">${s.catches.map(c=>`<div class="kv"><span class="k">${SPECIES[c.species]?SPECIES[c.species].name.split(" (")[0]:c.species}</span><span class="v">${c.count}</span></div>`).join("")}<div class="kv"><span class="k" style="font-weight:700;color:var(--ink)">Total</span><span class="v" style="color:var(--teal)">${total}</span></div></div>
+    ${s.notes?`<p class="muted" style="margin-bottom:14px">"${esc(s.notes)}"</p>`:""}
+    <button class="btn primary" onclick="bragReport('${s.id}')"><i class="fa-solid fa-share-nodes"></i> Make a brag report</button>
+    <button class="btn danger" style="margin-top:10px" onclick="delSession('${s.id}')"><i class="fa-solid fa-trash"></i> Delete session</button>`);
+}
+function delSession(id){ if(confirm("Delete this session?")){S.sessions=S.sessions.filter(x=>x.id!==id);save();closeSheet();renderHome();renderLog();flash("Deleted");} }
+
+/* ===================== BRAG REPORT (canvas, Pro) ===================== */
+function bragReport(id){
+  const s=S.sessions.find(x=>x.id===id); if(!s)return;
+  const total=s.catches.reduce((a,c)=>a+c.count,0);
+  const cv=document.createElement("canvas"); cv.width=1080; cv.height=1080; const x=cv.getContext("2d");
+  // teal gradient
+  const g=x.createLinearGradient(0,0,1080,1080); g.addColorStop(0,"#0f766e");g.addColorStop(.55,"#0b5f59");g.addColorStop(1,"#083f42");
+  x.fillStyle=g; x.fillRect(0,0,1080,1080);
+  // light rays
+  x.save();x.globalAlpha=.16;x.strokeStyle="#fff";x.lineWidth=30;x.translate(760,-120);x.rotate(.34);
+  for(let i=0;i<16;i++){x.beginPath();x.moveTo(i*70-560,0);x.lineTo(i*70-560,1500);x.stroke();}
+  x.restore();
+  // glow
+  const rg=x.createRadialGradient(820,200,40,820,200,520); rg.addColorStop(0,"rgba(255,255,255,.28)");rg.addColorStop(1,"transparent"); x.fillStyle=rg;x.fillRect(0,0,1080,1080);
+  function txt(t,px,py,size,weight,col,font){x.fillStyle=col;x.font=`${weight} ${size}px ${font||'Inter, sans-serif'}`;x.fillText(t,px,py);}
+  txt("CLAMSIGHT PRO",80,150,30,"700","rgba(255,255,255,.7)"); x.letterSpacing="6px";
+  txt("THE HAUL",80,260,96,"600","#fff","Fraunces, Georgia, serif");
+  txt(fmtDate(s.date)+"  ·  "+(s.location||"Long Island Sound"),80,320,32,"500","rgba(255,255,255,.85)");
+  // big total
+  x.fillStyle="#fff";x.font="700 300px Fraunces, Georgia, serif";x.fillText(String(total),80,640);
+  txt("shellfish landed",84,700,40,"600","rgba(255,255,255,.85)");
+  // breakdown
+  let yy=820;
+  s.catches.forEach(c=>{ const nm=SPECIES[c.species]?SPECIES[c.species].name.split(" (")[0]:c.species; txt("• "+nm,84,yy,40,"600","#fff"); x.textAlign="right";txt(String(c.count),1000,yy,40,"700","#bdf3e6");x.textAlign="left"; yy+=64; });
+  txt("Caught legal. Caught clean. 🐚",80,1010,30,"500","rgba(255,255,255,.7)");
+  const url=cv.toDataURL("image/png");
+  sheet(`<div class="grab"></div><h3>Your brag report</h3><p class="muted" style="margin:6px 0 14px">Save it and share your haul.</p>
+    <img src="${url}" style="width:100%;border-radius:16px;border:1px solid var(--line2)"/>
+    <a class="btn primary" style="margin-top:14px" href="${url}" download="clamsight-haul-${s.date}.png"><i class="fa-solid fa-download"></i> Save image</a>
+    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
+}
+
+/* ===================== SHEETS / UTIL ===================== */
+function sheet(html){document.getElementById("sheet").innerHTML=html;document.getElementById("overlay").classList.add("show");}
+function closeSheet(){document.getElementById("overlay").classList.remove("show");}
+function extLink(u){ if(confirm("Open this official site in your browser?\n\n"+u))window.open(u,"_blank"); }
+function clearData(){ if(confirm("Erase all logged sessions on this device?")){S.sessions=[];save();renderHome();renderLog();flash("Data cleared");} }
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function fmtDate(d){try{return new Date(d+"T00:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});}catch(e){return d;}}
+let toastT;function flash(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1900);}
+
+/* ===================== BOOT ===================== */
+window.addEventListener("load",()=>{ if(localStorage.getItem("clamsight.ack")){document.getElementById("gate").style.display="none";boot();} });
+if(document.readyState==="complete"&&localStorage.getItem("clamsight.ack")){document.getElementById("gate").style.display="none";boot();}
+</script>
+</body>
+</html>
