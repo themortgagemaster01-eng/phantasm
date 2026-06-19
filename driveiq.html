@@ -683,7 +683,16 @@ function openResults(triggerKey){
   go("results");
   const v=activeVehicle();
   document.getElementById("res-title").textContent="Vehicle Health Report";
-  document.getElementById("res-sub").textContent=v?`${v.year} ${v.make} ${v.model} — informational snapshot.`:"Informational snapshot based on your inputs.";
+  if(!v){
+    document.getElementById("res-sub").textContent="Add a vehicle to generate a health snapshot.";
+    drawGauge(0);
+    document.getElementById("g-score").innerHTML='—<small> /100</small>';
+    const gl0=document.getElementById("g-label"); gl0.textContent="No vehicle linked"; gl0.style.color="var(--mut)";
+    document.getElementById("systems").innerHTML=`<div class="muted" style="padding:4px 2px 2px">A health snapshot is built from your vehicle's year, mileage and model data. Add a car by VIN to get model-specific guidance.</div>`;
+    document.getElementById("flags").innerHTML=`<button class="btn primary" onclick="go('garage')"><i class="fa-solid fa-plus"></i> Add a vehicle</button>`;
+    return;
+  }
+  document.getElementById("res-sub").textContent=`${v.year} ${v.make} ${v.model} — informational snapshot.`;
   // generate a plausible score from vehicle age/mileage + any high-sev trigger
   const yr=+(v&&v.year)||2016, age=Math.max(0,2026-yr), mi=(v&&v.mileage)||Math.min(180000,age*12000);
   let score=92-Math.min(34,age*2)-Math.min(20,Math.floor(mi/15000)*2);
@@ -721,9 +730,11 @@ function drawGauge(score){
   x.clearRect(0,0,w,h); x.lineCap="round";
   x.lineWidth=20; x.strokeStyle="rgba(255,255,255,.08)"; x.beginPath(); x.arc(cx,cy,R,Math.PI,2*Math.PI); x.stroke();
   const col=score>=80?"#3DDC97":score>=60?"#FFB54E":"#FF5A5F";
-  const end=Math.PI+(score/100)*Math.PI;
-  const g=x.createLinearGradient(cx-R,0,cx+R,0); g.addColorStop(0,"#00f0ff"); g.addColorStop(1,col);
-  x.strokeStyle=g; x.shadowBlur=18; x.shadowColor=col; x.beginPath(); x.arc(cx,cy,R,Math.PI,end); x.stroke();
+  if(score>0){
+    const end=Math.PI+(score/100)*Math.PI;
+    const g=x.createLinearGradient(cx-R,0,cx+R,0); g.addColorStop(0,"#00f0ff"); g.addColorStop(1,col);
+    x.strokeStyle=g; x.shadowBlur=18; x.shadowColor=col; x.beginPath(); x.arc(cx,cy,R,Math.PI,end); x.stroke();
+  }
 }
 
 /* ===================== SHEETS / MISC ===================== */
