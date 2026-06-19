@@ -10,20 +10,23 @@
 <meta name="apple-mobile-web-app-title" content="DriveIQ"/>
 <meta name="description" content="Hardware-free vehicle diagnostics from your iPhone. Informational AI estimates — not a replacement for a certified mechanic."/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"/>
 <style>
 :root{
-  --bg:#06080d; --bg2:#0a0d15; --panel:#0e1320; --panel2:#131a2a; --panel3:#172033;
-  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.13);
-  --txt:#eaf0fb; --mut:#8b96ad; --mut2:#5a6478;
-  --blue:#2F9BFF; --blue-dim:rgba(47,155,255,.14); --blue-glow:rgba(47,155,255,.5);
-  --green:#3DDC97; --amber:#FFB54E; --red:#FF5A5F;
-  --green-bg:rgba(61,220,151,.13); --amber-bg:rgba(255,181,78,.14); --red-bg:rgba(255,90,95,.14);
-  --r:20px;
+  --bg:#0B0F14; --bg2:#0d1320; --panel:rgba(255,255,255,.045); --panel2:rgba(255,255,255,.07); --panel3:rgba(255,255,255,.10);
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+  --txt:#e6edf6; --mut:#8b96ad; --mut2:#5a6478;
+  --blue:#00f0ff; --blue-dim:rgba(0,240,255,.12); --blue-glow:rgba(0,240,255,.45);
+  --green:#00ff66; --amber:#ffb700; --red:#ff3b3b;
+  --green-bg:rgba(0,255,102,.12); --amber-bg:rgba(255,183,0,.13); --red-bg:rgba(255,59,59,.13);
+  --r:16px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 html,body{height:100%}
-body{background:radial-gradient(130% 90% at 50% -10%, #0c1322 0%, #05070c 58%) fixed,#05070c;color:var(--txt);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+body{background:radial-gradient(125% 85% at 50% -10%, #10202e 0%, #0B0F14 56%) fixed,#0B0F14;color:var(--txt);
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased;
   overflow:hidden;position:fixed;inset:0;letter-spacing:.01em}
 #app{position:absolute;inset:0;display:flex;flex-direction:column}
 .screen{display:none;flex:1;min-height:0;animation:fade .4s ease}
@@ -192,6 +195,48 @@ a{color:var(--blue);text-decoration:none}
 .pick{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line2);border-radius:13px;padding:12px;text-align:left;color:var(--txt)}
 .pick i{font-size:18px;width:24px;text-align:center}
 .pick .pn{font-size:12.5px;font-weight:600;line-height:1.2}
+
+/* ============ COCKPIT SKIN (telemetry look grafted over real app) ============ */
+/* display + mono typography */
+h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
+  font-family:"Space Grotesk","Inter",system-ui,sans-serif; letter-spacing:-.02em;
+}
+.brand .nm{letter-spacing:.02em}
+.gscore, .gscore small, .kv .v, .veh-pill .vt .b, .flag .frow b, .hero .hl, .eyebrow, .section-h, .glabel, .tab,
+.chip, .stp .sn, .tiny.mono, .vmono{
+  font-feature-settings:"tnum"; font-variant-numeric:tabular-nums;
+}
+.gscore, .kv .v, .vmono{font-family:"JetBrains Mono","SF Mono",ui-monospace,monospace}
+/* cockpit section headers / eyebrows */
+.section-h{letter-spacing:.18em;color:rgba(226,232,240,.5)}
+.eyebrow,.hero .hl{letter-spacing:.2em}
+/* glass panels — translucent over near-black, with blur + depth */
+.card,.qcard,.hero,.row,.veh-pill,.flag,.set-row,.disc,.pick,.gcheck,.field,.sheet,.toast,.btn:not(.primary){
+  backdrop-filter:blur(16px) saturate(1.15); -webkit-backdrop-filter:blur(16px) saturate(1.15);
+}
+.card,.qcard,.hero,.flag{box-shadow:0 8px 32px -8px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04)}
+.qcard,.row,.veh-pill{background:rgba(255,255,255,.05)}
+/* accent glow on interactive icons */
+.brand .mk,.qcard .ic,.row .ic,.veh-pill .vic{box-shadow:0 0 18px -6px var(--blue-glow); border:1px solid rgba(0,240,255,.14)}
+.hero{background:linear-gradient(135deg, rgba(0,240,255,.10) 0%, rgba(255,255,255,.03) 55%)}
+.hero::before{background:radial-gradient(75% 120% at 100% 0%, rgba(0,240,255,.22), transparent 60%)}
+/* primary buttons / shutter — cyan core */
+.btn.primary,.hero .go{color:#031318}
+.btn.primary{box-shadow:0 10px 30px -10px var(--blue-glow), 0 0 0 1px rgba(0,240,255,.25) inset}
+/* glowing radial health gauge + heartbeat ring */
+.gaugewrap{position:relative}
+#gauge{filter:drop-shadow(0 0 14px var(--blue-glow))}
+.gscore{text-shadow:0 0 22px var(--blue-glow)}
+.gaugewrap::after{content:"";position:absolute;top:6px;left:50%;width:206px;height:206px;transform:translateX(-50%);
+  border-radius:50%;border:1px solid rgba(0,240,255,.16);pointer-events:none;animation:hbring 1.4s ease-in-out infinite}
+@keyframes hbring{0%,100%{opacity:.5;transform:translateX(-50%) scale(1)}50%{opacity:.85;transform:translateX(-50%) scale(.985)}}
+/* live status dot on brand */
+.brand .mk::after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green);transform:translate(13px,-13px);animation:hbring 1.4s ease-in-out infinite}
+.brand .mk{position:relative}
+/* active nav tab + chips a touch brighter */
+.tab.on i{text-shadow:0 0 16px var(--blue-glow)}
+.chip{letter-spacing:.06em}
 </style>
 </head>
 <body>
@@ -486,7 +531,7 @@ function renderHome(){
   document.getElementById("vp-b").textContent=v?(v.mileage?v.mileage.toLocaleString()+" mi":(v.vin?"VIN "+v.vin.slice(-6):"tap to manage")):"tap to set up";
   const rl=document.getElementById("recent-list");
   if(!S.history.length){rl.innerHTML=`<div class="muted" style="padding:8px 2px">No checks yet. Run a Dashboard Vision or SoundPrint scan to get started.</div>`;}
-  else{rl.innerHTML=S.history.slice(0,5).map(h=>`<div class="row"><div class="ic" style="background:${hex(h.color||'#2F9BFF',.14)};color:${h.color||'#2F9BFF'}"><i class="fa-solid ${h.icon||'fa-bolt'}"></i></div><div class="meta"><div class="t">${h.title}</div><div class="s">${h.sub} · ${rel(h.ts)}</div></div></div>`).join("");}
+  else{rl.innerHTML=S.history.slice(0,5).map(h=>`<div class="row"><div class="ic" style="background:${hex(h.color||'#00f0ff',.14)};color:${h.color||'#00f0ff'}"><i class="fa-solid ${h.icon||'fa-bolt'}"></i></div><div class="meta"><div class="t">${h.title}</div><div class="s">${h.sub} · ${rel(h.ts)}</div></div></div>`).join("");}
 }
 function renderGarage(){
   const l=document.getElementById("garage-list");
@@ -607,7 +652,7 @@ let _wd=null;
 function drawWave(){
   const cv=document.getElementById("wave"),x=cv.getContext("2d"),w=cv.width,h=cv.height; x.clearRect(0,0,w,h);
   if(analyser&&soundOn){ if(!_wd)_wd=new Uint8Array(analyser.fftSize); analyser.getByteTimeDomainData(_wd);
-    x.lineWidth=2.4;x.strokeStyle="#2F9BFF";x.shadowBlur=10;x.shadowColor="#2F9BFF";x.beginPath();
+    x.lineWidth=2.4;x.strokeStyle="#00f0ff";x.shadowBlur=12;x.shadowColor="#00f0ff";x.beginPath();
     const step=w/_wd.length; for(let i=0;i<_wd.length;i++){const px=i*step,py=h/2+((_wd[i]-128)/128)*(h/2-10);i?x.lineTo(px,py):x.moveTo(px,py);} x.stroke();
     vraf=requestAnimationFrame(drawWave);
   }
@@ -677,7 +722,7 @@ function drawGauge(score){
   x.lineWidth=20; x.strokeStyle="rgba(255,255,255,.08)"; x.beginPath(); x.arc(cx,cy,R,Math.PI,2*Math.PI); x.stroke();
   const col=score>=80?"#3DDC97":score>=60?"#FFB54E":"#FF5A5F";
   const end=Math.PI+(score/100)*Math.PI;
-  const g=x.createLinearGradient(cx-R,0,cx+R,0); g.addColorStop(0,"#2F9BFF"); g.addColorStop(1,col);
+  const g=x.createLinearGradient(cx-R,0,cx+R,0); g.addColorStop(0,"#00f0ff"); g.addColorStop(1,col);
   x.strokeStyle=g; x.shadowBlur=18; x.shadowColor=col; x.beginPath(); x.arc(cx,cy,R,Math.PI,end); x.stroke();
 }
 
