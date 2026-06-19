@@ -308,6 +308,40 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
 .rec .rm .b{font-size:11px;color:var(--mut2);margin-top:2px}
 .rec .rx{color:var(--red);font-size:14px;padding:8px;background:none;border:none;flex:none}
 .recview{max-width:100%;border-radius:12px;margin:8px 0}
+
+/* ===================== GARAGE FEATURED + VISION HUD ===================== */
+.gfeat{border:1px solid var(--line2);border-radius:18px;overflow:hidden;margin-bottom:18px;background:var(--panel);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.gfeat-banner{position:relative;height:172px;background-size:cover;background-position:center;background-color:#05080e;display:flex;align-items:flex-end}
+.gfeat-banner.noimg{align-items:center;justify-content:center;font-size:46px;color:var(--blue);background:radial-gradient(circle at 50% 40%, rgba(0,240,255,.16), rgba(255,255,255,.02))}
+.gfeat-ov{position:absolute;inset:0;background:linear-gradient(to top, rgba(5,8,14,.94), rgba(5,8,14,.12) 55%, transparent)}
+.gfeat-cap{position:relative;padding:14px 16px}
+.gfeat-tag{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
+.gfeat-name{font-family:"Space Grotesk","Inter",sans-serif;font-size:21px;font-weight:700;line-height:1.05}
+.gfeat-spec{font-size:11.5px;color:var(--mut);margin-top:3px;font-family:"JetBrains Mono",monospace}
+.gfeat-chips{display:flex;gap:8px;padding:12px}
+.gfeat-chips button{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:11px 6px;color:var(--txt);font-size:11px;font-weight:600}
+.gfeat-chips button i{color:var(--blue);font-size:15px}
+.gfeat-chips button:active{transform:scale(.96)}
+/* vision scan context chip */
+.scan-ctx{display:none;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:9px 12px;margin-bottom:14px}
+.scan-ctx .sc-th{width:40px;height:40px;border-radius:10px;flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--blue-dim);color:var(--blue);font-size:16px}
+.scan-ctx .sc-th img{width:100%;height:100%;object-fit:cover}
+.scan-ctx .sc-a{font-size:13px;font-weight:700}
+.scan-ctx .sc-b{font-size:10.5px;color:var(--mut2);margin-top:1px}
+/* HUD viewfinder reticle */
+.vf-frame{--c:#00f0ff;--t:2px;--l:24px;inset:12%!important;border:none!important;border-radius:0!important;
+  background:
+    linear-gradient(var(--c),var(--c)) 0 0/var(--l) var(--t),
+    linear-gradient(var(--c),var(--c)) 0 0/var(--t) var(--l),
+    linear-gradient(var(--c),var(--c)) 100% 0/var(--l) var(--t),
+    linear-gradient(var(--c),var(--c)) 100% 0/var(--t) var(--l),
+    linear-gradient(var(--c),var(--c)) 0 100%/var(--l) var(--t),
+    linear-gradient(var(--c),var(--c)) 0 100%/var(--t) var(--l),
+    linear-gradient(var(--c),var(--c)) 100% 100%/var(--l) var(--t),
+    linear-gradient(var(--c),var(--c)) 100% 100%/var(--t) var(--l);
+  background-repeat:no-repeat;filter:drop-shadow(0 0 5px var(--blue-glow))}
+.vf-frame::after{content:"";position:absolute;left:6%;right:6%;height:2px;top:6%;background:linear-gradient(90deg,transparent,var(--c),transparent);box-shadow:0 0 12px var(--c);animation:vfscan 2.6s ease-in-out infinite}
+@keyframes vfscan{0%{top:6%}50%{top:90%}100%{top:6%}}
 </style>
 </head>
 <body>
@@ -390,6 +424,8 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     <div class="eyebrow"><i class="fa-solid fa-warehouse"></i> Garage</div>
     <h1 class="h" style="font-size:25px">Your vehicles</h1>
     <div class="sub">Add a car by VIN for accurate, model-specific guidance.</div>
+    <div id="garage-featured"></div>
+    <div class="section-h" id="garage-list-h" style="display:none">All vehicles</div>
     <div id="garage-list"></div>
     <button class="btn primary" style="margin-top:6px" onclick="openAddVehicle()"><i class="fa-solid fa-plus"></i> Add a vehicle</button>
     <button class="btn ghost" style="margin-top:10px" onclick="go('records')"><i class="fa-solid fa-folder-open"></i> Service records &amp; receipts</button>
@@ -400,6 +436,7 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Dashboard Vision</div>
     <h1 class="h" style="font-size:25px">Read a warning light</h1>
     <div class="sub" id="vision-sub">Frame your lit dashboard cluster and capture. Works on any vehicle.</div>
+    <div class="scan-ctx" id="vision-veh"></div>
     <div class="viewfinder" id="viewfinder">
       <div class="vf-placeholder" id="vf-ph"><i class="fa-solid fa-camera"></i>Tap below to open your camera<br/><span class="tiny">or pick the light manually</span></div>
       <div class="vf-frame" style="display:none" id="vf-frame"></div>
@@ -551,7 +588,7 @@ function go(s){
   document.getElementById("screen-"+s).classList.add("active");
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
   const sc=document.querySelector("#screen-"+s+" .scroll"); if(sc)sc.scrollTop=0;
-  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound(); if(s==="records")renderRecords();
+  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound(); if(s==="records")renderRecords(); if(s==="vision")setScanContext();
 }
 
 /* ===================== GATE ===================== */
@@ -712,9 +749,26 @@ function renderHome(){
   else{rl.innerHTML=S.history.slice(0,5).map(h=>`<div class="row"><div class="ic" style="background:${hex(h.color||'#00f0ff',.14)};color:${h.color||'#00f0ff'}"><i class="fa-solid ${h.icon||'fa-bolt'}"></i></div><div class="meta"><div class="t">${h.title}</div><div class="s">${h.sub} · ${rel(h.ts)}</div></div></div>`).join("");}
 }
 function renderGarage(){
-  const l=document.getElementById("garage-list");
-  if(!S.vehicles.length){l.innerHTML=`<div class="muted" style="padding:6px 2px 14px">No vehicles yet. Add one by VIN for model-specific guidance.</div>`;return;}
-  l.innerHTML=S.vehicles.map(v=>`<div class="row" onclick="vehicleSheet('${v.id}')"><div class="ic${v.img?' gthumb':''}">${v.img?`<img src="${v.img}" alt=""/>`:'<i class="fa-solid fa-car-side"></i>'}</div><div class="meta"><div class="t">${v.year} ${v.make} ${v.model} ${v.id===S.activeId?'<span class="chip lo" style="margin-left:6px">Active</span>':''}</div><div class="s">${[v.engine,v.mileage?v.mileage.toLocaleString()+' mi':''].filter(Boolean).join(' · ')||(v.vin?'VIN '+v.vin:'—')}</div></div><i class="fa-solid fa-chevron-right chev"></i></div>`).join("");
+  const l=document.getElementById("garage-list"), feat=document.getElementById("garage-featured"), lh=document.getElementById("garage-list-h");
+  const av=activeVehicle();
+  if(feat){
+    if(av){
+      const spec=[av.engine,av.mileage?av.mileage.toLocaleString()+" mi":""].filter(Boolean).join(" · ")||(av.vin?"VIN "+av.vin:"");
+      feat.innerHTML=`<div class="gfeat"><div class="gfeat-banner ${av.img?"":"noimg"}" ${av.img?`style="background-image:url('${av.img}')"`:""} onclick="vehicleSheet('${av.id}')">${av.img?"":'<i class="fa-solid fa-car-side"></i>'}<div class="gfeat-ov"></div><div class="gfeat-cap"><div class="gfeat-tag">Active vehicle</div><div class="gfeat-name">${av.year} ${av.make} ${av.model}</div><div class="gfeat-spec">${spec}</div></div></div><div class="gfeat-chips"><button onclick="openResults()"><i class="fa-solid fa-heart-pulse"></i>Health</button><button onclick="openMaint()"><i class="fa-solid fa-screwdriver-wrench"></i>Service</button><button onclick="go('records')"><i class="fa-solid fa-folder-open"></i>Records</button></div></div>`;
+    } else feat.innerHTML="";
+  }
+  if(!S.vehicles.length){ if(lh)lh.style.display="none"; l.innerHTML=`<div class="muted" style="padding:6px 2px 14px">No vehicles yet. Add one by VIN for model-specific guidance.</div>`; return; }
+  const others=S.vehicles.filter(v=>!av||v.id!==av.id);
+  if(lh)lh.style.display=others.length?"block":"none";
+  l.innerHTML=others.map(v=>`<div class="row" onclick="vehicleSheet('${v.id}')"><div class="ic${v.img?' gthumb':''}">${v.img?`<img src="${v.img}" alt=""/>`:'<i class="fa-solid fa-car-side"></i>'}</div><div class="meta"><div class="t">${v.year} ${v.make} ${v.model}</div><div class="s">${[v.engine,v.mileage?v.mileage.toLocaleString()+' mi':''].filter(Boolean).join(' · ')||(v.vin?'VIN '+v.vin:'—')}</div></div><i class="fa-solid fa-chevron-right chev"></i></div>`).join("");
+}
+function setScanContext(){
+  const el=document.getElementById("vision-veh"); if(!el)return;
+  const v=activeVehicle();
+  el.style.display="flex";
+  el.innerHTML=v
+    ? `<div class="sc-th">${v.img?`<img src="${v.img}" alt=""/>`:'<i class="fa-solid fa-car-side"></i>'}</div><div><div class="sc-a">${v.year} ${v.make} ${v.model}</div><div class="sc-b">Guidance tuned to this vehicle</div></div>`
+    : `<div class="sc-th"><i class="fa-solid fa-car-side"></i></div><div><div class="sc-a">No vehicle selected</div><div class="sc-b">Add one in Garage for model-specific results</div></div>`;
 }
 function vehicleSheet(id){
   const v=S.vehicles.find(x=>x.id===id);if(!v)return;
