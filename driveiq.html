@@ -611,12 +611,24 @@ function vinValid(vin){ const c=vinCheckDigit(vin); return c!==null && c===vin[8
 let pendingVeh=null;
 async function carImage(v){
   if(!v||(!v.make&&!v.model))return null;
-  const term=[v.year,v.make,v.model].filter(Boolean).join(" ")+" car";
+  // Year-accurate: search Wikimedia Commons FILE namespace (filenames usually include the exact year/generation)
+  const queries=[[v.year,v.make,v.model].filter(Boolean).join(" "), [v.make,v.model].filter(Boolean).join(" ")];
+  for(const q of queries){
+    try{
+      const u=`https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrsearch=${encodeURIComponent(q)}&gsrlimit=8&prop=imageinfo&iiprop=url|mime&iiurlwidth=640`;
+      const r=await fetch(u); const j=await r.json(); const pages=j.query&&j.query.pages;
+      if(pages){
+        const arr=Object.values(pages).filter(p=>p.imageinfo&&p.imageinfo[0]&&/image\/(jpeg|png)/.test(p.imageinfo[0].mime||"")).sort((a,b)=>(a.index||0)-(b.index||0));
+        if(arr.length&&arr[0].imageinfo[0].thumburl)return arr[0].imageinfo[0].thumburl;
+      }
+    }catch(e){}
+  }
+  // Fallback: Wikipedia article lead image (newest generation — last resort)
   try{
-    const r=await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=640&redirects=1&generator=search&gsrsearch=${encodeURIComponent(term)}&gsrlimit=1`);
-    const j=await r.json(); const pages=j.query&&j.query.pages; if(!pages)return null;
-    const p=Object.values(pages)[0]; return (p.thumbnail&&p.thumbnail.source)||null;
-  }catch(e){return null;}
+    const r=await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=640&redirects=1&generator=search&gsrsearch=${encodeURIComponent([v.make,v.model].filter(Boolean).join(" ")+" car")}&gsrlimit=1`);
+    const j=await r.json(); const pages=j.query&&j.query.pages; if(pages){const p=Object.values(pages)[0]; return (p.thumbnail&&p.thumbnail.source)||null;}
+  }catch(e){}
+  return null;
 }
 function openAddVehicle(){
   sheet(`
@@ -664,7 +676,7 @@ async function decodeVin(){
   const imgHolder=document.getElementById("vin-img");
   if(imgHolder)imgHolder.innerHTML=`<div style="text-align:center;padding:4px 0 12px"><div class="spin"></div><div class="tiny" style="margin-top:8px">Finding a photo of your car…</div></div>`;
   carImage(v).then(url=>{
-    if(pendingVeh)pendingVeh.img=url||"";
+    if(pendingVeh){pendingVeh.img=url||""; pendingVeh.imgV2=true;}
     const h=document.getElementById("vin-img");
     if(h)h.innerHTML=url?`<img class="vinimg" src="${url}" alt="${v.year} ${v.make} ${v.model}"/><div class="vincap">Representative image of this model</div>`:"";
   });
@@ -738,7 +750,7 @@ function renderHome(){
     veh.textContent=`${v.year} ${v.make} ${v.model}`.trim();
     pill.className="am-pill on"; pillT.textContent=v.mileage?v.mileage.toLocaleString()+" mi":"Linked"; note.style.display="";
     if(carEl)carEl.innerHTML=v.img?`<img src="${v.img}" alt=""/>`:`<i class="fa-solid fa-car-side"></i>`;
-    if(!v.img){carImage(v).then(url=>{ if(!url)return; v.img=url; save(); const c=document.getElementById("am-car"); const av=activeVehicle(); if(c&&av&&av.id===v.id)c.innerHTML=`<img src="${url}" alt=""/>`; });}
+    if(!v.imgV2){carImage(v).then(url=>{ if(url)v.img=url; v.imgV2=true; save(); const c=document.getElementById("am-car"); const av=activeVehicle(); if(c&&av&&av.id===v.id&&v.img)c.innerHTML=`<img src="${v.img}" alt=""/>`; });}
     sys.innerHTML=estSystems(v).map(s=>`<div class="am-sysrow"><div class="am-sic" style="background:${s.bg};color:${s.ic}"><i class="fa-solid ${s.icon}"></i></div><div class="am-smeta"><div class="am-sn">${s.name}</div><div class="am-ss" style="color:${s.col}">${s.status}</div></div><div class="am-sv">${s.note}</div></div>`).join("");
   }
   // maintenance overview
