@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<title>ClamSight Pro — Long Island Sound</title>
+<title>Clam Finder — Long Island Sound</title>
 <meta name="theme-color" content="#0f766e"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="ClamSight"/>
+<meta name="apple-mobile-web-app-title" content="Clam Finder"/>
 <meta name="description" content="A clean field companion for clamming the Long Island Sound — identify, log your haul, and learn the legal sizes."/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -196,6 +196,20 @@ a{color:var(--teal);text-decoration:none}
 .scan-status b{font-weight:700}
 .det-bar{height:5px;border-radius:5px;background:var(--line2);overflow:hidden;margin-top:6px}
 .det-bar>i{display:block;height:100%;border-radius:5px}
+
+/* teach the AI */
+.teach-cam{position:relative;width:100%;aspect-ratio:4/3;max-height:46vh;background:#06231f;border-radius:18px;overflow:hidden;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.teach-cam video{width:100%;height:100%;object-fit:cover}
+.teach-reticle{position:absolute;inset:16% 22%;border:2px dashed rgba(255,255,255,.6);border-radius:14px;pointer-events:none}
+.teach-pred{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(6,35,31,.72);color:#fff;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;text-align:center;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.teach-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.teach-b{display:flex;flex-direction:column;align-items:center;gap:6px;border:none;border-radius:14px;padding:14px 8px;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;text-align:center;line-height:1.3}
+.teach-b.pos{background:var(--green)} .teach-b.neg{background:#7c8a86}
+.teach-b .cnt{font-size:11px;opacity:.9;font-weight:600}
+/* guide segments + fishing */
+.seg{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:5px;margin-bottom:16px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.seg button{flex:1;background:none;border:none;color:var(--mut);font-weight:700;font-size:13.5px;padding:10px;border-radius:9px;cursor:pointer}
+.seg button.on{background:var(--teal);color:#fff}
 </style>
 </head>
 <body>
@@ -204,9 +218,9 @@ a{color:var(--teal);text-decoration:none}
 <div id="gate">
   <div class="gwrap">
     <div class="gmk"><i class="fa-solid fa-water"></i></div>
-    <h2>ClamSight <span style="color:var(--teal)">Pro</span></h2>
+    <h2>Clam <span style="color:var(--teal)">Finder</span></h2>
     <div class="tiny" style="letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin:2px 0 18px">Long Island Sound field tool</div>
-    <div class="warn-item"><i class="fa-solid fa-circle-info"></i><div>ClamSight helps you <b>identify shellfish, learn the legal sizes, and log your haul</b>. It's a helpful companion — not an official authority.</div></div>
+    <div class="warn-item"><i class="fa-solid fa-circle-info"></i><div>Clam Finder helps you <b>identify shellfish, learn the legal sizes, and log your haul</b>. It's a helpful companion — not an official authority.</div></div>
     <div class="warn-item"><i class="fa-solid fa-triangle-exclamation"></i><div><b>Only harvest from certified (open) waters.</b> Shellfish from closed or uncertified areas can carry bacteria or biotoxins and make you seriously ill. Always check current closures.</div></div>
     <div class="warn-item"><i class="fa-solid fa-ruler"></i><div>Size and limit info here is <b>general guidance</b>. Confirm current rules with <b>NY DEC</b> and <b>CT Dept. of Agriculture</b>, and your town — they change and vary by location.</div></div>
     <div class="warn-item"><i class="fa-solid fa-id-card"></i><div>Get any required <b>permit/license</b> for your town or state, and never sell or barter a recreational catch.</div></div>
@@ -222,7 +236,7 @@ a{color:var(--teal);text-decoration:none}
   <div class="screen active" id="screen-home"><div class="scroll">
     <div class="hero">
       <div class="htop">
-        <div class="logo"><div class="mk"><i class="fa-solid fa-water"></i></div><b>ClamSight</b></div>
+        <div class="logo"><div class="mk"><i class="fa-solid fa-water"></i></div><b>Clam Finder</b></div>
         <div class="pro">PRO</div>
       </div>
       <h2 id="greet">Good day for a dig.</h2>
@@ -268,6 +282,7 @@ a{color:var(--teal);text-decoration:none}
       </div>
     </div>
     <button class="btn primary" id="scan-start" style="margin-top:14px" onclick="startScan()"><i class="fa-solid fa-camera"></i> Start scanning</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="go('teach')"><i class="fa-solid fa-brain"></i> Teach the AI to spot clams</button>
     <div class="scan-status" id="scan-tide"><i class="fa-solid fa-water"></i><div>Set your tide spot on Home to see the dig window here.</div></div>
     <div id="det-list" style="margin-top:14px"></div>
     <div class="section-h">Or identify by sight</div>
@@ -277,11 +292,13 @@ a{color:var(--teal);text-decoration:none}
 
   <!-- SPECIES -->
   <div class="screen" id="screen-species"><div class="scroll"><div class="pad" style="padding-top:max(54px,env(safe-area-inset-top))">
-    <div class="eyebrow"><i class="fa-solid fa-book-open"></i> Species guide</div>
-    <h1 class="h" style="margin:8px 0 6px">Know your shellfish</h1>
-    <div class="sub" style="margin-bottom:16px">Long Island Sound's common catch — how to ID them and the legal sizes.</div>
+    <div class="eyebrow"><i class="fa-solid fa-book-open"></i> Field guide</div>
+    <h1 class="h" style="margin:8px 0 6px">Know your catch</h1>
+    <div class="sub" style="margin-bottom:16px">Clams and fish of the Long Island Sound — IDs, legal sizes, seasons and bait.</div>
+    <div class="seg"><button id="seg-clams" class="on" onclick="setGuide('clams')">Clams</button><button id="seg-fish" onclick="setGuide('fish')">Fish</button></div>
     <div id="species-list"></div>
-    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Sizes shown are <b>general guidance</b> for NY &amp; CT and can change. Always confirm current rules with the state and your town before keeping anything.</div></div>
+    <div id="fish-list" style="display:none"></div>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Sizes, seasons &amp; limits shown are <b>general 2026 guidance</b> for NY &amp; CT and can change. Always confirm current rules (NY DEC / CT Dept. of Agriculture) before keeping anything.</div></div>
   </div></div></div>
 
   <!-- LOG -->
@@ -307,13 +324,33 @@ a{color:var(--teal);text-decoration:none}
     <button class="row" onclick="extLink('https://portal.ct.gov/doag/aquaculture1/aquaculture/recreational-shellfishing')"><div class="ic"><i class="fa-solid fa-landmark"></i></div><div class="meta"><div class="t">CT Dept. of Agriculture</div><div class="s">Recreational shellfishing &amp; maps</div></div><i class="fa-solid fa-arrow-up-right-from-square chev"></i></button>
     <div class="section-h">App</div>
     <div class="set-row" onclick="clearData()"><div><div class="sl" style="color:var(--red)">Clear all data</div><div class="sd">Erase your logged sessions on this device</div></div><i class="fa-solid fa-trash" style="color:var(--red)"></i></div>
-    <p class="tiny" style="text-align:center;margin:16px 0 4px">ClamSight Pro · v2 · field companion<br/>Not an official authority. Verify all rules locally.</p>
+    <p class="tiny" style="text-align:center;margin:16px 0 4px">Clam Finder · v2 · field companion<br/>Not an official authority. Verify all rules locally.</p>
+  </div></div></div>
+
+  <!-- TEACH THE AI -->
+  <div class="screen" id="screen-teach"><div class="scroll"><div class="pad" style="padding-top:max(54px,env(safe-area-inset-top))">
+    <div class="eyebrow"><i class="fa-solid fa-brain"></i> Teach the AI</div>
+    <h1 class="h" style="margin:8px 0 6px">Teach it your sand</h1>
+    <div class="sub" style="margin-bottom:14px">Show the camera a few real clam signs (siphon holes, dimples, bubbles) and a few patches of empty sand. The app learns <b>on your device</b> — no internet after it loads.</div>
+    <div class="teach-cam" id="teach-cam">
+      <div class="vf-ph" id="teach-ph" style="color:#cfe;text-align:center;padding:22px"><i class="fa-solid fa-camera" style="font-size:36px;color:#7fd8cd;display:block;margin-bottom:10px"></i><div>Open the camera, point at the sand, and add examples.</div></div>
+      <div class="teach-reticle" id="teach-reticle" style="display:none"></div>
+      <div class="teach-pred" id="teach-pred" style="display:none"></div>
+    </div>
+    <button class="btn primary" id="teach-start" style="margin-top:14px" onclick="teachStart()"><i class="fa-solid fa-camera"></i> Open camera</button>
+    <div class="teach-btns" id="teach-btns" style="display:none">
+      <button class="teach-b pos" onclick="teachAdd('clam')"><i class="fa-solid fa-plus"></i> This is a clam sign <span class="cnt" id="cnt-clam">0 added</span></button>
+      <button class="teach-b neg" onclick="teachAdd('sand')"><i class="fa-solid fa-plus"></i> This is empty sand <span class="cnt" id="cnt-sand">0 added</span></button>
+    </div>
+    <div id="teach-status" class="tiny" style="margin-top:13px"></div>
+    <button class="btn ghost" style="margin-top:12px" onclick="teachReset()"><i class="fa-solid fa-rotate-left"></i> Reset training</button>
+    <div class="disc"><i class="fa-solid fa-circle-info"></i><div><b>How it works:</b> an on-device AI (MobileNet) learns from <b>your</b> examples — nothing is uploaded. Add 5-10 of each from different angles &amp; light. It's a learning aid, not a guarantee — always dig gently to confirm.</div></div>
   </div></div></div>
 
   <div id="nav">
     <button class="tab on" data-s="home" onclick="go('home')"><i class="fa-solid fa-house"></i>Home</button>
-    <button class="tab" data-s="identify" onclick="go('identify')"><i class="fa-solid fa-camera"></i>Identify</button>
-    <button class="tab" data-s="species" onclick="go('species')"><i class="fa-solid fa-book-open"></i>Species</button>
+    <button class="tab" data-s="identify" onclick="go('identify')"><i class="fa-solid fa-camera"></i>Scan</button>
+    <button class="tab" data-s="species" onclick="go('species')"><i class="fa-solid fa-book-open"></i>Guide</button>
     <button class="tab" data-s="log" onclick="go('log')"><i class="fa-solid fa-trophy"></i>Log</button>
     <button class="tab" data-s="more" onclick="go('more')"><i class="fa-solid fa-ellipsis"></i>More</button>
   </div>
@@ -369,12 +406,12 @@ function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
 
 /* ===================== NAV ===================== */
 function go(s){
-  if(s!=="identify")stopScan();
+  if(s!=="identify")stopScan(); if(s!=="teach")teachStop();
   document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));
   document.getElementById("screen-"+s).classList.add("active");
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
   const sc=document.querySelector("#screen-"+s+" .scroll"); if(sc)sc.scrollTop=0;
-  if(s==="home")renderHome(); if(s==="species")renderSpecies(); if(s==="identify"){renderIdPick();scanTideStatus();} if(s==="log")renderLog();
+  if(s==="home")renderHome(); if(s==="species"){renderSpecies();renderFish();setGuide("clams");} if(s==="identify"){renderIdPick();scanTideStatus();} if(s==="log")renderLog();
 }
 
 /* ===================== GATE ===================== */
@@ -627,7 +664,7 @@ function bragReport(id){
   // glow
   const rg=x.createRadialGradient(820,200,40,820,200,520); rg.addColorStop(0,"rgba(255,255,255,.28)");rg.addColorStop(1,"transparent"); x.fillStyle=rg;x.fillRect(0,0,1080,1080);
   function txt(t,px,py,size,weight,col,font){x.fillStyle=col;x.font=`${weight} ${size}px ${font||'Inter, sans-serif'}`;x.fillText(t,px,py);}
-  txt("CLAMSIGHT PRO",80,150,30,"700","rgba(255,255,255,.7)"); x.letterSpacing="6px";
+  txt("CLAM FINDER",80,150,30,"700","rgba(255,255,255,.7)"); x.letterSpacing="6px";
   txt("THE HAUL",80,260,96,"600","#fff","Fraunces, Georgia, serif");
   txt(fmtDate(s.date)+"  ·  "+(s.location||"Long Island Sound"),80,320,32,"500","rgba(255,255,255,.85)");
   // big total
@@ -688,7 +725,7 @@ async function loadTide(){
   tidePreds=null; renderTide();
   const st=S.tide; if(!st)return;
   const now=new Date(), end=new Date(now.getTime()+2*864e5);
-  const u=`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=ClamSight&begin_date=${ymd(now)}&end_date=${ymd(end)}&datum=MLLW&station=${st.id}&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+  const u=`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=Clam Finder&begin_date=${ymd(now)}&end_date=${ymd(end)}&datum=MLLW&station=${st.id}&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
   try{ const r=await fetch(u); const j=await r.json(); tidePreds=(j.predictions||[]).map(p=>({t:new Date(p.t.replace(" ","T")),type:p.type,v:+p.v})); }
   catch(e){ tidePreds=[]; }
   drawTide();
@@ -707,6 +744,75 @@ function drawTide(){
     <div class="tide-sched">${sched}</div>
     <div class="tiny" style="margin-top:10px">Best clamming is around <b>low tide</b>, when the flats are exposed. Predictions from <b>NOAA</b> for the nearest station — your exact spot may vary a little.</div>`;
 }
+
+/* ===================== FISHING GUIDE ===================== */
+const FISH=[
+  {n:"Striped Bass",sci:"Morone saxatilis",size:'28–31" slot',bag:"1 per day",season:"Apr 15 – Dec 15",dock:"Clams, bunker chunks",boat:"Live bunker, eels, topwater"},
+  {n:"Summer Flounder (Fluke)",sci:"Paralichthys dentatus",size:'19–19.5"',bag:"3 per day",season:"May 4 – Oct 15",dock:"Squid, Gulp on a bucktail",boat:"Drift rigs, live bait"},
+  {n:"Black Sea Bass",sci:"Centropristis striata",size:'16"',bag:"3 / 6 (seasonal)",season:"May 16 – Dec 31",dock:"Clams, squid",boat:"Jigs, bucktails near structure"},
+  {n:"Scup (Porgy)",sci:"Stenotomus chrysops",size:'9.5–11"',bag:"30+",season:"May 1 – Dec 31",dock:"Clams, worms, squid",boat:"High-low rigs"}
+];
+function setGuide(g){ const c=document.getElementById("species-list"),fl=document.getElementById("fish-list"),sc=document.getElementById("seg-clams"),sf=document.getElementById("seg-fish"); if(!c||!fl)return; if(sc)sc.classList.toggle("on",g==="clams"); if(sf)sf.classList.toggle("on",g==="fish"); if(g==="fish"){c.style.display="none";fl.style.display="";renderFish();} else {c.style.display="";fl.style.display="none";} }
+function renderFish(){ const el=document.getElementById("fish-list"); if(!el)return; el.innerHTML=FISH.map((f,i)=>`<button class="row" onclick="fishSheet(${i})"><div class="ic"><i class="fa-solid fa-fish"></i></div><div class="meta"><div class="t">${f.n}</div><div class="s">Min ${f.size} · ${f.bag}</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`).join(""); }
+function fishSheet(i){ const f=FISH[i]; sheet(`<div class="grab"></div><div class="spec-hero"><div class="si"><i class="fa-solid fa-fish"></i></div><h3>${f.n}</h3><div class="sci">${f.sci}</div></div>
+  <div class="section-h" style="margin-top:0">Regulations · NY 2026</div>
+  <div class="card"><div class="kv"><span class="k">Min size</span><span class="v">${f.size}</span></div><div class="kv"><span class="k">Bag limit</span><span class="v">${f.bag}</span></div><div class="kv"><span class="k">Open season</span><span class="v">${f.season}</span></div></div>
+  <div class="section-h">Best bait</div>
+  <div class="card"><div class="kv"><span class="k">From the dock</span><span class="v" style="font-weight:500;color:var(--ink2)">${f.dock}</span></div><div class="kv"><span class="k">From a boat</span><span class="v" style="font-weight:500;color:var(--ink2)">${f.boat}</span></div></div>
+  <button class="btn ghost" style="margin-top:14px" onclick="extLink('https://dec.ny.gov/things-to-do/fishing/saltwater-fishing')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Official NY DEC saltwater regs</button>
+  <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>2026 NY saltwater guidance — <b>seasons, slots and bag limits change</b>. Always verify on the NY DEC page before you fish.</div></div>`); }
+
+/* ===================== TEACH THE AI (on-device MobileNet + KNN) ===================== */
+let TF=null,MNET=null,KNN=null,_aiLoading=null,aiReady=false,teachStream=null,teachTimer=null;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("script"));document.head.appendChild(s);});}
+function loadAI(){ if(KNN&&MNET)return Promise.resolve(); if(_aiLoading)return _aiLoading;
+  _aiLoading=(async()=>{ await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"); await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/knn-classifier@1.2.4/dist/knn-classifier.min.js"); await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"); TF=window.tf; MNET=await mobilenet.load({version:2,alpha:0.5}); KNN=knnClassifier.create(); restoreKNN(); })();
+  return _aiLoading;
+}
+function embed(el){return MNET.infer(el,true);}
+function persistKNN(){ try{ const ds=KNN.getClassifierDataset(),out={}; Object.keys(ds).forEach(k=>{out[k]={d:Array.from(ds[k].dataSync()).map(v=>+v.toFixed(4)),s:ds[k].shape};}); localStorage.setItem("clamfinder.knn",JSON.stringify(out)); }catch(e){} }
+function restoreKNN(){ try{ const raw=JSON.parse(localStorage.getItem("clamfinder.knn")); if(!raw||!TF||!KNN)return; const ds={}; Object.keys(raw).forEach(k=>{ds[k]=TF.tensor(raw[k].d,raw[k].s);}); KNN.setClassifierDataset(ds); }catch(e){} }
+function teachCrop(){ const cam=document.getElementById("teach-cam"),v=cam&&cam.querySelector("video"); if(!v||!v.videoWidth)return null; const sz=Math.min(v.videoWidth,v.videoHeight),c=document.createElement("canvas"); c.width=224;c.height=224; c.getContext("2d").drawImage(v,(v.videoWidth-sz)/2,(v.videoHeight-sz)/2,sz,sz,0,0,224,224); return c; }
+async function teachStart(){
+  const cam=document.getElementById("teach-cam");
+  document.getElementById("teach-status").textContent="Loading the on-device AI engine (first time can take several seconds)…";
+  try{
+    teachStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+    let v=cam.querySelector("video"); if(!v){v=document.createElement("video");v.setAttribute("playsinline","");v.muted=true;cam.appendChild(v);}
+    v.srcObject=teachStream; await v.play();
+    document.getElementById("teach-ph").style.display="none";
+    document.getElementById("teach-reticle").style.display="block";
+    const b=document.getElementById("teach-start"); b.innerHTML='<i class="fa-solid fa-xmark"></i> Close camera'; b.onclick=teachStop;
+    await loadAI(); aiReady=true;
+    document.getElementById("teach-btns").style.display="grid";
+    updateTeachCounts(); teachLoop();
+  }catch(e){ const st=document.getElementById("teach-status"); if(st)st.textContent="Couldn't start — check camera permission and your connection, then try again."; teachStop(); }
+}
+function teachStop(){
+  if(teachTimer){clearTimeout(teachTimer);teachTimer=null;}
+  if(teachStream){teachStream.getTracks().forEach(t=>t.stop());teachStream=null;}
+  const cam=document.getElementById("teach-cam"),v=cam&&cam.querySelector("video"); if(v)v.remove();
+  const ph=document.getElementById("teach-ph"); if(ph)ph.style.display="";
+  const r=document.getElementById("teach-reticle"); if(r)r.style.display="none";
+  const p=document.getElementById("teach-pred"); if(p)p.style.display="none";
+  const bt=document.getElementById("teach-btns"); if(bt)bt.style.display="none";
+  const b=document.getElementById("teach-start"); if(b){b.innerHTML='<i class="fa-solid fa-camera"></i> Open camera';b.onclick=teachStart;}
+}
+async function teachAdd(label){ if(!aiReady||!teachStream)return; const c=teachCrop(); if(!c)return; const emb=embed(c); KNN.addExample(emb,label); emb.dispose(); persistKNN(); updateTeachCounts(); flash(label==="clam"?"Added a clam-sign example":"Added an empty-sand example"); }
+function teachCounts(){ try{return KNN?KNN.getClassExampleCount():{};}catch(e){return {};} }
+function updateTeachCounts(){
+  const cc=teachCounts(),ce=document.getElementById("cnt-clam"),se=document.getElementById("cnt-sand"); if(ce)ce.textContent=(cc.clam||0)+" added"; if(se)se.textContent=(cc.sand||0)+" added";
+  const ready=(cc.clam||0)>0&&(cc.sand||0)>0,st=document.getElementById("teach-status");
+  if(st)st.innerHTML=ready?`<b style="color:var(--green)">Trained.</b> Point at the sand to see what it thinks. Add more to make it sharper.`:`Add at least one of each. Point at a real clam sign → tap “clam sign”. Point at bare sand → tap “empty sand”.`;
+}
+function teachLoop(){
+  if(!teachStream)return;
+  teachTimer=setTimeout(async()=>{
+    try{ const cc=teachCounts(); if((cc.clam||0)>0&&(cc.sand||0)>0){ const c=teachCrop(); if(c){ const emb=embed(c),r=await KNN.predictClass(emb,Math.min(20,(cc.clam||0)+(cc.sand||0))); emb.dispose(); const isClam=r.label==="clam",conf=Math.round((r.confidences[r.label]||0)*100),el=document.getElementById("teach-pred"); if(el){el.style.display="block";el.style.background=isClam?"rgba(31,138,77,.85)":"rgba(6,35,31,.74)";el.textContent=isClam?`Looks like a clam sign · ${conf}%`:`Looks like empty sand · ${conf}%`;} } } }catch(e){}
+    teachLoop();
+  },650);
+}
+function teachReset(){ try{KNN&&KNN.clearAllClasses();}catch(e){} try{localStorage.removeItem("clamfinder.knn");}catch(e){} updateTeachCounts(); const p=document.getElementById("teach-pred"); if(p)p.style.display="none"; flash("Training reset"); }
 
 /* ===================== SHEETS / UTIL ===================== */
 function sheet(html){document.getElementById("sheet").innerHTML=html;document.getElementById("overlay").classList.add("show");}
