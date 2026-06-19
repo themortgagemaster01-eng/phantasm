@@ -11,17 +11,17 @@
 <meta name="description" content="A clean field companion for clamming the Long Island Sound — identify, log your haul, and learn the legal sizes."/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"/>
 <style>
 :root{
-  --bg:#f4f7f5; --card:rgba(255,255,255,.82); --ink:#0c2622; --ink2:#33493f; --mut:#5d7066; --line:rgba(120,140,130,.18); --line2:rgba(120,140,130,.32);
-  --teal:#0f766e; --teal2:#14b8a6; --teal-soft:#e6f4f1; --sand:#e8dcc0; --sand2:#f2ead7;
+  --bg:#F4F1EA; --card:rgba(255,255,255,.85); --ink:#10302e; --ink2:#39524e; --mut:#6b7d78; --line:rgba(120,140,130,.16); --line2:rgba(120,140,130,.30);
+  --teal:#166063; --teal2:#A5D8CE; --teal-soft:#e4f3ef; --neon:#00F2FE; --sand:#F4F1EA; --sand2:#efe7d6;
   --green:#1f9d57; --amber:#d98a1f; --red:#d2503f;
-  --r:18px;
+  --r:22px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{background:#bca87f url('clamsight_bg.jpg?v=5') center top / cover no-repeat fixed;color:var(--ink);font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;position:fixed;inset:0}
+body{background:#bca87f url('clamsight_bg.jpg?v=5') center top / cover no-repeat fixed;color:var(--ink);font-family:"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;position:fixed;inset:0}
 #app{background:transparent}
 #app{position:absolute;inset:0;display:flex;flex-direction:column}
 .screen{display:none;flex:1;min-height:0;animation:fade .35s ease}
@@ -29,11 +29,11 @@ body{background:#bca87f url('clamsight_bg.jpg?v=5') center top / cover no-repeat
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(96px + env(safe-area-inset-bottom))}
 .pad{padding:0 18px}
-.serif{font-family:"Fraunces",Georgia,serif}
-h1.h{font-family:"Fraunces",serif;font-size:30px;font-weight:600;letter-spacing:-.01em;line-height:1.08}
+.serif{font-family:"Playfair Display",Georgia,serif}
+h1.h{font-family:"Playfair Display",serif;font-size:30px;font-weight:600;letter-spacing:-.01em;line-height:1.08}
 .eyebrow{color:var(--teal);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
 .sub{color:var(--mut);font-size:14px;line-height:1.5}
-.section-h{font-family:"Fraunces",serif;font-size:19px;font-weight:600;margin:26px 2px 12px}
+.section-h{font-family:"Playfair Display",serif;font-size:19px;font-weight:600;margin:26px 2px 12px}
 
 /* hero with underwater light rays (pure CSS, no external images) */
 .hero{position:relative;overflow:hidden;padding:max(54px,env(safe-area-inset-top)) 20px 34px;
@@ -46,9 +46,9 @@ h1.h{font-family:"Fraunces",serif;font-size:30px;font-weight:600;letter-spacing:
 .hero .htop{position:relative;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .hero .logo{display:flex;align-items:center;gap:10px;color:#fff}
 .hero .logo .mk{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:16px}
-.hero .logo b{font-family:"Fraunces",serif;font-size:18px;font-weight:600;letter-spacing:.01em}
+.hero .logo b{font-family:"Playfair Display",serif;font-size:18px;font-weight:600;letter-spacing:.01em}
 .hero .pro{font-size:10px;font-weight:800;letter-spacing:.1em;color:#0f766e;background:#fff;border-radius:20px;padding:4px 9px}
-.hero h2{position:relative;color:#fff;font-family:"Fraunces",serif;font-size:27px;font-weight:600;line-height:1.12;margin-bottom:6px}
+.hero h2{position:relative;color:#fff;font-family:"Playfair Display",serif;font-size:27px;font-weight:600;line-height:1.12;margin-bottom:6px}
 .hero p{position:relative;color:rgba(255,255,255,.82);font-size:13.5px;line-height:1.5;max-width:30ch}
 .hero .cond{position:relative;display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 .hero .pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:11.5px;font-weight:600;padding:7px 12px;border-radius:20px}
@@ -106,7 +106,7 @@ a{color:var(--teal);text-decoration:none}
 .spec-hero{border-radius:16px;overflow:hidden;background:linear-gradient(150deg,#0f766e,#0a4d50);padding:20px;color:#fff;position:relative;margin-bottom:14px}
 .spec-hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(108deg,rgba(255,255,255,.12) 0 2px,transparent 2px 24px);opacity:.5;-webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent)}
 .spec-hero .si{position:relative;font-size:30px;margin-bottom:8px}
-.spec-hero h3{position:relative;font-family:"Fraunces",serif;font-size:23px;font-weight:600}
+.spec-hero h3{position:relative;font-family:"Playfair Display",serif;font-size:23px;font-weight:600}
 .spec-hero .sci{position:relative;font-style:italic;font-size:12.5px;opacity:.85;margin-top:2px}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
 .kv:last-child{border-bottom:none}.kv .k{color:var(--mut)}.kv .v{font-weight:700;text-align:right;max-width:62%}
@@ -136,7 +136,7 @@ a{color:var(--teal);text-decoration:none}
 .overlay.show{display:flex;animation:fade .25s ease}
 .sheet{background:var(--bg);border-radius:24px 24px 0 0;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;padding:22px 18px calc(26px + env(safe-area-inset-bottom))}
 .sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--line2);margin:0 auto 16px}
-.sheet h3{font-family:"Fraunces",serif;font-size:21px;font-weight:600;margin-bottom:4px}
+.sheet h3{font-family:"Playfair Display",serif;font-size:21px;font-weight:600;margin-bottom:4px}
 .toast{position:absolute;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(14px);background:#102a26;color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:13px;opacity:0;pointer-events:none;transition:.3s;z-index:90;white-space:nowrap;box-shadow:0 12px 30px -10px rgba(0,0,0,.5)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -145,7 +145,7 @@ a{color:var(--teal);text-decoration:none}
 #gate::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(108deg,rgba(255,255,255,.13) 0 2px,transparent 2px 26px);opacity:.5;-webkit-mask-image:linear-gradient(#000,transparent 70%);mask-image:linear-gradient(#000,transparent 70%)}
 #gate .gwrap{position:relative;background:var(--bg);border-radius:26px 26px 0 0;padding:26px 22px calc(26px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto}
 #gate .gmk{width:56px;height:56px;border-radius:16px;background:var(--teal-soft);color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:25px;margin-bottom:16px}
-#gate h2{font-family:"Fraunces",serif;font-size:27px;font-weight:600;margin-bottom:4px}
+#gate h2{font-family:"Playfair Display",serif;font-size:27px;font-weight:600;margin-bottom:4px}
 .warn-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
 .warn-item i{color:var(--teal);font-size:15px;margin-top:2px;width:18px;text-align:center;flex:none}
 .warn-item div{font-size:13px;color:var(--ink2);line-height:1.5}.warn-item b{color:var(--ink)}
@@ -178,7 +178,7 @@ a{color:var(--teal);text-decoration:none}
 .tide-chg{font-size:11px;color:var(--teal);font-weight:700;background:none;border:none;cursor:pointer;flex:none}
 .tide-next{display:flex;align-items:center;gap:13px}
 .tide-ic{width:46px;height:46px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--teal-soft);color:var(--teal)}
-.tide-big{font-size:19px;font-weight:600;font-family:"Fraunces",serif;line-height:1.1}
+.tide-big{font-size:19px;font-weight:600;font-family:"Playfair Display",serif;line-height:1.1}
 .tide-sub{font-size:12px;color:var(--mut);margin-top:2px}
 .tide-sched{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}
 .tide-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:6px 10px;border-radius:20px}
@@ -210,6 +210,34 @@ a{color:var(--teal);text-decoration:none}
 .seg{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:5px;margin-bottom:16px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .seg button{flex:1;background:none;border:none;color:var(--mut);font-weight:700;font-size:13.5px;padding:10px;border-radius:9px;cursor:pointer}
 .seg button.on{background:var(--teal);color:#fff}
+
+/* ===================== COASTAL LIGHT + CYBER HUD DESIGN SYSTEM ===================== */
+/* pillowy glass cards */
+.card,.qcard,.row,.field,.sheet,.set-row,.pick,.disc,.up-label,.tide-card,.am-status,.am-mcard,.gfeat,.scan-status,.seg{
+  backdrop-filter:blur(22px) saturate(1.3)!important;-webkit-backdrop-filter:blur(22px) saturate(1.3)!important;
+  box-shadow:0 14px 32px -18px rgba(22,96,99,.45), 0 2px 8px -5px rgba(22,96,99,.18)!important;
+}
+/* pill gradient buttons with soft glow */
+.btn{border-radius:40px;font-weight:700}
+.btn.primary{background:linear-gradient(96deg,#166063,#2aa39a 58%,#46c4b6)!important;color:#fff!important;border:none!important;
+  box-shadow:0 15px 32px -10px rgba(22,96,99,.55), inset 0 0 0 1px rgba(255,255,255,.14)!important}
+.btn.ghost{border-radius:40px;background:rgba(255,255,255,.62)}
+.seg button.on{background:linear-gradient(96deg,#166063,#46c4b6)}
+/* editorial serif headers + Outfit metrics */
+h1.h,.section-h,.tide-big,.am-title,.gfeat-name,.spec-hero h3,.sheet h3,.am-feat-h,.serif{font-family:"Playfair Display",Georgia,serif}
+/* floating capsule dock */
+#nav{left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));height:62px;padding:7px 8px 0;border-radius:34px;
+  border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.8);
+  backdrop-filter:blur(20px) saturate(1.35);-webkit-backdrop-filter:blur(20px) saturate(1.35);
+  box-shadow:0 18px 44px -14px rgba(22,96,99,.42);align-items:center;justify-content:space-around}
+.tab{height:46px;justify-content:center;border-radius:23px;width:60px;gap:3px;transition:.2s}
+.tab.on{color:#fff;background:linear-gradient(120deg,#166063,#46c4b6);box-shadow:0 9px 18px -8px rgba(22,96,99,.6)}
+.tab.on i{color:#fff}
+.scroll{padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+/* Cyber HUD scanner surfaces */
+.scan-stage,.teach-cam{background:#121E21}
+.vf-chip.on{background:var(--neon);border-color:var(--neon);color:#062a2c}
+.scan-badge i{color:var(--neon)}
 </style>
 </head>
 <body>
@@ -237,7 +265,6 @@ a{color:var(--teal);text-decoration:none}
     <div class="hero">
       <div class="htop">
         <div class="logo"><div class="mk" style="background:rgba(255,255,255,.92);padding:3px"><svg viewBox="0 0 64 64" style="width:100%;height:100%"><path d="M32 5c-.4 0-5.2 6.4-5.2 10.2a5.2 5.2 0 0 0 10.4 0C37.2 11.4 32.4 5 32 5z" fill="#5cd0e3"/><path d="M13 35q19-3 38 0-2 14-19 16-17-2-19-16z" fill="#0e6f68"/><path d="M15 35q17-19 34 0-8-5-17-5-9 0-17 5z" fill="#16a99d"/><g stroke="#0c5f59" stroke-width="1.3" stroke-linecap="round" fill="none"><path d="M32 31v4"/><path d="M25 32l1.5 3.4"/><path d="M39 32l-1.5 3.4"/><path d="M19 33.5l3 3"/><path d="M45 33.5l-3 3"/></g><circle cx="32" cy="39" r="6.2" fill="#fff6e2"/><circle cx="29.7" cy="38.6" r="1.05" fill="#0e3b38"/><circle cx="34.3" cy="38.6" r="1.05" fill="#0e3b38"/><path d="M30 41q2 2 4 0" stroke="#0e3b38" stroke-width="1.1" fill="none" stroke-linecap="round"/><circle cx="27.4" cy="40.4" r="1.2" fill="#ff9bb0" opacity=".6"/><circle cx="36.6" cy="40.4" r="1.2" fill="#ff9bb0" opacity=".6"/></svg></div><b>Clam Finder</b></div>
-        <div class="pro">PRO</div>
       </div>
       <h2 id="greet">Good day for a dig.</h2>
       <p>Identify your catch, check the legal size, and log the haul — all from the flats.</p>
@@ -534,9 +561,13 @@ function drawOverlay(ov,v){
   x.strokeStyle="rgba(125,232,217,.7)";x.lineWidth=2;x.beginPath();x.moveTo(0,sweepY);x.lineTo(ov.width,sweepY);x.stroke();
   const tn=performance.now();
   detections.forEach(dn=>{
-    const px=dn.x*ov.width,py=dn.y*ov.height,col=dn.motion?"#ffd23f":"#22e3c6";
+    const px=dn.x*ov.width,py=dn.y*ov.height,col=dn.motion?"#ffd23f":"#00F2FE";
     const base=Math.max(48,ov.width*0.135),p=1+0.04*Math.sin(tn*0.005+dn.id),bw=base*p,bh=base*0.82*p;
-    x.save();x.strokeStyle=col;x.lineWidth=2.5;x.shadowColor=col;x.shadowBlur=12;
+    // topographic ripple rings (perspective ellipses, expanding)
+    x.save();x.strokeStyle=col;x.shadowColor=col;x.shadowBlur=8;
+    for(let k=0;k<3;k++){const rr=base*0.45+k*base*0.32+((tn*0.03+dn.id*30)%(base*0.32)); x.globalAlpha=Math.max(0,0.5-k*0.13-((tn*0.03)%(base*0.32))/(base*0.7)); x.lineWidth=1.6; x.beginPath(); x.ellipse(px,py+bh*0.28,rr,rr*0.42,0,0,7); x.stroke();}
+    x.restore();
+    x.save();x.strokeStyle=col;x.lineWidth=2.5;x.shadowColor=col;x.shadowBlur=14;
     roundRect(x,px-bw/2,py-bh/2,bw,bh,9);x.stroke();x.restore();
     const lbl=(dn.motion?"MOVE ":"CLAM ~")+dn.conf+"%";
     x.font="bold 12px Inter,sans-serif";const tw=x.measureText(lbl).width+16;
@@ -675,10 +706,10 @@ function bragReport(id){
   const rg=x.createRadialGradient(820,200,40,820,200,520); rg.addColorStop(0,"rgba(255,255,255,.28)");rg.addColorStop(1,"transparent"); x.fillStyle=rg;x.fillRect(0,0,1080,1080);
   function txt(t,px,py,size,weight,col,font){x.fillStyle=col;x.font=`${weight} ${size}px ${font||'Inter, sans-serif'}`;x.fillText(t,px,py);}
   txt("CLAM FINDER",80,150,30,"700","rgba(255,255,255,.7)"); x.letterSpacing="6px";
-  txt("THE HAUL",80,260,96,"600","#fff","Fraunces, Georgia, serif");
+  txt("THE HAUL",80,260,96,"600","#fff","Playfair Display, Georgia, serif");
   txt(fmtDate(s.date)+"  ·  "+(s.location||"Long Island Sound"),80,320,32,"500","rgba(255,255,255,.85)");
   // big total
-  x.fillStyle="#fff";x.font="700 300px Fraunces, Georgia, serif";x.fillText(String(total),80,640);
+  x.fillStyle="#fff";x.font="700 300px Playfair Display, Georgia, serif";x.fillText(String(total),80,640);
   txt("shellfish landed",84,700,40,"600","rgba(255,255,255,.85)");
   // breakdown
   let yy=820;
