@@ -445,7 +445,7 @@ async function decodeVin(){
   }
   const v={id:"v"+Date.now(),vin,
     year:data.ModelYear||"", make:data.Make||"", model:data.Model||"",
-    trim:data.Trim||"", body:data.BodyClass||"", engine:[data.DisplacementL?data.DisplacementL+"L":"",data.EngineCylinders?data.EngineCylinders+"-cyl":"",data.FuelTypePrimary||""].filter(Boolean).join(" · "),
+    trim:data.Trim||"", body:data.BodyClass||"", engine:[data.DisplacementL?(Math.round(parseFloat(data.DisplacementL)*10)/10)+"L":"",data.EngineCylinders?data.EngineCylinders+"-cyl":"",data.FuelTypePrimary||""].filter(Boolean).join(" · "),
     drive:data.DriveType||"", mileage:0};
   out.innerHTML=`
     <div class="card" style="margin-bottom:12px">
