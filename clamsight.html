@@ -14,14 +14,15 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"/>
 <style>
 :root{
-  --bg:#f4f7f5; --card:#ffffff; --ink:#102a26; --ink2:#3c5450; --mut:#6d827d; --line:#e4ebe7; --line2:#d4ddd9;
+  --bg:#f4f7f5; --card:rgba(255,255,255,.82); --ink:#0c2622; --ink2:#33493f; --mut:#5d7066; --line:rgba(120,140,130,.18); --line2:rgba(120,140,130,.32);
   --teal:#0f766e; --teal2:#14b8a6; --teal-soft:#e6f4f1; --sand:#e8dcc0; --sand2:#f2ead7;
   --green:#1f9d57; --amber:#d98a1f; --red:#d2503f;
   --r:18px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;position:fixed;inset:0}
+body{background:#bca87f url('clamsight_bg.jpg') center top / cover no-repeat fixed;color:var(--ink);font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;position:fixed;inset:0}
+#app{background:transparent}
 #app{position:absolute;inset:0;display:flex;flex-direction:column}
 .screen{display:none;flex:1;min-height:0;animation:fade .35s ease}
 .screen.active{display:flex;flex-direction:column}
@@ -35,13 +36,12 @@ h1.h{font-family:"Fraunces",serif;font-size:30px;font-weight:600;letter-spacing:
 .section-h{font-family:"Fraunces",serif;font-size:19px;font-weight:600;margin:26px 2px 12px}
 
 /* hero with underwater light rays (pure CSS, no external images) */
-.hero{position:relative;overflow:hidden;padding:max(54px,env(safe-area-inset-top)) 20px 26px;
-  background:linear-gradient(160deg,#0f766e 0%,#0b5f59 45%,#0a4d50 100%)}
-.hero::before{content:"";position:absolute;inset:-20% -10% auto -10%;height:160%;pointer-events:none;opacity:.5;
-  background:repeating-linear-gradient(108deg, rgba(255,255,255,.16) 0 2px, transparent 2px 26px);
-  -webkit-mask-image:linear-gradient(to bottom, #000, transparent 75%);mask-image:linear-gradient(to bottom, #000, transparent 75%)}
-.hero::after{content:"";position:absolute;top:-40%;right:-15%;width:300px;height:300px;border-radius:50%;
-  background:radial-gradient(circle, rgba(255,255,255,.28), transparent 65%);pointer-events:none}
+.hero{position:relative;overflow:hidden;padding:max(54px,env(safe-area-inset-top)) 20px 34px;
+  background:linear-gradient(to bottom, rgba(8,48,46,.52) 0%, rgba(8,48,46,.14) 55%, transparent 100%)}
+/* frosted glass cards over the underwater background */
+.card,.qcard,.row,.field,.sheet,.set-row,.pick,.disc,.up-label,.catch-row select,.catch-row .num{
+  backdrop-filter:blur(12px) saturate(1.1);-webkit-backdrop-filter:blur(12px) saturate(1.1)}
+.scroll{background:linear-gradient(to bottom, transparent 0, transparent 30%, rgba(244,247,245,.0) 100%)}
 .hero .htop{position:relative;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .hero .logo{display:flex;align-items:center;gap:10px;color:#fff}
 .hero .logo .mk{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:16px}
@@ -155,6 +155,16 @@ a{color:var(--teal);text-decoration:none}
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card);border:1px solid var(--line);padding:15px 16px;margin-bottom:1px}
 .set-row:first-of-type{border-radius:14px 14px 0 0}.set-row:last-of-type{border-radius:0 0 14px 14px}
 .set-row .sl{font-size:14px;font-weight:600}.set-row .sd{font-size:11.5px;color:var(--mut);margin-top:2px}
+
+/* clam scanner */
+.scan-stage{position:relative;width:100%;aspect-ratio:3/4;max-height:54vh;background:#06231f;border-radius:18px;overflow:hidden;border:1px solid var(--line2)}
+.scan-stage video{width:100%;height:100%;object-fit:cover;display:block}
+.scan-stage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.scan-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#cfe;text-align:center;padding:24px;font-size:13.5px;line-height:1.5}
+.scan-ph i{font-size:38px;color:#7fd8cd}
+.vf-chips{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;gap:8px;z-index:3}
+.vf-chip{background:rgba(6,35,31,.62);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11.5px;font-weight:700;padding:7px 13px;border-radius:20px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);cursor:pointer}
+.vf-chip.on{background:var(--teal);border-color:var(--teal)}
 </style>
 </head>
 <body>
@@ -192,8 +202,13 @@ a{color:var(--teal);text-decoration:none}
       </div>
     </div>
     <div class="pad">
+      <div class="card" style="margin-top:-30px;position:relative;z-index:2;text-align:center;padding:20px 18px">
+        <div class="serif" style="font-size:19px;font-weight:600;margin-bottom:4px">Ready to find some clams?</div>
+        <div class="muted" style="margin-bottom:14px">Use your camera to scan the wet sand for siphon holes and movement.</div>
+        <button class="btn primary" onclick="go('identify')"><i class="fa-solid fa-camera"></i> Start scanning</button>
+      </div>
       <div class="qgrid">
-        <button class="qcard" onclick="go('identify')"><div class="ic"><i class="fa-solid fa-camera"></i></div><div class="qt">Identify</div><div class="qd">What did you find?</div></button>
+        <button class="qcard" onclick="go('identify')"><div class="ic"><i class="fa-solid fa-location-crosshairs"></i></div><div class="qt">Scan sand</div><div class="qd">Find holes &amp; movement</div></button>
         <button class="qcard" onclick="openLog()"><div class="ic"><i class="fa-solid fa-plus"></i></div><div class="qt">Log a haul</div><div class="qd">Record today's catch</div></button>
         <button class="qcard" onclick="go('species')"><div class="ic"><i class="fa-solid fa-book-open"></i></div><div class="qt">Species guide</div><div class="qd">IDs &amp; legal sizes</div></button>
         <button class="qcard" onclick="go('log')"><div class="ic"><i class="fa-solid fa-trophy"></i></div><div class="qt">My log</div><div class="qd">Sessions &amp; brag reports</div></button>
@@ -204,20 +219,26 @@ a{color:var(--teal);text-decoration:none}
     </div>
   </div></div>
 
-  <!-- IDENTIFY -->
+  <!-- SCANNER -->
   <div class="screen" id="screen-identify"><div class="scroll"><div class="pad" style="padding-top:max(54px,env(safe-area-inset-top))">
-    <div class="eyebrow"><i class="fa-solid fa-camera"></i> Identify</div>
-    <h1 class="h" style="margin:8px 0 6px">What did you find?</h1>
-    <div class="sub" style="margin-bottom:16px">Frame your shell, then confirm the species below. Always measure to confirm it's legal size.</div>
-    <div class="viewfinder" id="viewfinder">
-      <div class="vf-ph" id="vf-ph"><i class="fa-solid fa-camera"></i>Tap below to open your camera<br/><span class="tiny" style="color:#bfe">or just pick the species</span></div>
-      <div class="vf-frame" style="display:none" id="vf-frame"></div>
+    <div class="eyebrow"><i class="fa-solid fa-location-crosshairs"></i> Clam Scanner</div>
+    <h1 class="h" style="margin:8px 0 6px">Find clams in the sand</h1>
+    <div class="sub" style="margin-bottom:14px">Point your camera at wet sand in shallow water. The scanner highlights dark siphon holes and little squirts of movement — likely clam signs.</div>
+    <div class="scan-stage" id="scan-stage">
+      <video id="scan-video" playsinline muted></video>
+      <canvas id="scan-ov"></canvas>
+      <div class="scan-ph" id="scan-ph"><i class="fa-solid fa-water"></i><div>Tap <b>Start scanning</b> and sweep slowly over the wet sand.</div></div>
+      <div class="vf-chips">
+        <button class="vf-chip on" data-f="normal" onclick="setFilter('normal')">Normal</button>
+        <button class="vf-chip" data-f="contrast" onclick="setFilter('contrast')">Contrast</button>
+        <button class="vf-chip" data-f="heat" onclick="setFilter('heat')">Heat view</button>
+      </div>
     </div>
-    <button class="shutter" id="shutter" style="display:none" onclick="flash('Snap! Now confirm the species below.')"></button>
-    <button class="btn primary" id="cam-btn" style="margin-top:14px" onclick="openCamera()"><i class="fa-solid fa-camera"></i> Open camera</button>
-    <div class="section-h">Pick the species</div>
+    <button class="btn primary" id="scan-start" style="margin-top:14px" onclick="startScan()"><i class="fa-solid fa-camera"></i> Start scanning</button>
+    <div id="det-list" style="margin-top:14px"></div>
+    <div class="section-h">Or identify by sight</div>
     <div class="pickgrid" id="id-pick"></div>
-    <div class="disc"><i class="fa-solid fa-circle-info"></i><div>This is a <b>guided ID helper</b>, not a certified identification. Confirm by sight and by measuring. When unsure, release it.</div></div>
+    <div class="disc"><i class="fa-solid fa-circle-info"></i><div><b>How it works, honestly:</b> this is an <b>on-device assist</b> — it flags dark spots and movement in the live image, not a certified clam detector. "Heat view" is a contrast filter, <b>not a real thermal sensor</b> (phones don't have one). Always dig gently and measure to confirm.</div></div>
   </div></div></div>
 
   <!-- SPECIES -->
@@ -314,7 +335,7 @@ function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
 
 /* ===================== NAV ===================== */
 function go(s){
-  if(s!=="identify")stopCamera();
+  if(s!=="identify")stopScan();
   document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));
   document.getElementById("screen-"+s).classList.add("active");
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
@@ -350,28 +371,105 @@ function renderIdPick(){
   const el=document.getElementById("id-pick"); if(!el)return;
   el.innerHTML=ID_TARGETS.map(k=>{const S2=SPECIES[k];return `<button class="pick" onclick="speciesSheet('${k}')"><div class="pic"><i class="fa-solid ${S2.icon}"></i></div><div><div class="pn">${S2.name.split(" (")[0]}</div><div class="pd">${S2.tag}</div></div></button>`;}).join("");
 }
-let camStream=null;
-async function openCamera(){
-  const vf=document.getElementById("viewfinder");
+/* --- Clam Scanner: real on-device assist (dark-spot + motion heuristics) --- */
+let scanStream=null,scanOn=false,scanRAF=null,scanFilter="normal",prevBri=null,detections=[],lastAnalyze=0,sweepY=0;
+const _an=document.createElement("canvas"),_ax=_an.getContext("2d",{willReadFrequently:true});
+const _fc=document.createElement("canvas"),_fx=_fc.getContext("2d",{willReadFrequently:true});
+async function startScan(){
+  const v=document.getElementById("scan-video");
   try{
-    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
-    let v=vf.querySelector("video"); if(!v){v=document.createElement("video");v.setAttribute("playsinline","");v.muted=true;vf.appendChild(v);}
-    v.srcObject=camStream; await v.play();
-    document.getElementById("vf-ph").style.display="none";
-    document.getElementById("vf-frame").style.display="block";
-    document.getElementById("shutter").style.display="block";
-    document.getElementById("cam-btn").innerHTML='<i class="fa-solid fa-xmark"></i> Close camera';
-    document.getElementById("cam-btn").onclick=stopCamera;
-  }catch(e){ flash("Camera unavailable — pick the species below instead."); }
+    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+    v.srcObject=scanStream; v.setAttribute("playsinline",""); v.muted=true; await v.play();
+    scanOn=true; prevBri=null; detections=[];
+    document.getElementById("scan-ph").style.display="none";
+    const b=document.getElementById("scan-start"); b.innerHTML='<i class="fa-solid fa-stop"></i> Stop scanning'; b.onclick=stopScan;
+    scanRAF=requestAnimationFrame(loopScan);
+  }catch(e){ flash("Camera unavailable — identify by sight below instead."); }
 }
-function stopCamera(){
-  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
-  const vf=document.getElementById("viewfinder"); if(!vf)return;
-  const v=vf.querySelector("video"); if(v)v.remove();
-  const ph=document.getElementById("vf-ph"); if(ph)ph.style.display="";
-  const fr=document.getElementById("vf-frame"); if(fr)fr.style.display="none";
-  const sh=document.getElementById("shutter"); if(sh)sh.style.display="none";
-  const cb=document.getElementById("cam-btn"); if(cb){cb.innerHTML='<i class="fa-solid fa-camera"></i> Open camera';cb.onclick=openCamera;}
+function stopScan(){
+  scanOn=false; if(scanRAF)cancelAnimationFrame(scanRAF);
+  if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}
+  const v=document.getElementById("scan-video"); if(v)v.srcObject=null;
+  const ph=document.getElementById("scan-ph"); if(ph)ph.style.display="";
+  const ov=document.getElementById("scan-ov"); if(ov){const x=ov.getContext("2d");x.clearRect(0,0,ov.width,ov.height);}
+  const b=document.getElementById("scan-start"); if(b){b.innerHTML='<i class="fa-solid fa-camera"></i> Start scanning';b.onclick=startScan;}
+  detections=[]; prevBri=null; renderDetList();
+}
+function loopScan(t){
+  if(!scanOn)return;
+  const v=document.getElementById("scan-video"),ov=document.getElementById("scan-ov");
+  if(v&&v.videoWidth&&ov){
+    if(ov.width!==ov.clientWidth||ov.height!==ov.clientHeight){ov.width=ov.clientWidth;ov.height=ov.clientHeight;}
+    if(!lastAnalyze||t-lastAnalyze>150){ analyzeFrame(v); lastAnalyze=t; }
+    drawOverlay(ov,v);
+  }
+  scanRAF=requestAnimationFrame(loopScan);
+}
+function analyzeFrame(v){
+  const GW=72,GH=Math.max(8,Math.round(GW*v.videoHeight/v.videoWidth));
+  _an.width=GW;_an.height=GH;_ax.drawImage(v,0,0,GW,GH);
+  const d=_ax.getImageData(0,0,GW,GH).data, bri=new Float32Array(GW*GH);
+  for(let i=0;i<GW*GH;i++)bri[i]=d[i*4]*0.299+d[i*4+1]*0.587+d[i*4+2]*0.114;
+  let motion=null; if(prevBri&&prevBri.length===bri.length){motion=new Float32Array(GW*GH);for(let i=0;i<bri.length;i++)motion[i]=Math.abs(bri[i]-prevBri[i]);}
+  prevBri=bri.slice(0);
+  let mean=0; for(let i=0;i<bri.length;i++)mean+=bri[i]; mean/=bri.length;
+  const found=[],R=2;
+  for(let y=R;y<GH-R;y+=2)for(let x=R;x<GW-R;x+=2){
+    const i=y*GW+x,c=bri[i]; let la=0,n=0;
+    for(let yy=-R;yy<=R;yy++)for(let xx=-R;xx<=R;xx++){la+=bri[(y+yy)*GW+(x+xx)];n++;} la/=n;
+    const dark=la-c, mo=motion?motion[i]:0;
+    if((c<mean*0.62&&dark>13)||mo>26) found.push({x:x/GW,y:y/GH,score:dark+mo,mo});
+  }
+  found.sort((a,b)=>b.score-a.score);
+  const keep=[];
+  for(const f of found){ if(keep.length>=5)break; if(keep.every(k=>Math.hypot(k.x-f.x,k.y-f.y)>0.13))keep.push(f); }
+  detections=keep.map((f,i)=>({id:i,x:f.x,y:f.y,motion:f.mo>26,conf:Math.min(95,42+Math.round(f.score))}));
+  renderDetList();
+}
+function drawFilter(x,ov,v){
+  if(!v.videoWidth)return;
+  _fc.width=Math.min(170,ov.width); _fc.height=Math.max(8,Math.round(_fc.width*v.videoHeight/v.videoWidth));
+  _fx.drawImage(v,0,0,_fc.width,_fc.height); const im=_fx.getImageData(0,0,_fc.width,_fc.height),d=im.data;
+  for(let i=0;i<d.length;i+=4){ const b=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114)/255; let r,g,bl;
+    if(scanFilter==="heat"){ r=Math.min(255,b*1.7*255); g=Math.max(0,Math.min(255,(b-0.32)*1.8*255)); bl=Math.max(0,(0.45-b)*1.7*255); }
+    else { const c=b<0.5?b*0.45:0.22+(b-0.5)*1.6; r=g=bl=Math.min(255,c*1.25*255); }
+    d[i]=r;d[i+1]=g;d[i+2]=bl;
+  }
+  _fx.putImageData(im,0,0);
+  x.globalAlpha=scanFilter==="heat"?0.84:0.72; x.imageSmoothingEnabled=true; x.drawImage(_fc,0,0,ov.width,ov.height); x.globalAlpha=1;
+}
+function drawOverlay(ov,v){
+  const x=ov.getContext("2d"); x.clearRect(0,0,ov.width,ov.height);
+  if(scanFilter!=="normal")drawFilter(x,ov,v);
+  sweepY=(sweepY+ov.height*0.011)%ov.height;
+  const g=x.createLinearGradient(0,sweepY-28,0,sweepY+28); g.addColorStop(0,"rgba(20,184,166,0)");g.addColorStop(.5,"rgba(45,212,191,.45)");g.addColorStop(1,"rgba(20,184,166,0)");
+  x.fillStyle=g; x.fillRect(0,sweepY-28,ov.width,56);
+  x.strokeStyle="rgba(125,232,217,.7)";x.lineWidth=2;x.beginPath();x.moveTo(0,sweepY);x.lineTo(ov.width,sweepY);x.stroke();
+  const tn=performance.now();
+  detections.forEach(dn=>{
+    const px=dn.x*ov.width,py=dn.y*ov.height,p=1+0.12*Math.sin(tn*0.006+dn.id),col=dn.motion?"#ffd23f":"#2dd4bf";
+    x.save();x.translate(px,py);x.scale(p,p);
+    x.strokeStyle=col;x.lineWidth=2.5;x.shadowColor=col;x.shadowBlur=10;
+    const r=22; x.beginPath();x.moveTo(-r,5);x.quadraticCurveTo(-r*0.6,-r,0,-r);x.quadraticCurveTo(r*0.6,-r,r,5);x.stroke();
+    x.beginPath();x.moveTo(-r,5);x.lineTo(r,5);x.stroke();
+    x.beginPath();x.moveTo(0,-r+2);x.lineTo(0,4);x.moveTo(-r*0.5,-r*0.5);x.lineTo(-r*0.16,4);x.moveTo(r*0.5,-r*0.5);x.lineTo(r*0.16,4);x.stroke();
+    x.restore();
+    x.fillStyle=col;x.font="bold 11px Inter,sans-serif";x.textAlign="center";x.shadowColor=col;x.shadowBlur=6;
+    x.fillText(dn.motion?"movement":"dark spot",px,py+32);x.shadowBlur=0;
+  });
+}
+function setFilter(f){ scanFilter=f; document.querySelectorAll(".vf-chip").forEach(c=>c.classList.toggle("on",c.dataset.f===f)); }
+function renderDetList(){
+  const el=document.getElementById("det-list"); if(!el)return;
+  if(!scanOn){el.innerHTML="";return;}
+  if(!detections.length){el.innerHTML=`<div class="tiny" style="padding:6px 2px"><i class="fa-solid fa-magnifying-glass"></i> Scanning… sweep slowly over wet sand and likely spots.</div>`;return;}
+  el.innerHTML=detections.map(d=>`<button class="row" style="padding:11px" onclick="tapDetection(${d.id})"><div class="ic" style="background:${d.motion?'#fff3d6':'#d8f3ee'};color:${d.motion?'#b07d15':'#0f766e'}"><i class="fa-solid ${d.motion?'fa-droplet':'fa-circle-dot'}"></i></div><div class="meta"><div class="t">${d.motion?'Movement spotted':'Dark spot / possible hole'}</div><div class="s">~${d.conf}% signal · tap to identify &amp; log</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`).join("");
+}
+function tapDetection(id){ const d=detections.find(x=>x.id===id);
+  sheet(`<div class="grab"></div><h3>Possible clam sign</h3>
+    <p class="muted" style="margin:6px 0 12px">The scanner flagged ${d&&d.motion?'a <b>squirt / movement</b> — often a clam breathing under the sand':'a <b>dark spot or small hole</b> — often a siphon hole'}. Dig gently to confirm. What do you think it is?</p>
+    <div class="pickgrid">${ID_TARGETS.map(k=>`<button class="pick" onclick="closeSheet();speciesSheet('${k}')"><div class="pic"><i class="fa-solid ${SPECIES[k].icon}"></i></div><div><div class="pn">${SPECIES[k].name.split(' (')[0]}</div><div class="pd">${SPECIES[k].tag}</div></div></button>`).join('')}</div>
+    <div class="disc"><i class="fa-solid fa-circle-info"></i><div>This is an <b>assist</b>, not a confirmed clam. Dig gently and measure before keeping anything.</div></div>`);
 }
 
 /* ===================== SPECIES ===================== */
