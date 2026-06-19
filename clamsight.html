@@ -185,6 +185,17 @@ a{color:var(--teal);text-decoration:none}
 .tide-pill.lowt{background:#e3f5ea;color:#1f8a4d}
 .tide-pill.hight{background:#e7eef7;color:#2c6e9e}
 .tide-pill.now{box-shadow:0 0 0 2px var(--teal)}
+
+/* AR scanner refinements (inspired by reference) */
+.scan-badge{position:absolute;top:12px;left:12px;display:none;align-items:center;gap:6px;background:rgba(6,35,31,.72);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:5px 10px;border-radius:20px;z-index:3;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.scan-badge.on{display:inline-flex}
+.scan-badge i{color:#22e3c6;font-size:8px;animation:blinkdot 1.2s steps(2) infinite}
+@keyframes blinkdot{50%{opacity:.25}}
+.scan-status{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin-top:12px;font-size:12.5px;color:var(--ink2);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.scan-status i{color:var(--teal);font-size:15px;flex:none}
+.scan-status b{font-weight:700}
+.det-bar{height:5px;border-radius:5px;background:var(--line2);overflow:hidden;margin-top:6px}
+.det-bar>i{display:block;height:100%;border-radius:5px}
 </style>
 </head>
 <body>
@@ -248,6 +259,7 @@ a{color:var(--teal);text-decoration:none}
     <div class="scan-stage" id="scan-stage">
       <video id="scan-video" playsinline muted></video>
       <canvas id="scan-ov"></canvas>
+      <div class="scan-badge" id="scan-badge"><i class="fa-solid fa-circle"></i> LIVE</div>
       <div class="scan-ph" id="scan-ph"><i class="fa-solid fa-water"></i><div>Tap <b>Start scanning</b> and sweep slowly over the wet sand.</div></div>
       <div class="vf-chips">
         <button class="vf-chip on" data-f="normal" onclick="setFilter('normal')">Normal</button>
@@ -256,6 +268,7 @@ a{color:var(--teal);text-decoration:none}
       </div>
     </div>
     <button class="btn primary" id="scan-start" style="margin-top:14px" onclick="startScan()"><i class="fa-solid fa-camera"></i> Start scanning</button>
+    <div class="scan-status" id="scan-tide"><i class="fa-solid fa-water"></i><div>Set your tide spot on Home to see the dig window here.</div></div>
     <div id="det-list" style="margin-top:14px"></div>
     <div class="section-h">Or identify by sight</div>
     <div class="pickgrid" id="id-pick"></div>
@@ -361,7 +374,7 @@ function go(s){
   document.getElementById("screen-"+s).classList.add("active");
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
   const sc=document.querySelector("#screen-"+s+" .scroll"); if(sc)sc.scrollTop=0;
-  if(s==="home")renderHome(); if(s==="species")renderSpecies(); if(s==="identify")renderIdPick(); if(s==="log")renderLog();
+  if(s==="home")renderHome(); if(s==="species")renderSpecies(); if(s==="identify"){renderIdPick();scanTideStatus();} if(s==="log")renderLog();
 }
 
 /* ===================== GATE ===================== */
@@ -406,6 +419,8 @@ async function startScan(){
     v.srcObject=scanStream; v.setAttribute("playsinline",""); v.muted=true; await v.play();
     scanOn=true; prevBri=null; detections=[];
     document.getElementById("scan-ph").style.display="none";
+    document.getElementById("scan-badge").classList.add("on");
+    scanTideStatus();
     const b=document.getElementById("scan-start"); b.innerHTML='<i class="fa-solid fa-stop"></i> Stop scanning'; b.onclick=stopScan;
     scanRAF=requestAnimationFrame(loopScan);
   }catch(e){ flash("Camera unavailable — identify by sight below instead."); }
@@ -415,6 +430,7 @@ function stopScan(){
   if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}
   const v=document.getElementById("scan-video"); if(v)v.srcObject=null;
   const ph=document.getElementById("scan-ph"); if(ph)ph.style.display="";
+  const bd=document.getElementById("scan-badge"); if(bd)bd.classList.remove("on");
   const ov=document.getElementById("scan-ov"); if(ov){const x=ov.getContext("2d");x.clearRect(0,0,ov.width,ov.height);}
   const b=document.getElementById("scan-start"); if(b){b.innerHTML='<i class="fa-solid fa-camera"></i> Start scanning';b.onclick=startScan;}
   detections=[]; prevBri=null; renderDetList();
@@ -471,23 +487,36 @@ function drawOverlay(ov,v){
   x.strokeStyle="rgba(125,232,217,.7)";x.lineWidth=2;x.beginPath();x.moveTo(0,sweepY);x.lineTo(ov.width,sweepY);x.stroke();
   const tn=performance.now();
   detections.forEach(dn=>{
-    const px=dn.x*ov.width,py=dn.y*ov.height,p=1+0.12*Math.sin(tn*0.006+dn.id),col=dn.motion?"#ffd23f":"#2dd4bf";
-    x.save();x.translate(px,py);x.scale(p,p);
-    x.strokeStyle=col;x.lineWidth=2.5;x.shadowColor=col;x.shadowBlur=10;
-    const r=22; x.beginPath();x.moveTo(-r,5);x.quadraticCurveTo(-r*0.6,-r,0,-r);x.quadraticCurveTo(r*0.6,-r,r,5);x.stroke();
-    x.beginPath();x.moveTo(-r,5);x.lineTo(r,5);x.stroke();
-    x.beginPath();x.moveTo(0,-r+2);x.lineTo(0,4);x.moveTo(-r*0.5,-r*0.5);x.lineTo(-r*0.16,4);x.moveTo(r*0.5,-r*0.5);x.lineTo(r*0.16,4);x.stroke();
-    x.restore();
-    x.fillStyle=col;x.font="bold 11px Inter,sans-serif";x.textAlign="center";x.shadowColor=col;x.shadowBlur=6;
-    x.fillText(dn.motion?"movement":"dark spot",px,py+32);x.shadowBlur=0;
+    const px=dn.x*ov.width,py=dn.y*ov.height,col=dn.motion?"#ffd23f":"#22e3c6";
+    const base=Math.max(48,ov.width*0.135),p=1+0.04*Math.sin(tn*0.005+dn.id),bw=base*p,bh=base*0.82*p;
+    x.save();x.strokeStyle=col;x.lineWidth=2.5;x.shadowColor=col;x.shadowBlur=12;
+    roundRect(x,px-bw/2,py-bh/2,bw,bh,9);x.stroke();x.restore();
+    const lbl=(dn.motion?"MOVE ":"CLAM ~")+dn.conf+"%";
+    x.font="bold 12px Inter,sans-serif";const tw=x.measureText(lbl).width+16;
+    x.save();x.shadowColor=col;x.shadowBlur=8;x.fillStyle=col;roundRect(x,px-tw/2,py-bh/2-23,tw,19,6);x.fill();x.restore();
+    x.fillStyle="#05201c";x.textAlign="center";x.textBaseline="middle";x.fillText(lbl,px,py-bh/2-13.5);x.textBaseline="alphabetic";
   });
+}
+function roundRect(x,X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath();}
+function scanTideStatus(){
+  const el=document.getElementById("scan-tide"); if(!el)return;
+  if(!S.tide||!tidePreds||!tidePreds.length){ el.innerHTML=`<i class="fa-solid fa-water"></i><div>Set your tide spot on Home to see the dig window here.</div>`; return; }
+  const now=new Date(), next=tidePreds.find(p=>p.t>now);
+  const lows=tidePreds.filter(p=>p.type==="L");
+  const nearLow=lows.some(p=>Math.abs(p.t-now)<90*6e4); // within 90 min of a low
+  let msg,good=nearLow;
+  if(nearLow){ msg=`<b>Tide: Low</b> — flats are exposing, good digging window.`; }
+  else if(next&&next.type==="L"){ const m=Math.round((next.t-now)/6e4); msg=`<b>Tide dropping</b> — low in ${m>90?Math.round(m/60)+'h':m+'m'}, window opening soon.`; good=true; }
+  else if(next){ const m=Math.round((next.t-now)/6e4); msg=`<b>Tide rising</b> — high in ${m>90?Math.round(m/60)+'h':m+'m'}. Best digging is around the next low.`; }
+  else msg=`Check today's tide on Home.`;
+  el.innerHTML=`<i class="fa-solid fa-water" style="color:${good?'#1f8a4d':'var(--teal)'}"></i><div>${esc(S.tide.name)} · ${msg}</div>`;
 }
 function setFilter(f){ scanFilter=f; document.querySelectorAll(".vf-chip").forEach(c=>c.classList.toggle("on",c.dataset.f===f)); }
 function renderDetList(){
   const el=document.getElementById("det-list"); if(!el)return;
   if(!scanOn){el.innerHTML="";return;}
   if(!detections.length){el.innerHTML=`<div class="tiny" style="padding:6px 2px"><i class="fa-solid fa-magnifying-glass"></i> Scanning… sweep slowly over wet sand and likely spots.</div>`;return;}
-  el.innerHTML=detections.map(d=>`<button class="row" style="padding:11px" onclick="tapDetection(${d.id})"><div class="ic" style="background:${d.motion?'#fff3d6':'#d8f3ee'};color:${d.motion?'#b07d15':'#0f766e'}"><i class="fa-solid ${d.motion?'fa-droplet':'fa-circle-dot'}"></i></div><div class="meta"><div class="t">${d.motion?'Movement spotted':'Dark spot / possible hole'}</div><div class="s">~${d.conf}% signal · tap to identify &amp; log</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`).join("");
+  el.innerHTML=detections.map(d=>{const col=d.motion?'#d98a1f':'#0f766e';return `<button class="row" style="padding:11px" onclick="tapDetection(${d.id})"><div class="ic" style="background:${d.motion?'#fff3d6':'#d8f3ee'};color:${col}"><i class="fa-solid ${d.motion?'fa-droplet':'fa-circle-dot'}"></i></div><div class="meta"><div class="t">${d.motion?'Movement spotted':'Dark spot / possible hole'}</div><div class="s">~${d.conf}% signal · tap to identify &amp; log</div><div class="det-bar"><i style="width:${d.conf}%;background:${col}"></i></div></div><i class="fa-solid fa-chevron-right chev"></i></button>`;}).join("");
 }
 function tapDetection(id){ const d=detections.find(x=>x.id===id);
   sheet(`<div class="grab"></div><h3>Possible clam sign</h3>
