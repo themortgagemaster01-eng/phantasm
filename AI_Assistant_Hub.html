@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>AI Assistant Hub — Governed Prompt Library</title>
+<meta name="description" content="A governed prompt library for compliance, client services and operations. Human-in-the-loop, privacy-first."/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
+<style>
+:root{
+  --bg:#0b0e14; --bg2:#0e1320; --panel:rgba(255,255,255,.04); --panel2:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+  --txt:#e7ecf4; --mut:#9aa6bd; --mut2:#67718a;
+  --ac:#7c8cff; --ac-dim:rgba(124,140,255,.14); --ac-glow:rgba(124,140,255,.45);
+  --green:#37d39a; --amber:#ffba49; --red:#ff5d6c;
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(120% 80% at 50% -8%, #14203a 0%, #0b0e14 58%) fixed,#0b0e14;color:var(--txt);
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;letter-spacing:.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+a{color:var(--ac);text-decoration:none}
+.disp{font-family:"Space Grotesk","Inter",sans-serif}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+/* hero */
+.hero{position:relative;overflow:hidden;border:1px solid var(--line2);border-radius:20px;padding:26px 24px;margin-bottom:22px;
+  background:linear-gradient(135deg, rgba(124,140,255,.12), rgba(14,20,40,.5) 60%, transparent)}
+.hero .glow{position:absolute;top:-40%;right:-8%;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle, rgba(124,140,255,.30), transparent 65%);pointer-events:none}
+.hero-row{display:flex;align-items:center;gap:16px;position:relative}
+.hero-ic{width:62px;height:62px;border-radius:16px;flex:none;display:flex;align-items:center;justify-content:center;font-size:27px;color:var(--ac);
+  background:rgba(124,140,255,.10);border:1px solid rgba(124,140,255,.24);box-shadow:0 0 26px -6px var(--ac-glow)}
+.hero h1{font-family:"Space Grotesk",sans-serif;font-size:28px;font-weight:700;letter-spacing:-.01em;line-height:1.05}
+.hero p{color:var(--mut);font-size:13.5px;margin-top:6px;max-width:62ch;line-height:1.5}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;position:relative}
+.badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--mut);background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:6px 11px}
+.badge i{color:var(--ac)}
+
+/* controls */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.search{flex:1;min-width:200px;position:relative}
+.search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mut2);font-size:13px}
+.search input{width:100%;background:var(--panel);border:1px solid var(--line2);border-radius:12px;color:var(--txt);padding:12px 14px 12px 38px;font-size:14px;font-family:inherit;outline:none}
+.search input:focus{border-color:var(--ac)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:13.5px;padding:11px 15px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);color:var(--txt);cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{border-color:var(--ac)}
+.btn.primary{background:var(--ac);color:#0a0d18;border:none;font-weight:700}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.chip{font-size:12.5px;font-weight:600;color:var(--mut);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:8px 14px;cursor:pointer;transition:.15s}
+.chip:hover{color:var(--txt)}
+.chip.on{background:var(--ac-dim);border-color:rgba(124,140,255,.4);color:var(--ac)}
+
+/* cards */
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.card-head{display:flex;align-items:flex-start;gap:13px}
+.card-ic{width:42px;height:42px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--ac-dim);color:var(--ac)}
+.card-tt{flex:1;min-width:0}
+.card-cat{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mut2)}
+.card-name{font-size:16.5px;font-weight:700;margin-top:2px;font-family:"Space Grotesk",sans-serif}
+.card-desc{color:var(--mut);font-size:13px;line-height:1.5;margin-top:1px}
+.fav{background:none;border:none;color:var(--mut2);font-size:17px;cursor:pointer;padding:4px;flex:none}
+.fav.on{color:var(--amber)}
+.gov{display:flex;gap:9px;align-items:flex-start;font-size:11.5px;color:var(--mut);line-height:1.45;background:rgba(255,186,73,.07);border:1px solid rgba(255,186,73,.18);border-radius:11px;padding:10px 12px;margin-top:14px}
+.gov i{color:var(--amber);margin-top:1px;flex:none}
+.vars{margin-top:14px;display:grid;gap:10px}
+.var label{display:block;font-size:11.5px;font-weight:600;color:var(--mut);margin-bottom:5px}
+.var input,.var textarea{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:13.5px;font-family:inherit;outline:none;resize:vertical}
+.var input:focus,.var textarea:focus{border-color:var(--ac)}
+.prev{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);overflow:hidden}
+.prev-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid var(--line);font-size:11px;font-weight:600;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em}
+.prev-body{padding:13px;font-size:13px;line-height:1.6;color:var(--txt);white-space:pre-wrap;max-height:220px;overflow:auto}
+.prev-body .ph{color:var(--ac);font-weight:600}
+.actions{display:flex;gap:9px;margin-top:13px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);background:var(--panel2);border:1px solid var(--line2);color:var(--txt);font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.3s;z-index:60;box-shadow:0 12px 34px -10px #000;backdrop-filter:blur(12px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);color:var(--mut2);font-size:11.5px;line-height:1.6}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+@media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+
+/* view nav */
+.viewnav{display:flex;gap:6px;margin-bottom:20px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:5px}
+.viewnav button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:none;border:none;color:var(--mut);font-weight:600;font-size:13.5px;padding:11px;border-radius:10px;cursor:pointer;font-family:inherit;transition:.15s}
+.viewnav button.on{background:var(--ac-dim);color:var(--ac)}
+/* toolkit */
+.tk-h{font-family:"Space Grotesk",sans-serif;font-size:19px;font-weight:700;margin:26px 2px 6px}
+.tk-sub{color:var(--mut);font-size:13px;margin:0 2px 14px;line-height:1.5}
+.tk-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tk-card h3{font-size:15.5px;font-weight:700;margin-bottom:4px}
+.tk-card .lead{color:var(--mut);font-size:12.5px;line-height:1.5;margin-bottom:13px}
+table.tk{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+table.tk th,table.tk td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.tk th{color:var(--mut2);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.pill-h{color:var(--red);font-weight:700} .pill-m{color:var(--amber);font-weight:700} .pill-l{color:var(--green);font-weight:700}
+.tk-list{list-style:none;display:grid;gap:9px}
+.tk-list li{display:flex;gap:10px;font-size:13px;color:var(--txt);line-height:1.5}
+.tk-list li i{color:var(--ac);margin-top:3px;flex:none;font-size:12px}
+.tk-tmpl{font-size:13px;line-height:1.7;color:var(--txt)}
+.tk-tmpl .lbl{color:var(--ac);font-weight:600}
+.tk-tmpl hr{border:none;border-top:1px solid var(--line);margin:11px 0}
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media print{
+  body{background:#fff;color:#000}
+  .viewnav,.controls,.chips,.hero .glow,.foot,.toast,#view-prompts{display:none!important}
+  .tk-card{break-inside:avoid;border:1px solid #ccc}
+  table.tk th{color:#444}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="glow"></div>
+    <div class="hero-row">
+      <div class="hero-ic"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+      <div>
+        <h1>AI Assistant Hub</h1>
+        <p>A governed prompt library for compliance, client services and operations. Fill in the blanks, copy, and run in your approved AI tool.</p>
+      </div>
+    </div>
+    <div class="badges">
+      <div class="badge"><i class="fa-solid fa-user-check"></i> Human-in-the-loop</div>
+      <div class="badge"><i class="fa-solid fa-shield-halved"></i> Privacy-first</div>
+      <div class="badge"><i class="fa-solid fa-magnifying-glass-chart"></i> RAG-ready</div>
+      <div class="badge"><i class="fa-solid fa-clipboard-check"></i> Explainable outputs</div>
+    </div>
+  </div>
+
+  <div class="viewnav">
+    <button id="nav-prompts" class="on" onclick="setView('prompts')"><i class="fa-solid fa-wand-magic-sparkles"></i> Prompt Library</button>
+    <button id="nav-toolkit" onclick="setView('toolkit')"><i class="fa-solid fa-toolbox"></i> Implementation Toolkit</button>
+  </div>
+
+  <div id="view-prompts">
+  <div class="controls">
+    <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="q" placeholder="Search prompts…" oninput="render()"/></div>
+    <button class="btn" onclick="toggleFav()" id="favBtn"><i class="fa-regular fa-star"></i> Favorites</button>
+    <button class="btn" onclick="exportMd()"><i class="fa-solid fa-download"></i> Export</button>
+  </div>
+  <div class="chips" id="chips"></div>
+
+  <div class="grid" id="grid"></div>
+  </div><!-- /view-prompts -->
+
+  <div id="view-toolkit" style="display:none">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+      <button class="btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save as PDF</button>
+    </div>
+
+    <div class="tk-h" style="margin-top:4px">Phased Execution Roadmap</div>
+    <div class="tk-sub">Sequence for momentum: quick wins first, then foundations, then scale.</div>
+    <div class="tk-card">
+      <div class="scroll-x"><table class="tk">
+        <tr><th>Phase</th><th>Window</th><th>Focus</th><th>Early signal of success</th></tr>
+        <tr><td><b>1 · Quick Wins</b></td><td>~6–8 weeks</td><td>Cross-training (critical roles) + procurement automation; pilot AI workflows in one team</td><td>Visible time savings, cultural buy-in</td></tr>
+        <tr><td><b>2 · Foundation</b></td><td>Following quarter</td><td>Roll out AI-assisted workflows; begin data inventory + pilot warehouse; stand up governance</td><td>Adoption climbing, governance live</td></tr>
+        <tr><td><b>3 · Scale</b></td><td>Next year</td><td>Complete data-warehouse migration + real-time BI; advanced AI; measure vs. mandate</td><td>Reporting near real-time; targets tracking</td></tr>
+      </table></div>
+    </div>
+
+    <div class="tk-h">Risk Register</div>
+    <div class="tk-sub">Top risks with likelihood, impact, mitigation and a suggested owner. Update as the program runs.</div>
+    <div class="tk-card">
+      <div class="scroll-x"><table class="tk">
+        <tr><th>Risk</th><th>Likely</th><th>Impact</th><th>Mitigation</th><th>Owner</th></tr>
+        <tr><td><b>Change resistance &amp; low adoption</b></td><td class="pill-h">High</td><td class="pill-h">High</td><td>Executive sponsorship, phased rollout with quick wins, change-management &amp; training program</td><td>Exec Sponsor + HR</td></tr>
+        <tr><td><b>Data privacy &amp; AI compliance</b></td><td class="pill-m">Med</td><td class="pill-h">High</td><td>AI governance from day one: approved tools only, data minimization, human oversight, audit logging</td><td>Compliance Lead</td></tr>
+        <tr><td><b>Integration complexity / tech debt</b></td><td class="pill-m">Med</td><td class="pill-m">Med</td><td>Start with a pilot scope, prefer low/no-code tools, engage experienced data partners if needed</td><td>CIO / Data Lead</td></tr>
+        <tr><td><b>Resource &amp; priority contention</b></td><td class="pill-m">Med</td><td class="pill-m">Med</td><td>Clear prioritization via the roadmap, dedicated leads, regular steering-committee reviews</td><td>PMO / Steering Cmte</td></tr>
+      </table></div>
+    </div>
+
+    <div class="tk-h">RACI Matrix</div>
+    <div class="tk-sub">R = Responsible · A = Accountable · C = Consulted · I = Informed. Swap in your real roles.</div>
+    <div class="tk-card">
+      <div class="scroll-x"><table class="tk">
+        <tr><th>Workstream</th><th>Exec Sponsor</th><th>Pillar Lead</th><th>PMO</th><th>Dept Teams</th><th>Compliance</th></tr>
+        <tr><td>Cross-training</td><td>A</td><td>R</td><td>C</td><td>R</td><td>I</td></tr>
+        <tr><td>Procurement automation</td><td>A</td><td>R</td><td>C</td><td>C</td><td>I</td></tr>
+        <tr><td>AI-assisted workflows</td><td>A</td><td>R</td><td>C</td><td>R</td><td>C</td></tr>
+        <tr><td>Data architecture</td><td>A</td><td>R</td><td>R</td><td>C</td><td>C</td></tr>
+        <tr><td>Governance &amp; risk</td><td>A</td><td>C</td><td>R</td><td>I</td><td>R</td></tr>
+      </table></div>
+    </div>
+
+    <div class="tk-h">Project Charter Template</div>
+    <div class="tk-card"><div class="tk-tmpl">
+      <span class="lbl">Initiative:</span> _______________________________________________<hr/>
+      <span class="lbl">Objective / Core Mandate:</span> Tie to the measurable target (e.g. cost reduction %, output growth %).<hr/>
+      <span class="lbl">Scope (in / out):</span> What this project will and will not cover.<hr/>
+      <span class="lbl">Executive Sponsor:</span> ____________ &nbsp; <span class="lbl">Project Lead:</span> ____________<hr/>
+      <span class="lbl">Key milestones &amp; dates:</span> Phase 1 ____ · Phase 2 ____ · Phase 3 ____<hr/>
+      <span class="lbl">Success metrics (KPIs):</span> Baseline → Target, with measurement cadence.<hr/>
+      <span class="lbl">Budget / resources:</span> People, tools, estimated cost.<hr/>
+      <span class="lbl">Top risks &amp; dependencies:</span> Pull from the Risk Register above.<hr/>
+      <span class="lbl">Escalation path:</span> Blocker → Lead → Steering Committee → Sponsor.
+    </div></div>
+
+    <div class="tk-h">Post-Mortem / Continuous Feedback Template</div>
+    <div class="tk-sub">Run bi-weekly with engineering &amp; product teams. Blameless and action-focused.</div>
+    <div class="tk-card"><ul class="tk-list">
+      <li><i class="fa-solid fa-circle-check"></i><div><b>What went well?</b> Celebrate wins and note what to replicate.</div></li>
+      <li><i class="fa-solid fa-circle-check"></i><div><b>What could be improved?</b> Specific and actionable, not personal.</div></li>
+      <li><i class="fa-solid fa-circle-check"></i><div><b>Root cause analysis.</b> 5 Whys (or similar) on the biggest issue.</div></li>
+      <li><i class="fa-solid fa-circle-check"></i><div><b>Action items.</b> Task — Owner — Due date — Priority.</div></li>
+      <li><i class="fa-solid fa-circle-check"></i><div><b>Follow-up checkpoint.</b> When will we confirm these are done?</div></li>
+    </ul></div>
+
+    <div class="tk-h">Cross-Training Program Outline</div>
+    <div class="tk-sub">Reduce key-person risk on critical infrastructure roles.</div>
+    <div class="tk-card"><ul class="tk-list">
+      <li><i class="fa-solid fa-user-gear"></i><div>Identify critical roles and current single points of failure (key-person risk).</div></li>
+      <li><i class="fa-solid fa-calendar-week"></i><div>Design 4–6 week rotational modules per role pairing.</div></li>
+      <li><i class="fa-solid fa-people-arrows"></i><div>Include shadowing, documentation handoff, and live knowledge-transfer sessions.</div></li>
+      <li><i class="fa-solid fa-chart-line"></i><div>Measure: reduced key-person-dependency score + internal mobility / promotion rate.</div></li>
+    </ul></div>
+
+    <div class="tk-h">Governance &amp; Next Steps</div>
+    <div class="tk-card"><ul class="tk-list">
+      <li><i class="fa-solid fa-flag"></i><div>Assign an executive sponsor per pillar (target: within 14 business days).</div></li>
+      <li><i class="fa-solid fa-users-rectangle"></i><div>Stand up a cross-functional steering committee; meet bi-weekly to start.</div></li>
+      <li><i class="fa-solid fa-ruler"></i><div>Define baseline metrics immediately for the mandate targets.</div></li>
+      <li><i class="fa-solid fa-rocket"></i><div>Launch the two quick wins in parallel for early momentum.</div></li>
+      <li><i class="fa-solid fa-robot"></i><div>Pilot AI workflows using the Prompt Library tab — approved tools, human-in-the-loop.</div></li>
+    </ul></div>
+  </div><!-- /view-toolkit -->
+
+  <div class="foot">
+    <b>Governance note.</b> These prompts are starting points for <b>approved, governed</b> AI tools. Keep a human in the loop for any high-stakes
+    decision, avoid pasting confidential or regulated data into unapproved models, and have qualified legal/compliance staff review outputs before action.
+    Built from the Strategic Optimization Blueprint (Suggestion 2.2). All data (favorites) stays in this browser — nothing is sent anywhere.
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const PROMPTS=[
+ {id:"contract",cat:"Compliance & Legal",icon:"fa-file-contract",title:"Contract / Compliance Review",
+  desc:"Extract obligations, risks, and redlines from a contract, with risk ratings.",
+  gov:"High-stakes — always route flagged items to a qualified human reviewer before acting.",
+  vars:[{k:"regs",label:"Regulations / rules to check against",ph:"e.g. GDPR, SOX, state lending rules",t:"input"},
+        {k:"contract",label:"Contract text",ph:"Paste the contract or clause here…",t:"area"}],
+  template:`You are a senior compliance expert bound by strict confidentiality and privilege rules. Review the following contract text for {{regs}}.
+
+Extract:
+(1) Key obligations and deadlines
+(2) Potential risks and red flags
+(3) Suggested redlines or edits
+(4) Items requiring human legal review
+
+Output in clear bullet format with risk ratings (High / Medium / Low).
+
+CONTRACT:
+{{contract}}`},
+
+ {id:"reg",cat:"Compliance & Legal",icon:"fa-scale-balanced",title:"Regulatory Update Impact Summary",
+  desc:"Summarize a regulatory change and its direct operational impact.",
+  gov:"Verify citations against primary sources — models can misattribute regulations.",
+  vars:[{k:"area",label:"Regulation name / area",ph:"e.g. TRID disclosure changes 2026",t:"input"}],
+  template:`Summarize the latest regulatory changes in {{area}}.
+
+Highlight:
+(1) Key updates
+(2) Direct impact on our operations
+(3) High-risk areas requiring immediate action
+(4) Recommended next steps
+
+Cite sources and flag anything that may affect client deliverables or compliance posture.`},
+
+ {id:"email",cat:"Client Communications",icon:"fa-envelope-open-text",title:"Client Email Drafting",
+  desc:"Draft a professional, compliant, empathetic client response.",
+  vars:[{k:"topic",label:"Topic / client issue",ph:"e.g. delay on their loan approval",t:"input"},
+        {k:"regs",label:"Relevant regulations / disclaimers",ph:"e.g. RESPA, no rate guarantees",t:"input"}],
+  template:`Draft a professional, empathetic, and brand-aligned response to this client inquiry about {{topic}}.
+
+Ensure compliance with {{regs}}. Include:
+- Clear next steps or options
+- Any required disclaimers
+- A professional closing
+
+Maintain a helpful and solution-oriented tone.`},
+
+ {id:"ticket",cat:"Client Communications",icon:"fa-headset",title:"Support Ticket Triage & Response",
+  desc:"Categorize a ticket by urgency and draft an initial reply.",
+  gov:"Escalate anything with regulatory or data-privacy implications to a human specialist.",
+  vars:[{k:"ticket",label:"Support ticket text",ph:"Paste the ticket / customer message…",t:"area"}],
+  template:`Categorize this support ticket by urgency, type, and compliance implications. Suggest resolution steps and draft an initial client-facing response. Prioritize any regulatory or data-privacy concerns. Flag if escalation to a human specialist is recommended.
+
+TICKET:
+{{ticket}}`},
+
+ {id:"gap",cat:"Operations & Strategy",icon:"fa-clipboard-list",title:"Policy / Procedure Gap Analysis",
+  desc:"Compare a current policy against a standard and surface gaps.",
+  vars:[{k:"standard",label:"Standard / framework",ph:"e.g. SOC 2, internal SOP v3",t:"input"},
+        {k:"policy",label:"Current policy text",ph:"Paste the policy or procedure…",t:"area"}],
+  template:`Act as an internal controls reviewer. Compare the policy below against {{standard}}.
+
+Produce:
+(1) Gaps and missing controls (with severity High/Medium/Low)
+(2) Specific, actionable remediation for each gap
+(3) Quick wins vs. longer-term fixes
+(4) Items needing human/owner sign-off
+
+POLICY:
+{{policy}}`},
+
+ {id:"audit",cat:"Operations & Strategy",icon:"fa-folder-tree",title:"Audit Evidence Summarization",
+  desc:"Condense evidence into a clear, citable audit summary.",
+  gov:"Keep an audit trail; do not alter source evidence. Outputs are drafts for human auditors.",
+  vars:[{k:"control",label:"Control / requirement",ph:"e.g. access review for Q2",t:"input"},
+        {k:"evidence",label:"Evidence / documents",ph:"Paste logs, notes, or document text…",t:"area"}],
+  template:`Summarize the evidence below as it relates to control: {{control}}.
+
+Provide:
+(1) What the evidence demonstrates
+(2) Whether the control appears satisfied, partially satisfied, or not met
+(3) Any gaps or follow-ups for the auditor
+(4) A short, citable summary paragraph
+
+Reference specific evidence items. Do not infer beyond what is provided.
+
+EVIDENCE:
+{{evidence}}`},
+
+ {id:"risk",cat:"Operations & Strategy",icon:"fa-triangle-exclamation",title:"Risk Assessment Matrix",
+  desc:"Turn a scenario into a structured risk register.",
+  vars:[{k:"scope",label:"Initiative / scope",ph:"e.g. rollout of AI client-email tool",t:"input"}],
+  template:`Build a risk assessment matrix for: {{scope}}.
+
+For each risk provide: Risk | Likelihood (H/M/L) | Impact (H/M/L) | Overall rating | Mitigation | Owner.
+
+Cover at minimum: change/adoption, data privacy & compliance, integration/technical, and resource constraints. End with the top 3 risks to watch.`},
+
+ {id:"notes",cat:"Operations & Strategy",icon:"fa-list-check",title:"Meeting Notes → Action Items",
+  desc:"Convert raw notes into owned, dated action items.",
+  vars:[{k:"notes",label:"Meeting notes",ph:"Paste raw notes or transcript…",t:"area"}],
+  template:`Convert the meeting notes below into a clean output:
+
+(1) 3-5 sentence summary
+(2) Decisions made
+(3) Action items as a table: Task | Owner | Due date | Priority
+(4) Open questions / follow-ups
+
+If an owner or due date is missing, mark it "TBD — confirm".
+
+NOTES:
+{{notes}}`}
+];
+
+const CATS=["All",...Array.from(new Set(PROMPTS.map(p=>p.cat)))];
+let activeCat="All", favOnly=false;
+let favs=load();
+function load(){try{return JSON.parse(localStorage.getItem("aihub.favs"))||{};}catch(e){return {};}}
+function saveFavs(){try{localStorage.setItem("aihub.favs",JSON.stringify(favs));}catch(e){}}
+
+function chips(){
+  document.getElementById("chips").innerHTML=CATS.map(c=>`<div class="chip${c===activeCat?' on':''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">${c}</div>`).join("");
+}
+function setCat(c){activeCat=c;chips();render();}
+function toggleFav(){favOnly=!favOnly;const b=document.getElementById("favBtn");b.classList.toggle("primary",favOnly);b.innerHTML=favOnly?'<i class="fa-solid fa-star"></i> Favorites':'<i class="fa-regular fa-star"></i> Favorites';render();}
+
+function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+function highlight(t){return esc(t).replace(/\{\{(\w+)\}\}/g,'<span class="ph">[$1]</span>');}
+
+function render(){
+  const q=(document.getElementById("q").value||"").toLowerCase();
+  const list=PROMPTS.filter(p=>{
+    if(activeCat!=="All"&&p.cat!==activeCat)return false;
+    if(favOnly&&!favs[p.id])return false;
+    if(q&&!(p.title+" "+p.desc+" "+p.cat+" "+p.template).toLowerCase().includes(q))return false;
+    return true;
+  });
+  const g=document.getElementById("grid");
+  if(!list.length){g.innerHTML=`<div class="empty" style="grid-column:1/-1">No prompts match. Try clearing the search or filters.</div>`;return;}
+  g.innerHTML=list.map(p=>{
+    const vars=p.vars.map(v=>v.t==="area"
+      ? `<div class="var"><label>${v.label}</label><textarea rows="3" data-k="${v.k}" data-id="${p.id}" placeholder="${esc(v.ph)}"></textarea></div>`
+      : `<div class="var"><label>${v.label}</label><input data-k="${v.k}" data-id="${p.id}" placeholder="${esc(v.ph)}"/></div>`).join("");
+    return `<div class="card">
+      <div class="card-head">
+        <div class="card-ic"><i class="fa-solid ${p.icon}"></i></div>
+        <div class="card-tt"><div class="card-cat">${p.cat}</div><div class="card-name">${p.title}</div><div class="card-desc">${p.desc}</div></div>
+        <button class="fav${favs[p.id]?' on':''}" onclick="fav('${p.id}')" title="Favorite"><i class="fa-${favs[p.id]?'solid':'regular'} fa-star"></i></button>
+      </div>
+      ${p.gov?`<div class="gov"><i class="fa-solid fa-user-shield"></i><div>${p.gov}</div></div>`:""}
+      <div class="vars">${vars}</div>
+      <div class="prev"><div class="prev-head"><span>Prompt preview</span><span class="mono">${p.template.length} chars</span></div><div class="prev-body">${highlight(p.template)}</div></div>
+      <div class="actions">
+        <button class="btn primary" onclick="copyPrompt('${p.id}')"><i class="fa-solid fa-copy"></i> Copy filled prompt</button>
+        <button class="btn" onclick="copyRaw('${p.id}')"><i class="fa-regular fa-clone"></i> Copy template</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+function fav(id){favs[id]=!favs[id];if(!favs[id])delete favs[id];saveFavs();render();}
+
+function build(id,filled){
+  const p=PROMPTS.find(x=>x.id===id);let t=p.template;
+  p.vars.forEach(v=>{
+    let val="";
+    if(filled){const el=document.querySelector(`[data-id="${id}"][data-k="${v.k}"]`);val=el?el.value.trim():"";}
+    t=t.replace(new RegExp("\\{\\{"+v.k+"\\}\\}","g"), val||("["+v.label+"]"));
+  });
+  return t;
+}
+async function copyText(t,msg){
+  try{await navigator.clipboard.writeText(t);flash(msg);}
+  catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");flash(msg);}catch(_){flash("Couldn't copy — select and copy manually");}document.body.removeChild(ta);}
+}
+function copyPrompt(id){copyText(build(id,true),"Filled prompt copied ✓");}
+function copyRaw(id){copyText(build(id,false),"Template copied ✓");}
+
+function exportMd(){
+  const md=["# AI Assistant Hub — Prompt Library","",
+    "_Governed prompts for compliance, client services and operations. Keep a human in the loop; use approved tools only._","",
+    ...PROMPTS.map(p=>`## ${p.title}\n\n**Category:** ${p.cat}  \n${p.desc}\n\n\`\`\`\n${p.template}\n\`\`\`\n`)
+  ].join("\n");
+  const blob=new Blob([md],{type:"text/markdown"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="AI_Assistant_Hub_Prompts.md";a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);flash("Exported Markdown ✓");
+}
+let toastT;function flash(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1800);}
+
+function setView(v){
+  document.getElementById("view-prompts").style.display=v==="prompts"?"":"none";
+  document.getElementById("view-toolkit").style.display=v==="toolkit"?"":"none";
+  document.getElementById("nav-prompts").classList.toggle("on",v==="prompts");
+  document.getElementById("nav-toolkit").classList.toggle("on",v==="toolkit");
+  window.scrollTo(0,0);
+}
+
+chips();render();
+</script>
+</body>
+</html>
