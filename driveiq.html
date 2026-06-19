@@ -284,8 +284,8 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
 .am-bar{height:5px;border-radius:5px;background:var(--line2);overflow:hidden}
 .am-bar>i{display:block;height:100%;border-radius:5px}
 .am-mp{font-size:10px;color:var(--mut);font-weight:700;margin-top:5px;text-align:right;font-family:"JetBrains Mono",monospace}
-.am-qa{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}
-.am-qa-b{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;color:var(--txt);padding:0}
+.am-qa{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px;margin-bottom:4px}
+.am-qa-b{display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;color:var(--txt);padding:0}
 .am-qa-b .qc{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--blue);
   background:rgba(0,240,255,.07);border:1px solid var(--line2);transition:transform .15s}
 .am-qa-b:active .qc{transform:scale(.92)}
@@ -342,6 +342,31 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
   background-repeat:no-repeat;filter:drop-shadow(0 0 5px var(--blue-glow))}
 .vf-frame::after{content:"";position:absolute;left:6%;right:6%;height:2px;top:6%;background:linear-gradient(90deg,transparent,var(--c),transparent);box-shadow:0 0 12px var(--c);animation:vfscan 2.6s ease-in-out infinite}
 @keyframes vfscan{0%{top:6%}50%{top:90%}100%{top:6%}}
+
+/* ===================== TIRE PRESSURE + LIGHTS LIBRARY ===================== */
+.tp-rec{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:13px 15px;margin:6px 0 16px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tp-rec label{font-size:12.5px;color:var(--mut);font-weight:600;flex:1;line-height:1.35}
+.tp-rec input{width:84px;background:var(--bg2);border:1px solid var(--line2);border-radius:10px;color:var(--txt);padding:10px;font-size:17px;font-weight:700;text-align:center;font-family:"JetBrains Mono",monospace;outline:none}
+.tp-rec input:focus{border-color:var(--blue)}
+.tp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tp-tire{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tp-pos{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mut2)}
+.tp-val{display:flex;align-items:baseline;gap:6px;margin:9px 0 2px}
+.tp-val input{width:78px;background:var(--bg2);border:1px solid var(--line2);border-radius:10px;color:var(--txt);padding:8px;font-size:23px;font-weight:800;text-align:center;font-family:"JetBrains Mono",monospace;outline:none}
+.tp-val input:focus{border-color:var(--blue)}
+.tp-val span{font-size:12px;color:var(--mut2)}
+.tp-bar{height:7px;border-radius:7px;background:var(--line2);overflow:hidden;margin:10px 0 7px}
+.tp-bar>i{display:block;height:100%;border-radius:7px;transition:.3s}
+.tp-st{font-size:11.5px;font-weight:700}
+.tp-overall{display:flex;align-items:center;gap:10px;margin:16px 0 4px;font-size:13px}
+/* warning-lights library */
+.lib-row{display:flex;align-items:center;gap:13px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:9px;width:100%;text-align:left;color:var(--txt);transition:transform .12s}
+.lib-row:active{transform:scale(.99)}
+.lib-row .li{width:42px;height:42px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-size:18px}
+.lib-row .lm{flex:1;min-width:0}
+.lib-row .lm .a{font-size:14px;font-weight:700}
+.lib-row .lm .b{font-size:11px;color:var(--mut2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib-row .chev{color:var(--mut2);font-size:12px}
 </style>
 </head>
 <body>
@@ -409,6 +434,7 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     <div class="section-h">Quick Actions</div>
     <div class="am-qa">
       <button class="am-qa-b" onclick="go('vision')"><div class="qc"><i class="fa-solid fa-magnifying-glass"></i></div><span>Scan Now</span></button>
+      <button class="am-qa-b" onclick="go('tires')"><div class="qc"><i class="fa-solid fa-gauge-simple-high"></i></div><span>Tire PSI</span></button>
       <button class="am-qa-b" onclick="go('sound')"><div class="qc"><i class="fa-solid fa-wave-square"></i></div><span>SoundPrint</span></button>
       <button class="am-qa-b" onclick="openResults()"><div class="qc"><i class="fa-solid fa-heart-pulse"></i></div><span>Health</span></button>
       <button class="am-qa-b" onclick="openMaint()"><div class="qc"><i class="fa-solid fa-screwdriver-wrench"></i></div><span>Service</span></button>
@@ -445,6 +471,7 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     <button class="shutter" id="shutter" onclick="visionCapture()" style="display:none"></button>
     <button class="btn primary" id="vision-open" style="margin-top:16px" onclick="openCamera()"><i class="fa-solid fa-camera"></i> Open camera</button>
     <button class="btn ghost" style="margin-top:10px" onclick="pickLightManually()"><i class="fa-solid fa-list"></i> Pick the light manually</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="go('lights')"><i class="fa-solid fa-book-open"></i> Browse the warning-lights library</button>
     <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>DriveIQ provides AI-generated estimates to help you understand your vehicle. <b>Not a professional diagnosis or safety certification.</b> For anything affecting safety, consult a qualified mechanic before driving.</div></div>
   </div></div>
 
@@ -493,6 +520,28 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     <div class="set-row" onclick="showPrivacy()"><div><div class="sl">Privacy &amp; data</div><div class="sd">What we collect and why</div></div><i class="fa-solid fa-chevron-right" style="color:var(--mut2)"></i></div>
     <div class="set-row danger-row" onclick="clearData()"><div><div class="sl" style="color:var(--red)">Clear all data</div><div class="sd">Erase vehicles &amp; history on this device</div></div><i class="fa-solid fa-trash" style="color:var(--red)"></i></div>
     <p class="tiny" style="text-align:center;margin:14px 0 4px">DriveIQ provides informational estimates only.<br/>Not a professional diagnosis or safety certification.</p>
+  </div></div>
+
+  <!-- TIRE PRESSURE -->
+  <div class="screen" id="screen-tires"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-gauge-simple-high"></i> Tire Pressure</div>
+    <h1 class="h" style="font-size:25px">Tire pressure</h1>
+    <div class="sub">Enter the readings from your car's display or a tire gauge. We'll flag any that are low or high vs. your recommended PSI.</div>
+    <div id="tires-body"></div>
+    <div class="disc"><i class="fa-solid fa-circle-info"></i><div>Set your <b>recommended PSI</b> to the value on the driver's door-jamb sticker (cold pressure). DriveIQ shows what you enter — it isn't a live tire sensor. Inflate when cold for accuracy.</div></div>
+  </div></div>
+
+  <!-- WARNING LIGHTS LIBRARY -->
+  <div class="screen" id="screen-lights"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-book-open"></i> Warning Lights</div>
+    <h1 class="h" style="font-size:25px">Dashboard light library</h1>
+    <div class="sub">Tap any light to learn what it means, how urgent it is, common causes and a ballpark cost.</div>
+    <div class="field" style="display:flex;align-items:center;gap:10px;padding:0 14px;margin-bottom:14px">
+      <i class="fa-solid fa-magnifying-glass" style="color:var(--mut2);font-size:13px"></i>
+      <input id="lights-q" placeholder="Search lights…" oninput="renderLights()" style="flex:1;background:none;border:none;color:var(--txt);padding:13px 0;font-size:15px;outline:none"/>
+    </div>
+    <div id="lights-list"></div>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Reference information only — <b>not a diagnosis</b>. A symbol's exact meaning varies by make/model; check your owner's manual and a qualified mechanic for safety-critical lights.</div></div>
   </div></div>
 
   <!-- RECORDS -->
@@ -563,7 +612,28 @@ const LIGHTS = {
   traction:{name:"Traction / Stability",icon:"fa-car-side",fa:"fa-car-side",sev:"lo",color:"#3DDC97",
     expl:"Traction or stability control flashed or faulted. If flashing, it's actively helping with grip.",
     causes:["Slippery conditions (normal)","Wheel speed sensor","ABS-related fault"],
-    lo:0,hi:400,urg:"Monitor",diy:"If only in bad weather, it's normal; steady light = get it checked."}
+    lo:0,hi:400,urg:"Monitor",diy:"If only in bad weather, it's normal; steady light = get it checked."},
+  low_fuel:{name:"Low Fuel",icon:"fa-gas-pump",fa:"fa-gas-pump",sev:"lo",color:"#FFB54E",
+    expl:"Fuel level is low. Refuel soon — running very low can stress the fuel pump.",
+    causes:["Low fuel level"],lo:0,hi:0,urg:"Refuel soon",diy:"DIY — fill up at the next station."},
+  seatbelt:{name:"Seat Belt Reminder",icon:"fa-user-shield",fa:"fa-user",sev:"lo",color:"#FFB54E",
+    expl:"A seat belt isn't buckled (or a seat sensor detects weight). A safety reminder, not a fault.",
+    causes:["Unbuckled belt","Item on the seat","Seat-occupancy sensor"],lo:0,hi:0,urg:"Buckle up",diy:"DIY — buckle the belt; clear the seat."},
+  power_steering:{name:"Power Steering (EPS)",icon:"fa-circle-exclamation",fa:"fa-circle-exclamation",sev:"md",color:"#FFB54E",
+    expl:"The power-steering system has a fault. Steering may suddenly feel heavy. Get it checked soon.",
+    causes:["EPS sensor / motor fault","Low power-steering fluid (hydraulic)","Electrical / fuse issue"],lo:90,hi:900,urg:"Soon — steering can stiffen",diy:"Usually a shop diagnosis."},
+  washer_fluid:{name:"Low Washer Fluid",icon:"fa-droplet",fa:"fa-droplet",sev:"lo",color:"#3DDC97",
+    expl:"Windshield washer fluid is low. A simple top-up.",
+    causes:["Low washer fluid"],lo:0,hi:10,urg:"At your convenience",diy:"DIY — top up the washer reservoir."},
+  glow_plug:{name:"Glow Plug (Diesel)",icon:"fa-bolt",fa:"fa-bolt",sev:"md",color:"#FFB54E",
+    expl:"On diesels: glow plugs are preheating (normal at startup) — or, if it stays on, a glow-plug/system fault.",
+    causes:["Normal cold-start preheat","Failed glow plug","Glow-plug relay","Engine sensor fault"],lo:50,hi:500,urg:"Soon if it stays on",diy:"Steady light = shop diagnosis."},
+  door_ajar:{name:"Door / Trunk Ajar",icon:"fa-car-side",fa:"fa-door-open",sev:"lo",color:"#FFB54E",
+    expl:"A door, hood, or trunk isn't fully latched. Close it before driving.",
+    causes:["Door not fully shut","Hood/trunk open","Latch or sensor fault"],lo:0,hi:200,urg:"Before driving",diy:"DIY — open and firmly re-close; persistent = check the latch sensor."},
+  security:{name:"Security / Immobilizer",icon:"fa-key",fa:"fa-key",sev:"lo",color:"#FFB54E",
+    expl:"The anti-theft/immobilizer indicator. Blinking when parked is normal; on while driving can mean a key or system fault.",
+    causes:["Normal anti-theft blink (parked)","Key fob / transponder issue","Immobilizer fault"],lo:0,hi:400,urg:"Monitor",diy:"Try the spare key; persistent = dealer/locksmith."}
 };
 const LIGHT_ORDER=["check_engine","oil_pressure","battery","coolant_temp","brake","abs","airbag","coolant_temp","tpms","traction","oil_change"];
 const SYSTEMS=[
@@ -588,7 +658,7 @@ function go(s){
   document.getElementById("screen-"+s).classList.add("active");
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
   const sc=document.querySelector("#screen-"+s+" .scroll"); if(sc)sc.scrollTop=0;
-  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound(); if(s==="records")renderRecords(); if(s==="vision")setScanContext();
+  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound(); if(s==="records")renderRecords(); if(s==="vision")setScanContext(); if(s==="tires")renderTires(); if(s==="lights")renderLights();
 }
 
 /* ===================== GATE ===================== */
@@ -1052,6 +1122,89 @@ function viewReceipt(id){
   });
 }
 function delReceipt(id){ if(confirm("Delete this document? This can't be undone.")) idbDel(id).then(()=>{flash("Deleted");renderRecords();}).catch(()=>flash("Couldn't delete")); }
+
+/* ===================== TIRE PRESSURE ===================== */
+function tireStatus(cur,rec){
+  if(!cur||cur<=0)return {bar:0,col:"var(--mut2)",txt:"—"};
+  const d=cur-rec;
+  let col,txt;
+  if(d<=-7){col="var(--red)";txt="Low — inflate";}
+  else if(d<=-3){col="var(--amber)";txt="A bit low";}
+  else if(d>=8){col="var(--amber)";txt="High — release a little";}
+  else{col="var(--green)";txt="Good";}
+  let pct=Math.round(((cur-(rec-12))/24)*100); pct=Math.max(4,Math.min(100,pct));
+  return {bar:pct,col,txt};
+}
+function renderTires(){
+  const body=document.getElementById("tires-body"); if(!body)return;
+  const v=activeVehicle();
+  if(!v){ body.innerHTML=`<div class="muted" style="padding:8px 2px 4px">Add a vehicle first so your tire readings save to it.<button class="btn primary" style="margin-top:12px" onclick="go('garage')"><i class="fa-solid fa-plus"></i> Add a vehicle</button></div>`; return; }
+  const t=v.tires||{rec:35,fl:0,fr:0,rl:0,rr:0};
+  const pos=[["fl","Front Left"],["fr","Front Right"],["rl","Rear Left"],["rr","Rear Right"]];
+  body.innerHTML=`
+    <div class="tp-rec"><label>Recommended PSI<br/><span class="tiny">from your door-jamb sticker (cold)</span></label><input id="tp-rec" type="number" inputmode="decimal" value="${t.rec||35}" oninput="saveTires()"/></div>
+    <div class="tp-grid">${pos.map(([k,lbl])=>`
+      <div class="tp-tire">
+        <div class="tp-pos">${lbl}</div>
+        <div class="tp-val"><input id="tp-${k}" type="number" inputmode="decimal" value="${t[k]||''}" placeholder="--" oninput="saveTires()"/><span>PSI</span></div>
+        <div class="tp-bar"><i id="bar-${k}"></i></div>
+        <div class="tp-st" id="st-${k}"></div>
+      </div>`).join("")}</div>
+    <div class="tp-overall" id="tp-overall"></div>
+    <div class="tiny" id="tp-updated" style="margin-top:3px">${t.ts?"Last saved "+rel(t.ts):""}</div>`;
+  paintTires();
+}
+function paintTires(){
+  const recEl=document.getElementById("tp-rec"); if(!recEl)return;
+  const rec=+recEl.value||35; let worst=0;
+  ["fl","fr","rl","rr"].forEach(k=>{
+    const cur=+document.getElementById("tp-"+k).value||0;
+    const s=tireStatus(cur,rec);
+    const bar=document.getElementById("bar-"+k), st=document.getElementById("st-"+k);
+    bar.style.width=s.bar+"%"; bar.style.background=s.col;
+    st.textContent=s.txt; st.style.color=s.col;
+    if(s.txt!=="—"){ if(s.col==="var(--red)")worst=Math.max(worst,2); else if(s.col==="var(--amber)")worst=Math.max(worst,1); }
+  });
+  const o=document.getElementById("tp-overall");
+  const any=["fl","fr","rl","rr"].some(k=>+document.getElementById("tp-"+k).value>0);
+  if(!any){o.innerHTML=`<span class="tiny">Enter your readings to see overall status.</span>`;}
+  else{const c=worst===2?"var(--red)":worst===1?"var(--amber)":"var(--green)";const txt=worst===2?"One or more tires need attention":worst===1?"Check — a tire is off spec":"All tires look good";
+    o.innerHTML=`<span style="width:11px;height:11px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c};flex:none"></span><b style="color:${c}">${txt}</b>`;}
+}
+function saveTires(){
+  const v=activeVehicle(); if(!v)return;
+  v.tires={rec:+document.getElementById("tp-rec").value||35,
+    fl:+document.getElementById("tp-fl").value||0, fr:+document.getElementById("tp-fr").value||0,
+    rl:+document.getElementById("tp-rl").value||0, rr:+document.getElementById("tp-rr").value||0, ts:Date.now()};
+  save(); paintTires();
+  const u=document.getElementById("tp-updated"); if(u)u.textContent="Saved just now";
+}
+
+/* ===================== WARNING-LIGHTS LIBRARY ===================== */
+function renderLights(){
+  const list=document.getElementById("lights-list"); if(!list)return;
+  const q=(document.getElementById("lights-q").value||"").toLowerCase();
+  const ord={hi:0,md:1,lo:2};
+  const keys=Object.keys(LIGHTS).filter(k=>{const L=LIGHTS[k];return !q||(L.name+" "+L.expl+" "+L.causes.join(" ")).toLowerCase().includes(q);})
+    .sort((a,b)=>ord[LIGHTS[a].sev]-ord[LIGHTS[b].sev]);
+  if(!keys.length){list.innerHTML=`<div class="muted" style="padding:8px 2px">No lights match your search.</div>`;return;}
+  list.innerHTML=keys.map(k=>{const L=LIGHTS[k];return `<button class="lib-row" onclick="lightInfo('${k}')"><div class="li" style="background:${hex(L.color,.16)};color:${L.color}"><i class="fa-solid ${L.fa}"></i></div><div class="lm"><div class="a">${L.name}</div><div class="b">${L.expl}</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`;}).join("");
+}
+function lightInfo(k){
+  const L=LIGHTS[k];
+  sheet(`<div class="grab"></div>
+    <div style="display:flex;align-items:center;gap:13px;margin-bottom:12px"><div style="width:50px;height:50px;border-radius:13px;background:${hex(L.color,.16)};color:${L.color};display:flex;align-items:center;justify-content:center;font-size:22px"><i class="fa-solid ${L.fa}"></i></div><div><h3 style="margin:0">${L.name}</h3><span class="chip ${L.sev}">${sevLabel(L.sev)}</span></div></div>
+    <p class="muted" style="margin-bottom:12px">${L.expl}</p>
+    <div class="card" style="margin-bottom:12px">
+      <div class="kv"><span class="k">How soon</span><span class="v">${L.urg}</span></div>
+      ${(L.hi>0)?`<div class="kv"><span class="k">Ballpark cost</span><span class="v">$${L.lo}–$${L.hi}</span></div>`:''}
+      <div class="kv"><span class="k">DIY or shop</span><span class="v" style="font-weight:600;font-size:12px;max-width:60%">${L.diy}</span></div>
+    </div>
+    <div class="section-h" style="margin-top:4px">Common causes</div>
+    ${L.causes.map(c=>`<div class="flag" style="padding:11px 14px;margin-bottom:8px"><div class="fh" style="margin:0"><div class="ft" style="font-size:13.5px">${c}</div></div></div>`).join("")}
+    <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">Close</button>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Reference only, not a diagnosis. ${L.sev==='hi'?'<b>This can be safety-critical — have it checked before driving.</b>':'Confirm with a qualified mechanic.'}</div></div>`);
+}
 
 /* ===================== BOOT ===================== */
 window.addEventListener("load",()=>{ if(localStorage.getItem("driveiq.ack")){document.getElementById("gate").style.display="none";boot();} });
