@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRIVEIQ • Precision Telemetry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap');
+
+        :root {
+            --bg-color: #0B0F14;
+            --panel-bg: rgba(20, 20, 25, 0.65);
+            --accent-cyan: #00f0ff;
+            --accent-amber: #ffb700;
+            --accent-red: #ff3333;
+            --accent-green: #00ff66;
+            --current-accent: var(--accent-cyan);
+        }
+
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+            background: var(--bg-color);
+            color: #e2e8f0;
+        }
+
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', system_ui, sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border-radius: 12px;
+        }
+
+        .section-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(226, 232, 240, 0.5);
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: rgba(226, 232, 240, 0.45);
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            font-feature-settings: "tnum";
+        }
+
+        .tier-1 {
+            font-size: 4.25rem;
+            line-height: 0.95;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.4),
+                        0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .tier-2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .tier-3 {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .hud-text {
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            opacity: 0.6;
+        }
+
+        .telemetry-card {
+            transition: all 0.2s cubic-bezier(0.23, 1.0, 0.32, 1);
+        }
+
+        .telemetry-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2);
+        }
+
+        .radial-gauge {
+            filter: drop-shadow(0 0 12px var(--current-accent));
+            transition: filter 0.3s ease;
+        }
+
+        .state-active { --current-accent: var(--accent-cyan); }
+        .state-calibration { --current-accent: var(--accent-amber); }
+        .state-alert { --current-accent: var(--accent-red); }
+        .state-recording { --current-accent: var(--accent-green); }
+
+        .heartbeat {
+            animation: heartbeat 1.2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.985); }
+        }
+
+        .log-entry {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .metric-number {
+            font-variant-numeric: tabular-nums;
+            transition: all 0.15s ease-out;
+        }
+
+        .subtle-grid {
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+        }
+
+        .industrial-label {
+            font-size: 0.65rem;
+            letter-spacing: 1.25px;
+            text-transform: uppercase;
+            opacity: 0.55;
+        }
+    </style>
+</head>
+<body class="bg-[#0B0F14] text-slate-200 overflow-x-hidden">
+    <!-- Top Navigation / Session Bar -->
+    <div class="border-b border-white/10 bg-[#0B0F14]/95 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-[1480px] mx-auto px-6 h-14 flex items-center justify-between">
+            <div class="flex items-center gap-x-4">
+                <!-- Logo -->
+                <div class="flex items-center gap-x-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-400 to-sky-500 flex items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-tachometer-alt text-[#0B0F14] text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-display text-2xl tracking-[-1.5px] font-semibold">DRIVEIQ</span>
+                    </div>
+                </div>
+                
+                <!-- Status -->
+                <div class="flex items-center gap-x-2 pl-4 border-l border-white/10">
+                    <div class="flex items-center gap-x-1.5 px-3 py-1 bg-white/5 rounded-3xl text-xs">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="font-mono text-emerald-400 text-[10px] tracking-widest">LINKED</span>
+                    </div>
+                    <div class="text-xs text-white/50 font-mono">SESSION 24A7F3 • 47m 12s</div>
+                </div>
+            </div>
+
+            <!-- Mode & State Controls -->
+            <div class="flex items-center gap-x-3">
+                <!-- State Selector -->
+                <div class="flex items-center bg-white/5 rounded-3xl p-1 text-xs">
+                    <button onclick="setState('active')" id="state-active"
+                            class="px-4 py-1 rounded-3xl font-medium transition-all active state-active bg-white/10 text-white flex items-center gap-x-1.5">
+                        <i class="fa-solid fa-play text-[10px]"></i>
+                        <span>ACTIVE</span>
+                    </button>
+                    <button onclick="setState('calibration')" id="state-calibration"
+                            class="px-4 py-1 rounded-3xl font-medium transition-all hover:bg-white/10 flex items-center gap-x-1.5 text-white/70">
+                        <i class="fa-solid fa-sync-alt text-[10px]"></i>
+                        <span>CAL</span>
+                    </button>
+                    <button onclick="setState('alert')" id="state-alert"
+                            class="px-4 py-1 rounded-3xl font-medium transition-all hover:bg-white/10 flex items-center gap-x-1.5 text-white/70">
+                        <i class="fa-solid fa-exclamation-triangle text-[10px]"></i>
+                        <span>ALERT</span>
+                    </button>
+                    <button onclick="setState('recording')" id="state-recording"
+                            class="px-4 py-1 rounded-3xl font-medium transition-all hover:bg-white/10 flex items-center gap-x-1.5 text-white/70">
+                        <i class="fa-solid fa-record-vinyl text-[10px]"></i>
+                        <span>REC</span>
+                    </button>
+                </div>
+
+                <button onclick="exportSession()"
+                        class="flex items-center gap-x-2 px-4 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 border border-white/10 rounded-3xl transition-all active:scale-[0.985]">
+                    <i class="fa-solid fa-download text-xs"></i>
+                    <span>EXPORT</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-[1480px] mx-auto px-6 pt-6 pb-10">
+        
+        <!-- Header -->
+        <div class="flex items-end justify-between mb-6">
+            <div>
+                <div class="flex items-center gap-x-3">
+                    <h1 class="font-display text-5xl tracking-[-2.5px] font-semibold">DRIVE TELEMETRY</h1>
+                    <div class="px-3 py-1 rounded-2xl bg-white/5 text-xs font-mono tracking-[2px] text-white/60 self-start mt-2">v2.4.1 • ALPHA</div>
+                </div>
+                <p class="text-white/50 text-sm mt-1">Real-time vehicle dynamics • Cognitive load monitoring • Mission-grade diagnostics</p>
+            </div>
+            
+            <div class="text-right">
+                <div class="text-xs text-white/40 tracking-widest">CURRENT DRIVER</div>
+                <div class="font-medium">ROBERT C. • 16,842 km total</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            
+            <!-- CENTER: CORE SCORE + RADIAL GAUGE (Tier 1) -->
+            <div class="lg:col-span-5">
+                <div class="glass-panel p-7 h-full flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="section-header">PRIMARY INTEGRITY SCORE</div>
+                            <div class="text-[10px] text-white/40 mt-0.5">VISION ENGINE • REAL-TIME</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="hud-text">UPDATED 240ms AGO</div>
+                        </div>
+                    </div>
+
+                    <!-- Radial Gauge -->
+                    <div class="flex-1 flex items-center justify-center relative my-2">
+                        <div class="relative w-[260px] h-[260px]">
+                            <!-- Background circle -->
+                            <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="#1f2937" stroke-width="9"/>
+                                <!-- Progress circle -->
+                                <circle id="gauge-progress" cx="60" cy="60" r="52" fill="none" 
+                                        stroke="var(--current-accent)" stroke-width="9" 
+                                        stroke-dasharray="326.73" stroke-dashoffset="81.68"
+                                        stroke-linecap="round"/>
+                            </svg>
+                            
+                            <!-- Center content -->
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <div id="core-score" 
+                                     class="tier-1 font-display tabular-nums text-white metric-number"
+                                     style="color: var(--current-accent); text-shadow: 0 0 25px var(--current-accent);">87</div>
+                                <div class="text-xs tracking-[3px] text-white/50 -mt-1">DRIVE SCORE</div>
+                                
+                                <div class="mt-3 flex items-center gap-x-1.5">
+                                    <div class="px-2.5 py-px rounded bg-white/10 text-[10px] font-mono">+4</div>
+                                    <div class="text-emerald-400 text-xs">↑ FROM LAST SESSION</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Heartbeat ring -->
+                            <div class="absolute inset-0 rounded-full border border-white/10 heartbeat" 
+                                 style="box-shadow: 0 0 0 1px var(--current-accent); animation-duration: 1.1s;"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 text-center pt-2 border-t border-white/10">
+                        <div>
+                            <div class="text-[10px] text-white/40">PEAK</div>
+                            <div class="font-mono text-lg tabular-nums">94</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-white/40">AVG</div>
+                            <div class="font-mono text-lg tabular-nums">81</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-white/40">TREND</div>
+                            <div class="font-mono text-lg text-emerald-400 tabular-nums">+6</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: KEY TELEMETRY (Tier 2) -->
+            <div class="lg:col-span-7">
+                <div class="glass-panel p-6 h-full">
+                    <div class="section-header mb-4">KEY SYSTEM VECTORS</div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-5">
+                        <!-- VELOCITY VECTOR -->
+                        <div class="telemetry-card bg-white/5 rounded-2xl p-4 border border-white/10">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="metric-label">VELOCITY VECTOR</div>
+                                    <div id="velocity" class="tier-2 metric-number tabular-nums text-white mt-0.5">68.4</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[10px] text-white/40">km/h</div>
+                                    <div class="text-emerald-400 text-xs mt-0.5 flex items-center justify-end gap-x-px">
+                                        <i class="fa-solid fa-arrow-up text-[9px]"></i> <span class="font-mono">2.1</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-cyan-400 to-white w-[68%]" style="width: 68%"></div>
+                            </div>
+                        </div>
+
+                        <!-- COGNITIVE LOAD -->
+                        <div class="telemetry-card bg-white/5 rounded-2xl p-4 border border-white/10">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="metric-label">COGNITIVE_LOAD</div>
+                                    <div id="cognitive" class="tier-2 metric-number tabular-nums text-white mt-0.5">34</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[10px] text-white/40">%</div>
+                                    <div class="text-amber-400 text-xs mt-0.5">MODERATE</div>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex gap-1">
+                                <div class="flex-1 h-1.5 bg-white/10 rounded-l-full"><div class="h-full bg-amber-400 rounded-l-full" style="width: 34%"></div></div>
+                            </div>
+                        </div>
+
+                        <!-- LATERAL G -->
+                        <div class="telemetry-card bg-white/5 rounded-2xl p-4 border border-white/10">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="metric-label">LATERAL G-FORCE</div>
+                                    <div id="lateral-g" class="tier-2 metric-number tabular-nums text-white mt-0.5">0.38</div>
+                                </div>
+                                <div class="text-right text-xs text-white/40">g</div>
+                            </div>
+                            <div class="mt-3 text-[10px] flex items-center gap-x-2 text-white/60">
+                                <span class="font-mono">LEFT</span> 
+                                <div class="flex-1 h-px bg-white/20"></div> 
+                                <span class="font-mono text-emerald-400">STABLE</span>
+                            </div>
+                        </div>
+
+                        <!-- LONGITUDINAL -->
+                        <div class="telemetry-card bg-white/5 rounded-2xl p-4 border border-white/10">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="metric-label">LONGITUDINAL ACCEL</div>
+                                    <div id="longitudinal" class="tier-2 metric-number tabular-nums text-white mt-0.5">-0.12</div>
+                                </div>
+                                <div class="text-right text-xs text-white/40">g</div>
+                            </div>
+                            <div class="mt-1.5 text-emerald-400 text-xs font-mono flex items-center gap-x-1">
+                                <i class="fa-solid fa-minus text-[9px]"></i> DECEL
+                            </div>
+                        </div>
+
+                        <!-- HEADING -->
+                        <div class="telemetry-card bg-white/5 rounded-2xl p-4 border border-white/10">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="metric-label">HEADING / BEARING</div>
+                                    <div id="heading" class="tier-2 metric-number tabular-nums text-white mt-0.5">287°</div>
+                                </div>
+                                <div class="text-right">
+                                    <i class="fa-solid fa-compass text-white/40 text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="mt-1 text-xs text-white/50 font-mono">NNW • 12° from route</div>
+                        </div>
+
+                        <!-- SYSTEM TEMP -->
+                        <div class="telemetry-card bg-white/5 rounded-2xl p-4 border border-white/10">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="metric-label">SYSTEM TEMP</div>
+                                    <div id="temp" class="tier-2 metric-number tabular-nums text-white mt-0.5">41.2</div>
+                                </div>
+                                <div class="text-right text-xs text-white/40">°C</div>
+                            </div>
+                            <div class="mt-3 text-emerald-400 text-xs">NOMINAL • <span class="font-mono">+0.8</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM SECTION: TELEMETRY STREAMS + EVENT LOG -->
+            <div class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-5 mt-1">
+                
+                <!-- Live Telemetry Streams (Tier 2/3) -->
+                <div class="lg:col-span-5 glass-panel p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="section-header">LIVE TELEMETRY STREAMS</div>
+                        <div class="text-[10px] px-2 py-0.5 bg-white/5 rounded text-white/50 font-mono">42 Hz</div>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center py-1 border-b border-white/10">
+                            <div class="flex items-center gap-x-3">
+                                <span class="industrial-label w-28">STEERING ANGLE</span>
+                                <span id="steering" class="font-mono tabular-nums text-lg">-4.2°</span>
+                            </div>
+                            <span class="text-emerald-400 text-xs">CENTERED</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center py-1 border-b border-white/10">
+                            <div class="flex items-center gap-x-3">
+                                <span class="industrial-label w-28">THROTTLE INPUT</span>
+                                <span id="throttle" class="font-mono tabular-nums text-lg">31%</span>
+                            </div>
+                            <div class="w-16 h-1 bg-white/10 rounded"><div class="h-1 bg-sky-400 rounded" style="width:31%"></div></div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center py-1 border-b border-white/10">
+                            <div class="flex items-center gap-x-3">
+                                <span class="industrial-label w-28">BRAKE PRESSURE</span>
+                                <span id="brake" class="font-mono tabular-nums text-lg">0.0</span>
+                            </div>
+                            <span class="text-xs text-white/40">MPa</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center py-1">
+                            <div class="flex items-center gap-x-3">
+                                <span class="industrial-label w-28">ENGINE RPM</span>
+                                <span id="rpm" class="font-mono tabular-nums text-lg">2,840</span>
+                            </div>
+                            <span class="text-emerald-400 text-xs">STABLE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Log / Status Feed (Tier 3) -->
+                <div class="lg:col-span-7 glass-panel p-6 flex flex-col">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="section-header">EVENT LOG • SYSTEM FEED</div>
+                        <button onclick="clearLog()" class="text-[10px] px-3 py-1 hover:bg-white/10 rounded-2xl transition flex items-center gap-x-1 text-white/60">
+                            <i class="fa-solid fa-trash text-xs"></i> <span>CLEAR</span>
+                        </button>
+                    </div>
+                    
+                    <div id="event-log" class="flex-1 overflow-auto text-xs font-mono space-y-px pr-1 custom-scroll max-h-[168px]">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div class="pt-3 mt-auto border-t border-white/10 flex items-center justify-between text-[10px] text-white/40">
+                        <div>142 EVENTS THIS SESSION</div>
+                        <div class="font-mono">AUTO-SCROLL ENABLED</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind config
+        function initTailwind() {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'display': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+
+        // State management
+        let currentState = 'active';
+        let animationFrame = null;
+        let logInterval = null;
+        let telemetryInterval = null;
+
+        const stateConfig = {
+            active: { accent: '#00f0ff', label: 'ACTIVE', colorClass: 'text-cyan-400' },
+            calibration: { accent: '#ffb700', label: 'CALIBRATION', colorClass: 'text-amber-400' },
+            alert: { accent: '#ff3333', label: 'ALERT', colorClass: 'text-red-400' },
+            recording: { accent: '#00ff66', label: 'RECORDING', colorClass: 'text-emerald-400' }
+        };
+
+        function setState(newState) {
+            currentState = newState;
+            
+            // Update body class for accent
+            document.body.className = `bg-[#0B0F14] text-slate-200 overflow-x-hidden state-${newState}`;
+            
+            // Update all state buttons
+            document.querySelectorAll('[id^="state-"]').forEach(btn => {
+                btn.classList.remove('bg-white/10', 'text-white');
+                btn.classList.add('text-white/70');
+                if (btn.id === `state-${newState}`) {
+                    btn.classList.add('bg-white/10', 'text-white');
+                    btn.classList.remove('text-white/70');
+                }
+            });
+
+            // Update accent color on gauge
+            const gauge = document.getElementById('gauge-progress');
+            if (gauge) {
+                gauge.setAttribute('stroke', stateConfig[newState].accent);
+            }
+
+            // Visual feedback on core score
+            const scoreEl = document.getElementById('core-score');
+            if (scoreEl) {
+                scoreEl.style.color = stateConfig[newState].accent;
+                scoreEl.style.textShadow = `0 0 25px ${stateConfig[newState].accent}`;
+            }
+
+            // Add log entry for state change
+            addLogEntry(`SYSTEM STATE → ${stateConfig[newState].label}`, newState === 'alert' ? 'alert' : 'info');
+
+            // Special behaviors per state
+            if (newState === 'alert') {
+                triggerAlertPulse();
+            } else if (newState === 'recording') {
+                startRecordingIndicator();
+            }
+        }
+
+        function triggerAlertPulse() {
+            const scoreEl = document.getElementById('core-score');
+            if (!scoreEl) return;
+            
+            scoreEl.style.transitionDuration = '80ms';
+            let pulses = 0;
+            const pulseInterval = setInterval(() => {
+                scoreEl.style.transform = pulses % 2 === 0 ? 'scale(1.04)' : 'scale(1)';
+                pulses++;
+                if (pulses > 5) {
+                    clearInterval(pulseInterval);
+                    scoreEl.style.transform = 'scale(1)';
+                    scoreEl.style.transitionDuration = '0.15s';
+                }
+            }, 120);
+        }
+
+        function startRecordingIndicator() {
+            const scoreEl = document.getElementById('core-score');
+            if (!scoreEl) return;
+            scoreEl.style.animation = 'heartbeat 800ms ease-in-out infinite';
+            
+            setTimeout(() => {
+                if (currentState !== 'recording' && scoreEl) {
+                    scoreEl.style.animation = '';
+                }
+            }, 8000);
+        }
+
+        // Update a single metric with animation
+        function updateMetric(id, newValue, suffix = '') {
+            const el = document.getElementById(id);
+            if (!el) return;
+            
+            const current = parseFloat(el.textContent) || 0;
+            const target = parseFloat(newValue);
+            
+            if (isNaN(target)) return;
+            
+            const duration = 380;
+            const startTime = performance.now();
+            
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                
+                const value = current + (target - current) * eased;
+                el.textContent = value.toFixed(id.includes('g') || id.includes('longitudinal') ? 2 : 
+                                           id.includes('velocity') ? 1 : 0) + suffix;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    el.textContent = target.toFixed(id.includes('g') || id.includes('longitudinal') ? 2 : 
+                                                  id.includes('velocity') ? 1 : 0) + suffix;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Simulate realistic telemetry updates
+        function simulateTelemetry() {
+            // Velocity
+            const vel = (62 + Math.random() * 14).toFixed(1);
+            updateMetric('velocity', vel);
+            
+            // Cognitive load (slow drift)
+            const cog = Math.max(22, Math.min(58, 34 + (Math.random() - 0.5) * 8));
+            updateMetric('cognitive', Math.round(cog));
+            
+            // Lateral G
+            const lat = (Math.random() * 0.7 - 0.1).toFixed(2);
+            updateMetric('lateral-g', lat);
+            
+            // Longitudinal
+            const lon = (Math.random() * 0.6 - 0.35).toFixed(2);
+            updateMetric('longitudinal', lon);
+            
+            // Heading (slow change)
+            const headEl = document.getElementById('heading');
+            if (headEl) {
+                let h = parseInt(headEl.textContent) || 280;
+                h = (h + (Math.random() * 3 - 1.2)) % 360;
+                headEl.textContent = Math.round(h) + '°';
+            }
+            
+            // Temp
+            const temp = (39.8 + Math.random() * 3.5).toFixed(1);
+            updateMetric('temp', temp, '°C');
+            
+            // Lower tier
+            const steer = (-8 + Math.random() * 16).toFixed(1);
+            const steerEl = document.getElementById('steering');
+            if (steerEl) steerEl.textContent = steer + '°';
+            
+            const throttle = Math.floor(18 + Math.random() * 35);
+            const thrEl = document.getElementById('throttle');
+            if (thrEl) thrEl.textContent = throttle + '%';
+            
+            const brake = (Math.random() * 1.8).toFixed(1);
+            const brakeEl = document.getElementById('brake');
+            if (brakeEl) brakeEl.textContent = brake;
+            
+            const rpm = Math.floor(2150 + Math.random() * 1250);
+            const rpmEl = document.getElementById('rpm');
+            if (rpmEl) rpmEl.textContent = rpm.toLocaleString();
+            
+            // Occasionally update core score
+            if (Math.random() < 0.25) {
+                const scoreEl = document.getElementById('core-score');
+                if (scoreEl) {
+                    let currentScore = parseInt(scoreEl.textContent);
+                    const delta = Math.floor(Math.random() * 5) - 2;
+                    const newScore = Math.max(68, Math.min(96, currentScore + delta));
+                    scoreEl.textContent = newScore;
+                    
+                    // Update gauge
+                    updateGauge(newScore);
+                }
+            }
+            
+            // Random log entries
+            if (Math.random() < 0.18) {
+                const events = [
+                    "Lane assist adjustment applied",
+                    "Adaptive cruise engaged",
+                    "Traction control intervention",
+                    "Road surface change detected",
+                    "Driver attention nominal",
+                    "Speed limit sign recognized",
+                    "Predictive braking active"
+                ];
+                const msg = events[Math.floor(Math.random() * events.length)];
+                addLogEntry(msg, 'info');
+            }
+        }
+
+        function updateGauge(score) {
+            const circle = document.getElementById('gauge-progress');
+            if (!circle) return;
+            
+            const circumference = 326.73;
+            const offset = circumference - (score / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            circle.setAttribute('stroke', stateConfig[currentState].accent);
+        }
+
+        // Add entry to event log
+        function addLogEntry(message, type = 'info') {
+            const logContainer = document.getElementById('event-log');
+            if (!logContainer) return;
+            
+            const time = new Date();
+            const timeStr = time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry flex gap-x-3 items-start ${type === 'alert' ? 'text-red-400' : 'text-white/80'}`;
+            
+            let icon = '';
+            if (type === 'alert') icon = '<i class="fa-solid fa-exclamation-triangle text-red-400 mt-px"></i>';
+            else if (type === 'info') icon = '<i class="fa-solid fa-info-circle text-white/40 mt-px"></i>';
+            
+            entry.innerHTML = `
+                <span class="font-mono text-white/40 w-[68px] flex-shrink-0">${timeStr}</span>
+                <span class="flex-1">${icon} ${message}</span>
+            `;
+            
+            logContainer.appendChild(entry);
+            
+            // Auto scroll
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Limit entries
+            while (logContainer.children.length > 18) {
+                logContainer.removeChild(logContainer.firstChild);
+            }
+        }
+
+        function clearLog() {
+            const log = document.getElementById('event-log');
+            if (log) log.innerHTML = '';
+            addLogEntry('Event log cleared by operator', 'info');
+        }
+
+        function exportSession() {
+            const btns = document.querySelectorAll('button');
+            const originalTexts = [];
+            
+            btns.forEach((btn, i) => {
+                if (btn.textContent.includes('EXPORT')) {
+                    originalTexts[i] = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-check mr-1.5"></i> EXPORTED';
+                    btn.disabled = true;
+                }
+            });
+            
+            // Create export data
+            const data = {
+                session: "24A7F3",
+                timestamp: new Date().toISOString(),
+                state: currentState,
+                coreScore: document.getElementById('core-score').textContent,
+                velocity: document.getElementById('velocity').textContent,
+                cognitiveLoad: document.getElementById('cognitive').textContent,
+                metrics: {
+                    lateralG: document.getElementById('lateral-g').textContent,
+                    longitudinal: document.getElementById('longitudinal').textContent,
+                    heading: document.getElementById('heading').textContent,
+                    systemTemp: document.getElementById('temp').textContent
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `driveiq-session-${data.session}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            setTimeout(() => {
+                btns.forEach((btn, i) => {
+                    if (btn.textContent.includes('EXPORTED') || btn.disabled) {
+                        btn.innerHTML = originalTexts[i] || '<i class="fa-solid fa-download text-xs"></i> EXPORT';
+                        btn.disabled = false;
+                    }
+                });
+                addLogEntry('Session data exported successfully', 'info');
+            }, 1450);
+        }
+
+        function initGauge() {
+            const circle = document.getElementById('gauge-progress');
+            if (circle) {
+                // Initial 87% fill
+                const circumference = 326.73;
+                const initialOffset = circumference - (0.87 * circumference);
+                circle.style.strokeDasharray = circumference;
+                circle.style.strokeDashoffset = initialOffset;
+                circle.setAttribute('stroke', '#00f0ff');
+            }
+            
+            // Initial core score styling
+            const score = document.getElementById('core-score');
+            if (score) {
+                score.style.color = '#00f0ff';
+                score.style.textShadow = '0 0 25px #00f0ff';
+            }
+        }
+
+        function seedInitialLog() {
+            const log = document.getElementById('event-log');
+            if (!log) return;
+            
+            const initialEntries = [
+                { time: '08:21:44', msg: 'Drive session initialized • All sensors nominal', type: 'info' },
+                { time: '08:22:11', msg: 'Cognitive baseline established', type: 'info' },
+                { time: '08:24:37', msg: 'Highway merge detected • Velocity vector stabilized', type: 'info' },
+                { time: '08:27:02', msg: 'Minor lateral correction applied by system', type: 'info' },
+            ];
+            
+            initialEntries.forEach((entry, idx) => {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.className = `log-entry flex gap-x-3 items-start text-white/80`;
+                    el.innerHTML = `
+                        <span class="font-mono text-white/40 w-[68px] flex-shrink-0">${entry.time}</span>
+                        <span class="flex-1"><i class="fa-solid fa-info-circle text-white/40 mt-px mr-1"></i> ${entry.msg}</span>
+                    `;
+                    log.appendChild(el);
+                    log.scrollTop = log.scrollHeight;
+                }, idx * 180);
+            });
+        }
+
+        function startSimulation() {
+            // Initial telemetry
+            setTimeout(() => {
+                simulateTelemetry();
+            }, 420);
+            
+            // Regular telemetry updates
+            telemetryInterval = setInterval(() => {
+                if (currentState !== 'calibration') {
+                    simulateTelemetry();
+                }
+            }, 1850);
+            
+            // Occasional interesting events
+            logInterval = setInterval(() => {
+                if (Math.random() < 0.28 && currentState !== 'calibration') {
+                    const interesting = [
+                        "Predictive collision avoidance engaged",
+                        "Fatigue pattern detected • micro-correction applied",
+                        "Road curvature ahead • velocity adjusted",
+                        "Driver gaze confirmed on primary roadway",
+                        "Tire pressure variance within tolerance"
+                    ];
+                    addLogEntry(interesting[Math.floor(Math.random() * interesting.length)], 'info');
+                }
+            }, 9200);
+            
+            // Heartbeat subtle effect on gauge
+            setInterval(() => {
+                const gauge = document.getElementById('gauge-progress');
+                if (gauge && currentState === 'active') {
+                    gauge.style.transitionDuration = '180ms';
+                    setTimeout(() => {
+                        if (gauge) gauge.style.transitionDuration = '300ms';
+                    }, 180);
+                }
+            }, 1200);
+        }
+
+        function initInteractive() {
+            // Make core score clickable to bump score
+            const scoreContainer = document.getElementById('core-score');
+            if (scoreContainer) {
+                scoreContainer.style.cursor = 'pointer';
+                scoreContainer.addEventListener('click', () => {
+                    let val = parseInt(scoreContainer.textContent);
+                    val = Math.min(98, val + 3);
+                    scoreContainer.textContent = val;
+                    updateGauge(val);
+                    addLogEntry('Manual score adjustment applied', 'info');
+                });
+            }
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '?') {
+                    e.preventDefault();
+                    const states = ['active', 'calibration', 'alert', 'recording'];
+                    const idx = (states.indexOf(currentState) + 1) % states.length;
+                    setState(states[idx]);
+                }
+                
+                if (e.key.toLowerCase() === 'r' && e.metaKey) {
+                    e.preventDefault();
+                    setState('recording');
+                }
+                
+                if (e.key === 'Escape') {
+                    if (currentState === 'alert') setState('active');
+                }
+            });
+            
+            // Hover hint on gauge
+            const gaugeWrapper = document.querySelector('.relative.w-\\[260px\\]');
+            if (gaugeWrapper) {
+                gaugeWrapper.title = "Click core score to simulate improvement • Press ? to cycle states";
+            }
+        }
+
+        function initialize() {
+            initTailwind();
+            initGauge();
+            
+            // Set initial state
+            document.body.classList.add('state-active');
+            document.getElementById('state-active').classList.add('bg-white/10', 'text-white');
+            
+            // Seed some log entries
+            seedInitialLog();
+            
+            // Start live simulation
+            startSimulation();
+            
+            // Initial log messages
+            setTimeout(() => {
+                addLogEntry('All primary sensors reporting healthy', 'info');
+            }, 1350);
+            
+            setTimeout(() => {
+                if (currentState === 'active') {
+                    addLogEntry('Vision Engine confidence: 94%', 'info');
+                }
+            }, 4200);
+            
+            initInteractive();
+            
+            // Boot message
+            console.log('%c[DRIVEIQ] Enhanced prototype initialized. State system + real-time telemetry active. Press "?" to cycle states.', 'color:#64748b; font-size:9px');
+            
+            // Easter egg: double click logo resets to active
+            const logo = document.querySelector('.fa-tachometer-alt');
+            if (logo) {
+                logo.addEventListener('dblclick', () => {
+                    setState('active');
+                    const score = document.getElementById('core-score');
+                    if (score) {
+                        score.textContent = '87';
+                        updateGauge(87);
+                    }
+                });
+            }
+        }
+
+        // Boot the application
+        window.onload = initialize;
+        
+        // Expose for console debugging / future extension
+        window.DRIVEIQ = {
+            setState,
+            simulateTelemetry,
+            addLogEntry,
+            exportSession
+        };
+    </script>
+</body>
+</html>
