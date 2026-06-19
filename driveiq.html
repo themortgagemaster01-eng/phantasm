@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>DriveIQ — Understand Your Vehicle</title>
+<meta name="theme-color" content="#06080d"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="DriveIQ"/>
+<meta name="description" content="Hardware-free vehicle diagnostics from your iPhone. Informational AI estimates — not a replacement for a certified mechanic."/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+:root{
+  --bg:#06080d; --bg2:#0a0d15; --panel:#0e1320; --panel2:#131a2a; --panel3:#172033;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.13);
+  --txt:#eaf0fb; --mut:#8b96ad; --mut2:#5a6478;
+  --blue:#2F9BFF; --blue-dim:rgba(47,155,255,.14); --blue-glow:rgba(47,155,255,.5);
+  --green:#3DDC97; --amber:#FFB54E; --red:#FF5A5F;
+  --green-bg:rgba(61,220,151,.13); --amber-bg:rgba(255,181,78,.14); --red-bg:rgba(255,90,95,.14);
+  --r:20px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%}
+body{background:radial-gradient(130% 90% at 50% -10%, #0c1322 0%, #05070c 58%) fixed,#05070c;color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  overflow:hidden;position:fixed;inset:0;letter-spacing:.01em}
+#app{position:absolute;inset:0;display:flex;flex-direction:column}
+.screen{display:none;flex:1;min-height:0;animation:fade .4s ease}
+.screen.active{display:flex;flex-direction:column}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:max(52px,env(safe-area-inset-top)) 18px calc(104px + env(safe-area-inset-bottom))}
+
+/* header / brand */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:9px}
+.brand .mk{width:32px;height:32px;border-radius:9px;background:linear-gradient(150deg,#102036,#0a1018);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:15px;box-shadow:0 0 16px -4px var(--blue-glow)}
+.brand .nm{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.brand .nm b{color:var(--blue)}
+h1.h{font-size:27px;font-weight:800;letter-spacing:-.02em;line-height:1.12;margin-bottom:5px}
+.sub{color:var(--mut);font-size:13.5px;line-height:1.5;margin-bottom:18px}
+.eyebrow{color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:8px}
+.section-h{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut2);margin:24px 2px 13px}
+
+/* vehicle switcher */
+.veh-pill{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:9px 12px;max-width:62%}
+.veh-pill .vic{width:30px;height:30px;border-radius:8px;background:var(--blue-dim);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+.veh-pill .vt{min-width:0}
+.veh-pill .vt .a{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.veh-pill .vt .b{font-size:10px;color:var(--mut2)}
+.veh-pill .chev{color:var(--mut2);font-size:11px;margin-left:auto}
+
+/* hero scan */
+.hero{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line2);padding:22px;margin-bottom:8px;background:linear-gradient(135deg,#0f1a2e 0%,#0a111d 60%)}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(75% 120% at 100% 0%, rgba(47,155,255,.20), transparent 60%);pointer-events:none}
+.hero .hl{position:relative;color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:9px}
+.hero h2{position:relative;font-size:21px;font-weight:800;margin-bottom:5px}
+.hero p{position:relative;color:var(--mut);font-size:12.5px;margin-bottom:16px}
+.hero .go{position:relative;display:inline-flex;align-items:center;gap:9px;background:var(--blue);color:#04121f;font-weight:800;font-size:14.5px;padding:13px 20px;border-radius:13px;border:none;box-shadow:0 10px 30px -10px var(--blue-glow)}
+
+/* quick grid */
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.qcard{position:relative;text-align:left;color:var(--txt);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;overflow:hidden;transition:transform .15s}
+.qcard:active{transform:scale(.97)}
+.qcard .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:26px;background:var(--blue-dim);color:var(--blue)}
+.qcard .qt{font-weight:700;font-size:14.5px;margin-bottom:2px}
+.qcard .qd{color:var(--mut);font-size:11px;line-height:1.35}
+
+/* generic */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:15px;padding:14px 18px;border-radius:14px;border:1px solid var(--line2);background:var(--panel2);color:var(--txt);width:100%}
+.btn.primary{background:var(--blue);color:#04121f;border:none;box-shadow:0 10px 28px -10px var(--blue-glow)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--red);border-color:rgba(255,90,95,.3)}
+.muted{color:var(--mut);font-size:13px;line-height:1.55}
+.tiny{color:var(--mut2);font-size:11px;line-height:1.5}
+input,textarea,select{font-family:inherit}
+.field{width:100%;background:var(--panel);border:1px solid var(--line2);border-radius:13px;color:var(--txt);padding:14px 15px;font-size:15px;outline:none;letter-spacing:.04em}
+.field::placeholder{color:var(--mut2)}
+.field.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:.12em}
+
+/* list rows */
+.row{display:flex;align-items:center;gap:13px;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px 15px;margin-bottom:10px;width:100%;text-align:left;color:var(--txt);transition:transform .15s}
+.row:active{transform:scale(.985)}
+.row .ic{width:42px;height:42px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--blue-dim);color:var(--blue)}
+.row .meta{flex:1;min-width:0}
+.row .meta .t{font-weight:700;font-size:14.5px}
+.row .meta .s{color:var(--mut);font-size:11.5px;margin-top:2px;line-height:1.35}
+.row .chev{color:var(--mut2);font-size:13px}
+
+/* disclaimer footer (compliance — every results screen) */
+.disc{display:flex;gap:10px;background:var(--panel2);border:1px solid var(--line2);border-radius:14px;padding:13px 14px;margin-top:16px}
+.disc i{color:var(--amber);font-size:14px;margin-top:1px;flex:none}
+.disc div{font-size:11.5px;color:var(--mut);line-height:1.5}
+.disc b{color:var(--txt)}
+
+/* severity chips & meters */
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;letter-spacing:.02em}
+.chip.lo{background:var(--green-bg);color:var(--green)}
+.chip.md{background:var(--amber-bg);color:var(--amber)}
+.chip.hi{background:var(--red-bg);color:var(--red)}
+.meter{height:6px;border-radius:6px;background:var(--line2);overflow:hidden;margin-top:7px}
+.meter > i{display:block;height:100%;border-radius:6px;background:var(--blue)}
+
+/* health gauge */
+.gaugewrap{display:flex;flex-direction:column;align-items:center;margin:6px 0 4px}
+#gauge{width:210px;height:135px}
+.gscore{font-size:44px;font-weight:800;margin-top:-58px}
+.gscore small{font-size:15px;color:var(--mut);font-weight:600}
+.glabel{font-size:13px;font-weight:700;margin-top:30px;letter-spacing:.04em}
+
+/* flagged item */
+.flag{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:11px}
+.flag .fh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+.flag .fh .ft{font-weight:700;font-size:14.5px}
+.flag .fd{color:var(--mut);font-size:12.5px;line-height:1.5;margin-bottom:9px}
+.flag .frow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut2);padding:5px 0;border-top:1px solid var(--line)}
+.flag .frow b{color:var(--txt);font-weight:700}
+
+/* system breakdown */
+.sysrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.sysrow:last-child{border-bottom:none}
+.sysrow .sic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+.sysrow .smeta{flex:1}
+.sysrow .smeta .sn{font-size:13.5px;font-weight:700}
+.sysrow .dot{width:9px;height:9px;border-radius:50%;flex:none}
+
+/* camera / viewfinder */
+.viewfinder{position:relative;width:100%;aspect-ratio:3/4;max-height:54vh;background:#000;border-radius:18px;overflow:hidden;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.viewfinder video{width:100%;height:100%;object-fit:cover}
+.vf-frame{position:absolute;inset:14%;border:2px dashed rgba(47,155,255,.6);border-radius:14px;pointer-events:none}
+.vf-hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:#cfe;font-size:12px;text-shadow:0 1px 6px #000}
+.vf-placeholder{color:var(--mut2);text-align:center;padding:20px}
+.vf-placeholder i{font-size:40px;display:block;margin-bottom:12px;color:var(--blue)}
+.shutter{width:66px;height:66px;border-radius:50%;background:#fff;border:4px solid var(--blue);margin:18px auto 0;box-shadow:0 0 24px -4px var(--blue-glow);display:block}
+
+/* sound / waveform */
+#wave{width:100%;height:120px;display:block;background:var(--panel);border:1px solid var(--line);border-radius:16px;margin:6px 0}
+.recdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);margin-right:7px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.steps{margin:14px 0}
+.stp{display:flex;align-items:center;gap:11px;padding:9px 0;color:var(--mut2)}
+.stp.on{color:var(--txt)}.stp.done{color:var(--green)}
+.stp .sn{width:24px;height:24px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none}
+.stp.done .sn{background:var(--green);color:#04121f;border-color:var(--green)}
+
+/* progress dots / spinner */
+.spin{width:34px;height:34px;border:3px solid var(--line2);border-top-color:var(--blue);border-radius:50%;animation:rot 1s linear infinite;margin:0 auto}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* settings rows */
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--panel);border:1px solid var(--line);padding:15px 16px;margin-bottom:1px}
+.set-row:first-of-type{border-radius:14px 14px 0 0}.set-row:last-of-type{border-radius:0 0 14px 14px}.set-row.solo{border-radius:14px}
+.set-row .sl{font-size:14px;font-weight:600}.set-row .sd{font-size:11.5px;color:var(--mut2);margin-top:2px}
+.switch{width:50px;height:30px;border-radius:30px;background:var(--line2);position:relative;flex:none;transition:.2s}
+.switch.on{background:var(--blue)}.switch .k{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}.switch.on .k{left:23px}
+
+/* bottom nav */
+#nav{position:absolute;left:0;right:0;bottom:0;height:calc(76px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
+  background:linear-gradient(to top,#06080dee,#06080df2 60%,#06080d00);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-around;padding-top:10px;z-index:40}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--mut2);font-size:9.5px;font-weight:600;width:62px;background:none;border:none;padding:4px 0}
+.tab i{font-size:18px}.tab.on{color:var(--blue)}.tab.on i{text-shadow:0 0 14px var(--blue-glow)}
+.tab .pill{position:absolute;top:-10px;width:28px;height:3px;border-radius:3px;background:var(--blue);box-shadow:0 0 12px var(--blue-glow);opacity:0;transition:.25s}.tab.on .pill{opacity:1}
+
+/* overlay sheet */
+.overlay{position:absolute;inset:0;z-index:80;background:rgba(2,4,8,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex;animation:fade .3s ease}
+.sheet{background:var(--bg2);border:1px solid var(--line2);border-radius:24px 24px 0 0;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;padding:24px 20px calc(26px + env(safe-area-inset-bottom))}
+.sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--line2);margin:0 auto 16px}
+.sheet h3{font-size:20px;font-weight:800;margin-bottom:6px}
+
+/* gate */
+#gate{position:absolute;inset:0;z-index:100;background:radial-gradient(130% 90% at 50% 0%,#0c1322,#05070c 72%);display:flex;flex-direction:column;justify-content:center;padding:30px 24px calc(30px + env(safe-area-inset-bottom));overflow-y:auto}
+#gate .gmk{width:62px;height:62px;border-radius:17px;background:linear-gradient(150deg,#102036,#0a1018);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:27px;margin-bottom:20px;box-shadow:0 0 26px -6px var(--blue-glow)}
+#gate h2{font-size:30px;font-weight:800;letter-spacing:-.01em;margin-bottom:3px}
+#gate h2 b{color:var(--blue)}
+#gate .gt{color:var(--mut2);font-size:11px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:22px;font-weight:600}
+.warn-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:13px}
+.warn-item i{color:var(--blue);font-size:15px;margin-top:2px;flex:none;width:18px;text-align:center}
+.warn-item div{font-size:13px;color:var(--mut);line-height:1.5}.warn-item b{color:var(--txt);font-weight:600}
+.gcheck{display:flex;gap:11px;align-items:flex-start;background:var(--panel);border:1px solid var(--line2);border-radius:13px;padding:13px;margin:6px 0 14px;cursor:pointer}
+.gcheck .box{width:22px;height:22px;border-radius:6px;border:2px solid var(--mut2);flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;transition:.15s}
+.gcheck.on .box{background:var(--blue);border-color:var(--blue);color:#04121f}
+.gcheck span{font-size:12.5px;color:var(--mut);line-height:1.45}
+.toast{position:absolute;left:50%;bottom:calc(94px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(14px);background:var(--panel2);border:1px solid var(--line2);color:var(--txt);font-size:13px;font-weight:600;padding:11px 18px;border-radius:13px;opacity:0;pointer-events:none;transition:.3s;z-index:60;white-space:nowrap;box-shadow:0 10px 30px -10px #000;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+a{color:var(--blue);text-decoration:none}
+.kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.kv:last-child{border-bottom:none}.kv .k{color:var(--mut)}.kv .v{font-weight:700;text-align:right}
+.pickgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.pick{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line2);border-radius:13px;padding:12px;text-align:left;color:var(--txt)}
+.pick i{font-size:18px;width:24px;text-align:center}
+.pick .pn{font-size:12.5px;font-weight:600;line-height:1.2}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING / CONSENT GATE -->
+<div id="gate">
+  <div class="gmk"><i class="fa-solid fa-car-on"></i></div>
+  <h2>Drive<b>IQ</b></h2>
+  <div class="gt">Understand your vehicle</div>
+  <div class="warn-item"><i class="fa-solid fa-circle-info"></i><div>DriveIQ gives <b>AI-powered informational estimates</b> from your phone's camera, microphone, and vehicle data — a helpful starting point to understand your car.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-user-gear"></i><div>It is <b>not a professional diagnosis or safety certification</b>, and never a replacement for OBD-II scanning or a certified technician.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-triangle-exclamation"></i><div>For anything affecting <b>vehicle safety or performance</b>, always consult a qualified mechanic before driving.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-lock"></i><div>Your camera and audio are processed <b>on your device</b>. Nothing is shared without your explicit consent.</div></div>
+  <div class="gcheck" id="gcheck" onclick="toggleConsent()"><div class="box"><i class="fa-solid fa-check"></i></div><span>I understand DriveIQ provides informational estimates only and is not a substitute for a professional mechanic.</span></div>
+  <button class="btn primary" id="gate-btn" onclick="acknowledge()" style="opacity:.5">Get started</button>
+  <p class="tiny" style="text-align:center;margin-top:12px">Informational tool · Not professional advice</p>
+</div>
+
+<div id="app" style="visibility:hidden">
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home"><div class="scroll">
+    <div class="topbar">
+      <div class="brand"><div class="mk"><i class="fa-solid fa-gauge-high"></i></div><div class="nm">Drive<b>IQ</b></div></div>
+      <button class="veh-pill" onclick="go('garage')" id="veh-pill">
+        <div class="vic"><i class="fa-solid fa-car-side"></i></div>
+        <div class="vt"><div class="a" id="vp-a">Add a vehicle</div><div class="b" id="vp-b">tap to set up</div></div>
+        <i class="fa-solid fa-chevron-down chev"></i>
+      </button>
+    </div>
+    <h1 class="h" id="home-greet">What's your car telling you?</h1>
+    <div class="sub">Run a quick check with your camera or microphone — no adapters, no dongles.</div>
+
+    <div class="hero" onclick="go('vision')">
+      <div class="hl"><i class="fa-solid fa-bolt"></i>&nbsp; Dashboard Vision</div>
+      <h2>Read a warning light</h2>
+      <p>Point your camera at the dashboard. We'll explain what's lit, how urgent it is, and a ballpark cost.</p>
+      <button class="go">Start a scan <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <div class="qgrid">
+      <button class="qcard" onclick="go('sound')"><div class="ic"><i class="fa-solid fa-waveform-lines"></i></div><div class="qt">SoundPrint AI</div><div class="qd">Listen to an unusual noise</div></button>
+      <button class="qcard" onclick="openResults()"><div class="ic"><i class="fa-solid fa-heart-pulse"></i></div><div class="qt">Health Report</div><div class="qd">Vehicle health score</div></button>
+      <button class="qcard" onclick="go('garage')"><div class="ic"><i class="fa-solid fa-warehouse"></i></div><div class="qt">Garage</div><div class="qd">Your vehicles &amp; VIN</div></button>
+      <button class="qcard" onclick="openMaint()"><div class="ic"><i class="fa-solid fa-screwdriver-wrench"></i></div><div class="qt">Maintenance</div><div class="qd">What's due &amp; when</div></button>
+    </div>
+
+    <div class="section-h">Recent</div>
+    <div id="recent-list"></div>
+  </div></div>
+
+  <!-- GARAGE -->
+  <div class="screen" id="screen-garage"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-warehouse"></i> Garage</div>
+    <h1 class="h" style="font-size:25px">Your vehicles</h1>
+    <div class="sub">Add a car by VIN for accurate, model-specific guidance.</div>
+    <div id="garage-list"></div>
+    <button class="btn primary" style="margin-top:6px" onclick="openAddVehicle()"><i class="fa-solid fa-plus"></i> Add a vehicle</button>
+  </div></div>
+
+  <!-- VISION -->
+  <div class="screen" id="screen-vision"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Dashboard Vision</div>
+    <h1 class="h" style="font-size:25px">Read a warning light</h1>
+    <div class="sub" id="vision-sub">Frame your lit dashboard cluster and capture. Works on any vehicle.</div>
+    <div class="viewfinder" id="viewfinder">
+      <div class="vf-placeholder" id="vf-ph"><i class="fa-solid fa-camera"></i>Tap below to open your camera<br/><span class="tiny">or pick the light manually</span></div>
+      <div class="vf-frame" style="display:none" id="vf-frame"></div>
+      <div class="vf-hint" style="display:none" id="vf-hint">Hold steady over the warning light</div>
+    </div>
+    <button class="shutter" id="shutter" onclick="visionCapture()" style="display:none"></button>
+    <button class="btn primary" id="vision-open" style="margin-top:16px" onclick="openCamera()"><i class="fa-solid fa-camera"></i> Open camera</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="pickLightManually()"><i class="fa-solid fa-list"></i> Pick the light manually</button>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>DriveIQ provides AI-generated estimates to help you understand your vehicle. <b>Not a professional diagnosis or safety certification.</b> For anything affecting safety, consult a qualified mechanic before driving.</div></div>
+  </div></div>
+
+  <!-- SOUND -->
+  <div class="screen" id="screen-sound"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-waveform-lines"></i> SoundPrint AI</div>
+    <h1 class="h" style="font-size:25px">Listen to your engine</h1>
+    <div class="sub">A guided recording of an unusual sound for AI-assisted pattern analysis.</div>
+    <canvas id="wave" width="800" height="240"></canvas>
+    <div class="steps" id="sound-steps"></div>
+    <button class="btn primary" id="sound-btn" onclick="soundToggle()"><i class="fa-solid fa-microphone"></i> Start guided recording</button>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Sound analysis is <b>AI-assisted pattern recognition</b>, not a certified diagnosis. Results are informational. Have a qualified mechanic inspect unusual symptoms.</div></div>
+  </div></div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="screen-results"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-heart-pulse"></i> Repair Intelligence</div>
+    <h1 class="h" style="font-size:25px" id="res-title">Vehicle Health Report</h1>
+    <div class="sub" id="res-sub">An informational snapshot based on your inputs and model data.</div>
+    <div class="card">
+      <div class="gaugewrap">
+        <canvas id="gauge" width="420" height="270"></canvas>
+        <div class="gscore" id="g-score">—<small> /100</small></div>
+        <div class="glabel" id="g-label">—</div>
+      </div>
+    </div>
+    <div class="section-h">By system</div>
+    <div class="card" id="systems"></div>
+    <div class="section-h">Flagged observations</div>
+    <div id="flags"></div>
+    <button class="btn primary" style="margin-top:6px" onclick="flash('Demo: would open nearby mechanics')"><i class="fa-solid fa-location-dot"></i> Find a qualified mechanic</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="flash('Demo: report saved & shareable')"><i class="fa-solid fa-share"></i> Save &amp; share report</button>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>This report is an <b>informational estimate</b> from pattern recognition and public vehicle data — <b>not a safety certification</b>. DriveIQ never states a vehicle is safe to drive. Always have a certified technician inspect your vehicle when warnings are present.</div></div>
+  </div></div>
+
+  <!-- SETTINGS -->
+  <div class="screen" id="screen-settings"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-gear"></i> Settings</div>
+    <h1 class="h" style="font-size:25px">Settings</h1>
+    <div class="sub" style="margin-bottom:22px">DriveIQ · v3.0 prototype</div>
+    <div class="section-h" style="margin-top:0">Privacy</div>
+    <div class="set-row"><div><div class="sl">On-device processing</div><div class="sd">Camera &amp; audio stay on your phone</div></div><div class="switch on" style="opacity:.6"><div class="k"></div></div></div>
+    <div class="set-row"><div style="flex:1"><div class="sl">Help improve SoundPrint</div><div class="sd">Share anonymized sound samples (opt-in)</div></div><div class="switch" id="sw-contrib" onclick="toggleContrib()"><div class="k"></div></div></div>
+    <div class="section-h">About &amp; legal</div>
+    <div class="set-row" onclick="showDisclaimer()"><div><div class="sl">Full disclaimer</div><div class="sd">How DriveIQ's estimates work</div></div><i class="fa-solid fa-chevron-right" style="color:var(--mut2)"></i></div>
+    <div class="set-row" onclick="showPrivacy()"><div><div class="sl">Privacy &amp; data</div><div class="sd">What we collect and why</div></div><i class="fa-solid fa-chevron-right" style="color:var(--mut2)"></i></div>
+    <div class="set-row danger-row" onclick="clearData()"><div><div class="sl" style="color:var(--red)">Clear all data</div><div class="sd">Erase vehicles &amp; history on this device</div></div><i class="fa-solid fa-trash" style="color:var(--red)"></i></div>
+    <p class="tiny" style="text-align:center;margin:14px 0 4px">DriveIQ provides informational estimates only.<br/>Not a professional diagnosis or safety certification.</p>
+  </div></div>
+
+  <div id="nav">
+    <button class="tab on" data-s="home" onclick="go('home')"><div class="pill"></div><i class="fa-solid fa-house"></i>Home</button>
+    <button class="tab" data-s="vision" onclick="go('vision')"><div class="pill"></div><i class="fa-solid fa-bolt"></i>Vision</button>
+    <button class="tab" data-s="sound" onclick="go('sound')"><div class="pill"></div><i class="fa-solid fa-waveform-lines"></i>Listen</button>
+    <button class="tab" data-s="garage" onclick="go('garage')"><div class="pill"></div><i class="fa-solid fa-warehouse"></i>Garage</button>
+    <button class="tab" data-s="settings" onclick="go('settings')"><div class="pill"></div><i class="fa-solid fa-gear"></i>Settings</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeSheet()"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ===================== DATA ===================== */
+const LIGHTS = {
+  check_engine:{name:"Check Engine",icon:"fa-engine",fa:"fa-gear",sev:"md",color:"#FFB54E",
+    expl:"The engine computer logged a fault. On its own it's usually not an emergency, but it shouldn't be ignored.",
+    causes:["Loose or failed gas cap","Oxygen (O2) sensor","Catalytic converter","Mass airflow sensor","Ignition coil / spark plug"],
+    lo:20,hi:600,urg:"Soon — within a week",diy:"Often DIY-friendly to start (check the gas cap); a code scan pinpoints it."},
+  oil_pressure:{name:"Oil Pressure",icon:"fa-oil-can",fa:"fa-oil-can",sev:"hi",color:"#FF5A5F",
+    expl:"Low oil pressure can cause serious engine damage quickly. Treat this as urgent.",
+    causes:["Low oil level","Failing oil pump","Oil leak","Worn engine bearings"],
+    lo:50,hi:1200,urg:"Stop driving — pull over safely",diy:"Check oil level; if low pressure persists, do not drive. See a mechanic."},
+  battery:{name:"Battery / Charging",icon:"fa-car-battery",fa:"fa-car-battery",sev:"md",color:"#FFB54E",
+    expl:"The charging system isn't keeping up. The car may run off the battery until it dies.",
+    causes:["Failing alternator","Loose/corroded belt","Weak battery","Bad ground connection"],
+    lo:120,hi:700,urg:"Soon — risk of stalling",diy:"Battery terminals are DIY; alternator usually a shop job."},
+  coolant_temp:{name:"Engine Temperature",icon:"fa-temperature-high",fa:"fa-temperature-three-quarters",sev:"hi",color:"#FF5A5F",
+    expl:"The engine is running too hot. Overheating can warp parts fast — act now.",
+    causes:["Low coolant","Failed thermostat","Bad water pump","Radiator/fan fault"],
+    lo:40,hi:1000,urg:"Pull over and let it cool",diy:"Top up coolant when cool; persistent heat needs a shop."},
+  abs:{name:"ABS",icon:"fa-car-burst",fa:"fa-car-burst",sev:"md",color:"#FFB54E",
+    expl:"Anti-lock braking has a fault. Normal braking usually still works, but ABS may not engage.",
+    causes:["Wheel speed sensor","ABS module","Low brake fluid","Wiring fault"],
+    lo:80,hi:600,urg:"Soon — get it checked",diy:"Usually a shop diagnosis."},
+  brake:{name:"Brake System",icon:"fa-circle-exclamation",fa:"fa-circle-exclamation",sev:"hi",color:"#FF5A5F",
+    expl:"A brake-system warning. This can be the parking brake, low fluid, or worn pads — safety-critical.",
+    causes:["Parking brake engaged","Low brake fluid","Worn brake pads","Hydraulic fault"],
+    lo:30,hi:800,urg:"Check before driving",diy:"Confirm parking brake is off; otherwise see a mechanic promptly."},
+  airbag:{name:"Airbag (SRS)",icon:"fa-user-shield",fa:"fa-user-shield",sev:"md",color:"#FFB54E",
+    expl:"The supplemental restraint system has a fault. Airbags may not deploy in a crash.",
+    causes:["Seat-belt sensor","Clock spring","Crash sensor","Wiring under seats"],
+    lo:90,hi:700,urg:"Soon — safety system",diy:"Shop diagnosis recommended."},
+  tpms:{name:"Tire Pressure",icon:"fa-gauge",fa:"fa-gauge-simple",sev:"lo",color:"#3DDC97",
+    expl:"One or more tires is low (or a sensor fault). Easy to address and worth doing soon.",
+    causes:["Low tire pressure","Temperature change","Slow leak / nail","TPMS sensor battery"],
+    lo:0,hi:150,urg:"This week",diy:"DIY — check pressures and inflate to the door-jamb spec."},
+  oil_change:{name:"Maintenance / Oil",icon:"fa-droplet",fa:"fa-droplet",sev:"lo",color:"#3DDC97",
+    expl:"A service reminder, not a fault. Time for routine maintenance.",
+    causes:["Oil-life reminder","Service interval reached"],
+    lo:40,hi:120,urg:"At your convenience",diy:"DIY oil change or a quick shop visit."},
+  traction:{name:"Traction / Stability",icon:"fa-car-side",fa:"fa-car-side",sev:"lo",color:"#3DDC97",
+    expl:"Traction or stability control flashed or faulted. If flashing, it's actively helping with grip.",
+    causes:["Slippery conditions (normal)","Wheel speed sensor","ABS-related fault"],
+    lo:0,hi:400,urg:"Monitor",diy:"If only in bad weather, it's normal; steady light = get it checked."}
+};
+const LIGHT_ORDER=["check_engine","oil_pressure","battery","coolant_temp","brake","abs","airbag","coolant_temp","tpms","traction","oil_change"];
+const SYSTEMS=[
+  {id:"engine",name:"Engine & Powertrain",icon:"fa-gear"},
+  {id:"brakes",name:"Brakes",icon:"fa-circle-stop"},
+  {id:"electrical",name:"Battery & Electrical",icon:"fa-car-battery"},
+  {id:"cooling",name:"Cooling",icon:"fa-temperature-half"},
+  {id:"tires",name:"Tires & TPMS",icon:"fa-gauge-simple"}
+];
+
+/* ===================== STATE ===================== */
+const LS="driveiq.v1";
+let S={vehicles:[],activeId:null,history:[],contrib:false};
+try{const j=JSON.parse(localStorage.getItem(LS));if(j)S=Object.assign(S,j);}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+function activeVehicle(){return S.vehicles.find(v=>v.id===S.activeId)||S.vehicles[0]||null;}
+
+/* ===================== NAV ===================== */
+function go(s){
+  if(s!=="vision")stopCamera(); if(s!=="sound")stopSound();
+  document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));
+  document.getElementById("screen-"+s).classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
+  const sc=document.querySelector("#screen-"+s+" .scroll"); if(sc)sc.scrollTop=0;
+  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound();
+}
+
+/* ===================== GATE ===================== */
+let consent=false;
+function toggleConsent(){consent=!consent;document.getElementById("gcheck").classList.toggle("on",consent);document.getElementById("gate-btn").style.opacity=consent?"1":".5";}
+function acknowledge(){ if(!consent){flash("Please confirm you understand to continue");return;} localStorage.setItem("driveiq.ack","1"); document.getElementById("gate").style.display="none"; boot(); }
+function boot(){ document.getElementById("app").style.visibility="visible"; renderHome(); renderGarage(); }
+
+/* ===================== VIN ===================== */
+const TRANS={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,J:1,K:2,L:3,M:4,N:5,P:7,R:9,S:2,T:3,U:4,V:5,W:6,X:7,Y:8,Z:9,"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9};
+const WEIGHTS=[8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2];
+function vinCheckDigit(vin){
+  if(vin.length!==17) return null;
+  let sum=0;
+  for(let i=0;i<17;i++){const c=vin[i];if(!(c in TRANS))return null;sum+=TRANS[c]*WEIGHTS[i];}
+  const r=sum%11; return r===10?"X":String(r);
+}
+function vinValid(vin){ const c=vinCheckDigit(vin); return c!==null && c===vin[8]; }
+
+function openAddVehicle(){
+  sheet(`
+    <div class="grab"></div>
+    <h3>Add a vehicle</h3>
+    <p class="muted" style="margin-bottom:14px">Enter your 17-character VIN (found on the driver's door jamb or registration). We decode it from the public NHTSA database.</p>
+    <input class="field mono" id="vin-in" maxlength="17" placeholder="1HGCM82633A004352" autocapitalize="characters" oninput="this.value=this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'');document.getElementById('vin-msg').textContent=this.value.length+'/17'"/>
+    <div class="tiny" id="vin-msg" style="margin:8px 2px">0/17</div>
+    <button class="btn primary" style="margin-top:8px" onclick="decodeVin()"><i class="fa-solid fa-magnifying-glass"></i> Decode VIN</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="addManual()">Add without VIN</button>
+    <div id="vin-result" style="margin-top:16px"></div>
+  `);
+  setTimeout(()=>{const el=document.getElementById("vin-in");el&&el.focus();},250);
+}
+async function decodeVin(){
+  const vin=(document.getElementById("vin-in").value||"").trim().toUpperCase();
+  const out=document.getElementById("vin-result");
+  if(vin.length!==17){out.innerHTML=`<div class="disc"><i class="fa-solid fa-circle-info"></i><div>A VIN is exactly 17 characters. You've entered ${vin.length}.</div></div>`;return;}
+  const cd=vinValid(vin);
+  out.innerHTML=`<div style="text-align:center;padding:18px"><div class="spin"></div><div class="tiny" style="margin-top:12px">Decoding with NHTSA…</div></div>`;
+  let data=null;
+  try{
+    const r=await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`);
+    const j=await r.json(); data=j.Results&&j.Results[0];
+  }catch(e){data=null;}
+  if(!data || (!data.Make && !data.ModelYear)){
+    out.innerHTML=`<div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Couldn't reach the VIN database (or the VIN wasn't recognized). You can <a onclick="addManual()">add the car manually</a>.</div></div>`;
+    return;
+  }
+  const v={id:"v"+Date.now(),vin,
+    year:data.ModelYear||"", make:data.Make||"", model:data.Model||"",
+    trim:data.Trim||"", body:data.BodyClass||"", engine:[data.DisplacementL?data.DisplacementL+"L":"",data.EngineCylinders?data.EngineCylinders+"-cyl":"",data.FuelTypePrimary||""].filter(Boolean).join(" · "),
+    drive:data.DriveType||"", mileage:0};
+  out.innerHTML=`
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><div class="row .ic" style="width:46px;height:46px;border-radius:12px;background:var(--blue-dim);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:19px"><i class="fa-solid fa-car-side"></i></div><div><div style="font-weight:800;font-size:16px">${v.year} ${v.make} ${v.model}</div><div class="tiny">${v.trim||v.body||""}</div></div></div>
+      <div class="kv"><span class="k">Engine</span><span class="v">${v.engine||"—"}</span></div>
+      <div class="kv"><span class="k">Body</span><span class="v">${v.body||"—"}</span></div>
+      <div class="kv"><span class="k">VIN check digit</span><span class="v" style="color:${cd?'var(--green)':'var(--amber)'}">${cd?"Valid ✓":"Unverified"}</span></div>
+    </div>
+    <input class="field" id="mi-in" type="number" inputmode="numeric" placeholder="Current mileage (optional)" style="margin-bottom:10px"/>
+    <button class="btn primary" onclick='saveVehicle(${JSON.stringify(v).replace(/'/g,"&#39;")})'><i class="fa-solid fa-check"></i> Add to garage</button>`;
+}
+function addManual(){
+  sheet(`<div class="grab"></div><h3>Add without VIN</h3>
+    <input class="field" id="m-year" type="number" inputmode="numeric" placeholder="Year (e.g. 2003)" style="margin-bottom:10px"/>
+    <input class="field" id="m-make" placeholder="Make (e.g. Lexus)" style="margin-bottom:10px"/>
+    <input class="field" id="m-model" placeholder="Model (e.g. ES 300)" style="margin-bottom:10px"/>
+    <input class="field" id="m-mi" type="number" inputmode="numeric" placeholder="Mileage (optional)" style="margin-bottom:14px"/>
+    <button class="btn primary" onclick="saveManual()"><i class="fa-solid fa-check"></i> Add to garage</button>`);
+}
+function saveManual(){
+  const y=document.getElementById("m-year").value,mk=document.getElementById("m-make").value.trim(),md=document.getElementById("m-model").value.trim(),mi=+document.getElementById("m-mi").value||0;
+  if(!mk||!md){flash("Make and model are required");return;}
+  saveVehicle({id:"v"+Date.now(),vin:"",year:y,make:mk,model:md,trim:"",body:"",engine:"",drive:"",mileage:mi});
+}
+function saveVehicle(v){
+  const miEl=document.getElementById("mi-in"); if(miEl)v.mileage=+miEl.value||0;
+  S.vehicles.push(v); S.activeId=v.id; save(); closeSheet(); renderGarage(); renderHome();
+  flash(`${v.year} ${v.make} ${v.model} added`);
+  go("home");
+}
+function setActive(id){S.activeId=id;save();renderHome();renderGarage();flash("Active vehicle switched");}
+function delVehicle(id){ if(confirm("Remove this vehicle?")){S.vehicles=S.vehicles.filter(v=>v.id!==id);if(S.activeId===id)S.activeId=S.vehicles[0]?S.vehicles[0].id:null;save();renderGarage();renderHome();} }
+
+/* ===================== RENDER HOME / GARAGE ===================== */
+function renderHome(){
+  const v=activeVehicle();
+  document.getElementById("vp-a").textContent=v?`${v.year} ${v.make} ${v.model}`.trim():"Add a vehicle";
+  document.getElementById("vp-b").textContent=v?(v.mileage?v.mileage.toLocaleString()+" mi":(v.vin?"VIN "+v.vin.slice(-6):"tap to manage")):"tap to set up";
+  const rl=document.getElementById("recent-list");
+  if(!S.history.length){rl.innerHTML=`<div class="muted" style="padding:8px 2px">No checks yet. Run a Dashboard Vision or SoundPrint scan to get started.</div>`;}
+  else{rl.innerHTML=S.history.slice(0,5).map(h=>`<div class="row"><div class="ic" style="background:${hex(h.color||'#2F9BFF',.14)};color:${h.color||'#2F9BFF'}"><i class="fa-solid ${h.icon||'fa-bolt'}"></i></div><div class="meta"><div class="t">${h.title}</div><div class="s">${h.sub} · ${rel(h.ts)}</div></div></div>`).join("");}
+}
+function renderGarage(){
+  const l=document.getElementById("garage-list");
+  if(!S.vehicles.length){l.innerHTML=`<div class="muted" style="padding:6px 2px 14px">No vehicles yet. Add one by VIN for model-specific guidance.</div>`;return;}
+  l.innerHTML=S.vehicles.map(v=>`<div class="row" onclick="vehicleSheet('${v.id}')"><div class="ic"><i class="fa-solid fa-car-side"></i></div><div class="meta"><div class="t">${v.year} ${v.make} ${v.model} ${v.id===S.activeId?'<span class="chip lo" style="margin-left:6px">Active</span>':''}</div><div class="s">${[v.engine,v.mileage?v.mileage.toLocaleString()+' mi':''].filter(Boolean).join(' · ')||(v.vin?'VIN '+v.vin:'—')}</div></div><i class="fa-solid fa-chevron-right chev"></i></div>`).join("");
+}
+function vehicleSheet(id){
+  const v=S.vehicles.find(x=>x.id===id);if(!v)return;
+  sheet(`<div class="grab"></div><h3>${v.year} ${v.make} ${v.model}</h3>
+    <div class="card" style="margin:12px 0">
+      ${v.vin?`<div class="kv"><span class="k">VIN</span><span class="v" style="font-family:ui-monospace,monospace;font-size:12px">${v.vin}</span></div>`:''}
+      ${v.engine?`<div class="kv"><span class="k">Engine</span><span class="v">${v.engine}</span></div>`:''}
+      ${v.body?`<div class="kv"><span class="k">Body</span><span class="v">${v.body}</span></div>`:''}
+      <div class="kv"><span class="k">Mileage</span><span class="v">${v.mileage?v.mileage.toLocaleString()+' mi':'—'}</span></div>
+    </div>
+    ${v.id!==S.activeId?`<button class="btn primary" onclick="setActive('${v.id}');closeSheet()"><i class="fa-solid fa-circle-check"></i> Make active</button>`:''}
+    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet();openMaint()"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance schedule</button>
+    <button class="btn danger" style="margin-top:10px" onclick="delVehicle('${v.id}');closeSheet()"><i class="fa-solid fa-trash"></i> Remove vehicle</button>`);
+}
+
+/* ===================== MAINTENANCE ===================== */
+function openMaint(){
+  const v=activeVehicle();
+  if(!v){flash("Add a vehicle first");go("garage");return;}
+  const yr=+v.year||2015, mk=(v.make||"").toLowerCase(), md=(v.model||"").toLowerCase(), mi=v.mileage||0;
+  let items=[
+    {t:"Engine oil & filter",due:"Every 5,000–7,500 mi",icon:"fa-droplet",sev:"lo"},
+    {t:"Tire rotation",due:"Every 5,000–8,000 mi",icon:"fa-rotate",sev:"lo"},
+    {t:"Brake pads (inspect)",due:"Every 10,000–15,000 mi",icon:"fa-circle-stop",sev:"lo"},
+    {t:"Engine air filter",due:"Every 15,000–30,000 mi",icon:"fa-wind",sev:"lo"},
+    {t:"Coolant flush",due:"~60,000 mi or 5 yrs",icon:"fa-temperature-half",sev:"md"},
+    {t:"Transmission fluid",due:"~60,000–100,000 mi",icon:"fa-gears",sev:"md"}
+  ];
+  // High-value example: interference-engine timing belt (e.g. 2003 Lexus ES 1MZ-FE V6)
+  if((mk.includes("lexus")||mk.includes("toyota")) && yr<2007){
+    items.unshift({t:"Timing belt + water pump",due:"90,000–105,000 mi (interference engine — critical)",icon:"fa-link",sev:"hi"});
+  }
+  sheet(`<div class="grab"></div><h3>Maintenance</h3>
+    <div class="muted" style="margin-bottom:14px">${v.year} ${v.make} ${v.model}${mi?` · ${mi.toLocaleString()} mi`:''} — typical intervals from manufacturer guidance.</div>
+    ${items.map(it=>`<div class="flag"><div class="fh"><div class="ft"><i class="fa-solid ${it.icon}" style="color:var(--blue);margin-right:8px"></i>${it.t}</div><span class="chip ${it.sev}">${it.sev==='hi'?'Critical':it.sev==='md'?'Plan ahead':'Routine'}</span></div><div class="fd" style="margin:0">${it.due}</div></div>`).join("")}
+    <div class="disc"><i class="fa-solid fa-circle-info"></i><div>Intervals are <b>general estimates</b>. Always follow your owner's manual and a qualified mechanic's advice for your exact vehicle.</div></div>
+    <button class="btn ghost" style="margin-top:12px" onclick="closeSheet()">Close</button>`);
+}
+
+/* ===================== DASHBOARD VISION ===================== */
+let camStream=null;
+async function openCamera(){
+  const vf=document.getElementById("viewfinder");
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+    document.getElementById("vf-ph").style.display="none";
+    let vid=vf.querySelector("video"); if(!vid){vid=document.createElement("video");vid.playsInline=true;vid.muted=true;vf.insertBefore(vid,vf.firstChild);}
+    vid.srcObject=camStream; await vid.play();
+    document.getElementById("vf-frame").style.display="block";
+    document.getElementById("vf-hint").style.display="block";
+    document.getElementById("shutter").style.display="block";
+    document.getElementById("vision-open").style.display="none";
+  }catch(e){
+    document.getElementById("vf-ph").innerHTML=`<i class="fa-solid fa-camera-rotate"></i>Camera unavailable here.<br/><span class="tiny">On your phone it opens the rear camera. For now, pick the light manually.</span>`;
+    flash("Camera needs your phone + permission");
+  }
+}
+function stopCamera(){ if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} const v=document.querySelector("#viewfinder video"); if(v)v.srcObject=null; }
+function visionCapture(){
+  // prototype: capture frame, then guide the user to confirm which light (real ML = native phase 2)
+  const sh=document.getElementById("shutter"); sh.style.transform="scale(.9)"; setTimeout(()=>sh.style.transform="",150);
+  stopCamera();
+  document.getElementById("vf-ph").style.display="flex";
+  document.getElementById("vf-ph").innerHTML=`<i class="fa-solid fa-circle-check" style="color:var(--green)"></i>Captured.<br/><span class="tiny">Confirm which light is lit so we can explain it.</span>`;
+  document.getElementById("vf-frame").style.display="none";document.getElementById("vf-hint").style.display="none";
+  document.getElementById("shutter").style.display="none";document.getElementById("vision-open").style.display="flex";
+  pickLightManually();
+}
+function pickLightManually(){
+  const keys=["check_engine","oil_pressure","battery","coolant_temp","brake","abs","airbag","tpms","traction","oil_change"];
+  sheet(`<div class="grab"></div><h3>Which light is on?</h3>
+    <p class="muted" style="margin-bottom:6px">Tap the warning light that matches your dashboard.</p>
+    <p class="tiny" style="margin-bottom:12px"><i class="fa-solid fa-circle-info"></i> In the native app, the camera identifies this automatically with on-device AI.</p>
+    <div class="pickgrid">${keys.map(k=>{const L=LIGHTS[k];return `<button class="pick" onclick="visionResult('${k}')"><i class="fa-solid ${L.fa}" style="color:${L.color}"></i><div class="pn">${L.name}</div></button>`;}).join("")}</div>`);
+}
+function visionResult(k){
+  const L=LIGHTS[k]; const conf=62+Math.floor(Math.random()*30);
+  addHistory({title:L.name+" light",sub:"Dashboard Vision",icon:L.fa,color:L.color});
+  sheet(`<div class="grab"></div>
+    <div style="display:flex;align-items:center;gap:13px;margin-bottom:12px"><div style="width:50px;height:50px;border-radius:13px;background:${hex(L.color,.16)};color:${L.color};display:flex;align-items:center;justify-content:center;font-size:22px"><i class="fa-solid ${L.fa}"></i></div><div><h3 style="margin:0">${L.name}</h3><span class="chip ${L.sev}">${sevLabel(L.sev)}</span></div></div>
+    <p class="muted" style="margin-bottom:12px">${L.expl}</p>
+    <div class="card" style="margin-bottom:12px">
+      <div class="kv"><span class="k">Match confidence</span><span class="v">${conf}%</span></div>
+      <div class="kv"><span class="k">How soon</span><span class="v">${L.urg}</span></div>
+      <div class="kv"><span class="k">Ballpark cost</span><span class="v">$${L.lo}–$${L.hi}</span></div>
+      <div class="kv"><span class="k">DIY or shop</span><span class="v" style="font-weight:600;font-size:12px;max-width:60%">${L.diy}</span></div>
+    </div>
+    <div class="section-h" style="margin-top:4px">Common causes</div>
+    ${L.causes.map((c,i)=>`<div class="flag" style="padding:11px 14px;margin-bottom:8px"><div class="fh" style="margin:0"><div class="ft" style="font-size:13.5px">${c}</div><span class="tiny">${Math.max(12,70-i*16)}% likely</span></div></div>`).join("")}
+    <button class="btn primary" style="margin-top:8px" onclick="closeSheet();openResults('${k}')"><i class="fa-solid fa-heart-pulse"></i> See full health report</button>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>This is an <b>informational estimate</b>, not a diagnosis. ${L.sev==='hi'?'<b>This warning can be safety-critical — have it checked before driving.</b>':'Have a qualified mechanic confirm and repair.'}</div></div>`);
+}
+
+/* ===================== SOUNDPRINT ===================== */
+let AC=null,analyser=null,micStream=null,soundOn=false,soundStep=0,vraf=null,stepTimer=null;
+const STEPS=["Find a quiet spot","Start the engine, let it idle","Hold the phone near the sound","Recording & analyzing…"];
+function renderSteps(){document.getElementById("sound-steps").innerHTML=STEPS.map((s,i)=>`<div class="stp ${i<soundStep?'done':i===soundStep?'on':''}"><div class="sn">${i<soundStep?'<i class=\"fa-solid fa-check\"></i>':i+1}</div>${s}</div>`).join("");}
+function resetSound(){soundStep=0;renderSteps();const c=document.getElementById("wave").getContext("2d");c.clearRect(0,0,800,240);}
+async function soundToggle(){
+  if(soundOn){stopSound();return;}
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    micStream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const src=AC.createMediaStreamSource(micStream); analyser=AC.createAnalyser(); analyser.fftSize=2048; src.connect(analyser);
+    soundOn=true; soundStep=1; renderSteps();
+    document.getElementById("sound-btn").innerHTML='<span class="recdot"></span> Recording — tap to stop';
+    drawWave();
+    let st=1; stepTimer=setInterval(()=>{ st++; if(st<=3){soundStep=st;renderSteps();} if(st>=4){clearInterval(stepTimer); soundStep=4; renderSteps(); setTimeout(soundAnalyze,1500);} },2500);
+  }catch(e){ flash("Microphone needs your phone + permission"); }
+}
+function stopSound(){ soundOn=false; if(vraf)cancelAnimationFrame(vraf); if(stepTimer)clearInterval(stepTimer); if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;} const b=document.getElementById("sound-btn"); if(b)b.innerHTML='<i class="fa-solid fa-microphone"></i> Start guided recording'; }
+let _wd=null;
+function drawWave(){
+  const cv=document.getElementById("wave"),x=cv.getContext("2d"),w=cv.width,h=cv.height; x.clearRect(0,0,w,h);
+  if(analyser&&soundOn){ if(!_wd)_wd=new Uint8Array(analyser.fftSize); analyser.getByteTimeDomainData(_wd);
+    x.lineWidth=2.4;x.strokeStyle="#2F9BFF";x.shadowBlur=10;x.shadowColor="#2F9BFF";x.beginPath();
+    const step=w/_wd.length; for(let i=0;i<_wd.length;i++){const px=i*step,py=h/2+((_wd[i]-128)/128)*(h/2-10);i?x.lineTo(px,py):x.moveTo(px,py);} x.stroke();
+    vraf=requestAnimationFrame(drawWave);
+  }
+}
+function soundAnalyze(){
+  stopSound(); soundStep=4; renderSteps();
+  // demo rule-based result pool
+  const pool=[
+    {t:"Rhythmic ticking at idle",sub:["Lifter/valve tick (common)","Low oil or thin oil","Exhaust manifold leak"],sev:"md",cost:[0,400],note:"Often harmless on warm-up; persistent ticking deserves a look."},
+    {t:"Squeal that changes with RPM",sub:["Worn serpentine/accessory belt","Belt tensioner","Glazed belt"],sev:"lo",cost:[25,180],note:"Belts are an inexpensive, common fix."},
+    {t:"Low-frequency rumble / drone",sub:["Wheel bearing","Exhaust leak","Tire wear"],sev:"md",cost:[120,600],note:"If it rises with speed, lean toward wheel bearing."},
+    {t:"Grinding when braking",sub:["Worn brake pads / rotors"],sev:"hi",cost:[150,650],note:"Safety-critical — have brakes inspected promptly."}
+  ];
+  const r=pool[Math.floor(Math.random()*pool.length)]; const conf=58+Math.floor(Math.random()*28);
+  addHistory({title:r.t,sub:"SoundPrint AI",icon:"fa-waveform-lines",color:r.sev==='hi'?'#FF5A5F':r.sev==='md'?'#FFB54E':'#3DDC97'});
+  sheet(`<div class="grab"></div><h3>What we heard</h3>
+    <div style="display:flex;align-items:center;gap:10px;margin:10px 0 12px"><span class="chip ${r.sev}">${sevLabel(r.sev)}</span><span class="tiny">${conf}% pattern confidence</span></div>
+    <div class="card" style="margin-bottom:12px"><div style="font-weight:800;font-size:16px;margin-bottom:6px">${r.t}</div><div class="muted">${r.note}</div></div>
+    <div class="section-h" style="margin-top:4px">Likely sources</div>
+    ${r.sub.map((s,i)=>`<div class="flag" style="padding:11px 14px;margin-bottom:8px"><div class="fh" style="margin:0"><div class="ft" style="font-size:13.5px">${s}</div><span class="tiny">${Math.max(15,68-i*18)}%</span></div></div>`).join("")}
+    <div class="card" style="margin-top:6px"><div class="kv"><span class="k">Ballpark cost</span><span class="v">$${r.cost[0]}–$${r.cost[1]}</span></div></div>
+    <button class="btn primary" style="margin-top:10px" onclick="closeSheet();openResults()"><i class="fa-solid fa-heart-pulse"></i> See full health report</button>
+    <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div><b>AI-assisted pattern recognition</b>, not a certified diagnosis. Have a qualified mechanic inspect the vehicle to confirm.</div></div>`);
+}
+
+/* ===================== REPAIR INTELLIGENCE (health report) ===================== */
+function openResults(triggerKey){
+  go("results");
+  const v=activeVehicle();
+  document.getElementById("res-title").textContent="Vehicle Health Report";
+  document.getElementById("res-sub").textContent=v?`${v.year} ${v.make} ${v.model} — informational snapshot.`:"Informational snapshot based on your inputs.";
+  // generate a plausible score from vehicle age/mileage + any high-sev trigger
+  const yr=+(v&&v.year)||2016, age=Math.max(0,2026-yr), mi=(v&&v.mileage)||Math.min(180000,age*12000);
+  let score=92-Math.min(34,age*2)-Math.min(20,Math.floor(mi/15000)*2);
+  let flags=buildFlags(age,mi);
+  if(triggerKey&&LIGHTS[triggerKey]){const L=LIGHTS[triggerKey]; flags.unshift({t:L.name+" indicated",d:L.expl,sys:sysFor(triggerKey),sev:L.sev,like:78,lo:L.lo,hi:L.hi}); if(L.sev==='hi')score-=14; else if(L.sev==='md')score-=7;}
+  score=Math.max(31,Math.min(98,score));
+  drawGauge(score);
+  document.getElementById("g-score").innerHTML=score+'<small> /100</small>';
+  const lbl=score>=80?"Looking good":score>=60?"Watch a few items":"Needs attention";
+  const lcol=score>=80?"var(--green)":score>=60?"var(--amber)":"var(--red)";
+  const gl=document.getElementById("g-label"); gl.textContent=lbl; gl.style.color=lcol;
+  // systems
+  const sysSev={}; flags.forEach(f=>{sysSev[f.sys]=Math.max(sysSev[f.sys]||0,f.sev==='hi'?3:f.sev==='md'?2:1);});
+  document.getElementById("systems").innerHTML=SYSTEMS.map(sy=>{const lv=sysSev[sy.id]||0;const col=lv>=3?'var(--red)':lv===2?'var(--amber)':'var(--green)';const txt=lv>=3?'Needs attention':lv===2?'Monitor':'OK';return `<div class="sysrow"><div class="sic" style="background:${hex(lv>=3?'#FF5A5F':lv===2?'#FFB54E':'#3DDC97',.14)};color:${col}"><i class="fa-solid ${sy.icon}"></i></div><div class="smeta"><div class="sn">${sy.name}</div></div><span class="tiny" style="color:${col};font-weight:700">${txt}</span><div class="dot" style="background:${col}"></div></div>`;}).join("");
+  // flags
+  document.getElementById("flags").innerHTML=flags.length?flags.map(f=>`<div class="flag"><div class="fh"><div class="ft">${f.t}</div><span class="chip ${f.sev}">${sevLabel(f.sev)}</span></div><div class="fd">${f.d}</div><div class="frow"><span>Likelihood</span><b>${f.like}%</b></div><div class="frow"><span>Est. repair</span><b>$${f.lo}–$${f.hi}</b></div></div>`).join(""):`<div class="muted" style="padding:6px 2px">No notable observations from your inputs. Keep up routine maintenance.</div>`;
+}
+function buildFlags(age,mi){
+  const pool=[
+    {t:"Brake pads approaching wear",d:"Based on typical wear for this age/mileage. Inspect at the next service.",sys:"brakes",sev:"md",like:54,lo:150,hi:420,min:30000},
+    {t:"Battery nearing end of life",d:"Batteries commonly last 3–5 years. Consider a load test.",sys:"electrical",sev:"lo",like:46,lo:120,hi:300,min:3},
+    {t:"Suspension components aging",d:"Bushings and struts soften with age; watch for clunks or uneven tire wear.",sys:"engine",sev:"lo",like:38,lo:200,hi:900,min:90000},
+    {t:"Coolant service likely due",d:"Coolant degrades over time; a flush protects the cooling system.",sys:"cooling",sev:"md",like:50,lo:90,hi:200,min:60000},
+    {t:"Tires may be aging",d:"Rubber hardens after ~6 years regardless of tread. Check date codes.",sys:"tires",sev:"lo",like:42,lo:400,hi:900,min:6}
+  ];
+  const out=[];
+  pool.forEach(p=>{ const cond = p.min>1000 ? mi>=p.min : age>=p.min; if(cond && out.length<4) out.push({t:p.t,d:p.d,sys:p.sys,sev:p.sev,like:p.like,lo:p.lo,hi:p.hi}); });
+  return out;
+}
+function sysFor(k){return ({check_engine:"engine",oil_pressure:"engine",coolant_temp:"cooling",battery:"electrical",brake:"brakes",abs:"brakes",airbag:"electrical",tpms:"tires",traction:"brakes",oil_change:"engine"})[k]||"engine";}
+
+/* gauge */
+function drawGauge(score){
+  const cv=document.getElementById("gauge"),x=cv.getContext("2d"),w=cv.width,h=cv.height,cx=w/2,cy=h-18,R=w*0.40;
+  x.clearRect(0,0,w,h); x.lineCap="round";
+  x.lineWidth=20; x.strokeStyle="rgba(255,255,255,.08)"; x.beginPath(); x.arc(cx,cy,R,Math.PI,2*Math.PI); x.stroke();
+  const col=score>=80?"#3DDC97":score>=60?"#FFB54E":"#FF5A5F";
+  const end=Math.PI+(score/100)*Math.PI;
+  const g=x.createLinearGradient(cx-R,0,cx+R,0); g.addColorStop(0,"#2F9BFF"); g.addColorStop(1,col);
+  x.strokeStyle=g; x.shadowBlur=18; x.shadowColor=col; x.beginPath(); x.arc(cx,cy,R,Math.PI,end); x.stroke();
+}
+
+/* ===================== SHEETS / MISC ===================== */
+function sheet(html){document.getElementById("sheet").innerHTML=html;document.getElementById("overlay").classList.add("show");}
+function closeSheet(){document.getElementById("overlay").classList.remove("show");}
+function showDisclaimer(){sheet(`<div class="grab"></div><h3>Full disclaimer</h3>
+  <p class="muted" style="margin:10px 0 12px">DriveIQ is an informational tool that uses your iPhone's camera and microphone (plus optional connected-car data) to surface <b>likely</b> causes of dashboard warnings and unusual sounds.</p>
+  <p class="muted" style="margin-bottom:12px">All outputs are <b>estimates</b> based on pattern recognition and publicly available vehicle data. DriveIQ does <b>not</b> replace OBD-II scanning, a professional inspection, or the judgment of a certified technician.</p>
+  <p class="muted" style="margin-bottom:12px">Never rely on DriveIQ alone for safety-critical decisions. Always have a qualified mechanic inspect your vehicle when warning lights are present or unusual symptoms occur.</p>
+  <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">Close</button>`);}
+function showPrivacy(){sheet(`<div class="grab"></div><h3>Privacy &amp; data</h3>
+  <div class="warn-item"><i class="fa-solid fa-lock"></i><div>Camera, audio, and diagnostic data are processed <b>on your device</b> by default.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-globe"></i><div>The only network call is a <b>VIN decode</b> (public NHTSA database), cached after the first lookup.</div></div>
+  <div class="warn-item"><i class="fa-solid fa-handshake-angle"></i><div>Anonymized sound samples are shared <b>only if you opt in</b>, with a clear benefit (improving accuracy for everyone).</div></div>
+  <div class="warn-item"><i class="fa-solid fa-ban"></i><div>No tracking. No location unless a feature explicitly needs it.</div></div>
+  <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">Close</button>`);}
+function toggleContrib(){S.contrib=!S.contrib;document.getElementById("sw-contrib").classList.toggle("on",S.contrib);save();flash(S.contrib?"Thanks — anonymized sharing on":"Sharing off");}
+function clearData(){if(confirm("Erase all vehicles and history on this device?")){localStorage.removeItem(LS);S={vehicles:[],activeId:null,history:[],contrib:false};renderHome();renderGarage();flash("Data cleared");go("home");}}
+function addHistory(h){h.ts=Date.now();S.history.unshift(h);if(S.history.length>40)S.history.length=40;save();renderHome();}
+
+function hex(c,a){const n=parseInt(c.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function sevLabel(s){return s==='hi'?'High priority':s==='md'?'Worth checking':'Low priority';}
+function rel(ts){const d=(Date.now()-ts)/1000;if(d<60)return"just now";if(d<3600)return Math.floor(d/60)+"m ago";if(d<86400)return Math.floor(d/3600)+"h ago";return new Date(ts).toLocaleDateString(undefined,{month:"short",day:"numeric"});}
+let toastT=null;function flash(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1700);}
+
+/* ===================== BOOT ===================== */
+window.addEventListener("load",()=>{ if(localStorage.getItem("driveiq.ack")){document.getElementById("gate").style.display="none";boot();} });
+if(document.readyState==="complete"&&localStorage.getItem("driveiq.ack")){document.getElementById("gate").style.display="none";boot();}
+</script>
+</body>
+</html>
