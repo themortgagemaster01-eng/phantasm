@@ -278,7 +278,7 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     </div>
 
     <div class="qgrid">
-      <button class="qcard" onclick="go('sound')"><div class="ic"><i class="fa-solid fa-waveform-lines"></i></div><div class="qt">SoundPrint AI</div><div class="qd">Listen to an unusual noise</div></button>
+      <button class="qcard" onclick="go('sound')"><div class="ic"><i class="fa-solid fa-wave-square"></i></div><div class="qt">SoundPrint AI</div><div class="qd">Listen to an unusual noise</div></button>
       <button class="qcard" onclick="openResults()"><div class="ic"><i class="fa-solid fa-heart-pulse"></i></div><div class="qt">Health Report</div><div class="qd">Vehicle health score</div></button>
       <button class="qcard" onclick="go('garage')"><div class="ic"><i class="fa-solid fa-warehouse"></i></div><div class="qt">Garage</div><div class="qd">Your vehicles &amp; VIN</div></button>
       <button class="qcard" onclick="openMaint()"><div class="ic"><i class="fa-solid fa-screwdriver-wrench"></i></div><div class="qt">Maintenance</div><div class="qd">What's due &amp; when</div></button>
@@ -315,7 +315,7 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
 
   <!-- SOUND -->
   <div class="screen" id="screen-sound"><div class="scroll">
-    <div class="eyebrow"><i class="fa-solid fa-waveform-lines"></i> SoundPrint AI</div>
+    <div class="eyebrow"><i class="fa-solid fa-wave-square"></i> SoundPrint AI</div>
     <h1 class="h" style="font-size:25px">Listen to your engine</h1>
     <div class="sub">A guided recording of an unusual sound for AI-assisted pattern analysis.</div>
     <canvas id="wave" width="800" height="240"></canvas>
@@ -363,7 +363,7 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
   <div id="nav">
     <button class="tab on" data-s="home" onclick="go('home')"><div class="pill"></div><i class="fa-solid fa-house"></i>Home</button>
     <button class="tab" data-s="vision" onclick="go('vision')"><div class="pill"></div><i class="fa-solid fa-bolt"></i>Vision</button>
-    <button class="tab" data-s="sound" onclick="go('sound')"><div class="pill"></div><i class="fa-solid fa-waveform-lines"></i>Listen</button>
+    <button class="tab" data-s="sound" onclick="go('sound')"><div class="pill"></div><i class="fa-solid fa-wave-square"></i>Listen</button>
     <button class="tab" data-s="garage" onclick="go('garage')"><div class="pill"></div><i class="fa-solid fa-warehouse"></i>Garage</button>
     <button class="tab" data-s="settings" onclick="go('settings')"><div class="pill"></div><i class="fa-solid fa-gear"></i>Settings</button>
   </div>
@@ -667,7 +667,7 @@ function soundAnalyze(){
     {t:"Grinding when braking",sub:["Worn brake pads / rotors"],sev:"hi",cost:[150,650],note:"Safety-critical — have brakes inspected promptly."}
   ];
   const r=pool[Math.floor(Math.random()*pool.length)]; const conf=58+Math.floor(Math.random()*28);
-  addHistory({title:r.t,sub:"SoundPrint AI",icon:"fa-waveform-lines",color:r.sev==='hi'?'#FF5A5F':r.sev==='md'?'#FFB54E':'#3DDC97'});
+  addHistory({title:r.t,sub:"SoundPrint AI",icon:"fa-wave-square",color:r.sev==='hi'?'#FF5A5F':r.sev==='md'?'#FFB54E':'#3DDC97'});
   sheet(`<div class="grab"></div><h3>What we heard</h3>
     <div style="display:flex;align-items:center;gap:10px;margin:10px 0 12px"><span class="chip ${r.sev}">${sevLabel(r.sev)}</span><span class="tiny">${conf}% pattern confidence</span></div>
     <div class="card" style="margin-bottom:12px"><div style="font-weight:800;font-size:16px;margin-bottom:6px">${r.t}</div><div class="muted">${r.note}</div></div>
