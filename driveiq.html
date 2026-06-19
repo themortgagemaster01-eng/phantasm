@@ -290,6 +290,24 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
   background:rgba(0,240,255,.07);border:1px solid var(--line2);transition:transform .15s}
 .am-qa-b:active .qc{transform:scale(.92)}
 .am-qa-b span{font-size:10.5px;font-weight:600;color:var(--mut)}
+
+/* ===================== CAR IMAGE + RECORDS ===================== */
+.am-car{overflow:hidden}
+.am-car img{width:100%;height:100%;object-fit:cover;border-radius:13px}
+.vinimg{width:100%;height:172px;object-fit:cover;border-radius:14px;border:1px solid var(--line2);margin-bottom:6px;background:#05080e}
+.vincap{font-size:10.5px;color:var(--mut2);text-align:center;margin-bottom:12px}
+.gthumb{overflow:hidden;padding:0!important}
+.gthumb img{width:100%;height:100%;object-fit:cover}
+.rec-up{display:flex;align-items:center;justify-content:center;gap:10px;border:1.5px dashed var(--line2);border-radius:16px;padding:22px 16px;color:var(--blue);font-weight:700;font-size:14px;background:rgba(0,240,255,.05);cursor:pointer;margin-bottom:8px;text-align:center}
+.rec-up input{display:none}
+.rec{display:flex;align-items:center;gap:13px;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:11px;margin-bottom:10px}
+.rec .rt{width:48px;height:48px;border-radius:11px;flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--panel2);color:var(--blue);font-size:18px}
+.rec .rt img{width:100%;height:100%;object-fit:cover}
+.rec .rm{flex:1;min-width:0}
+.rec .rm .a{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec .rm .b{font-size:11px;color:var(--mut2);margin-top:2px}
+.rec .rx{color:var(--red);font-size:14px;padding:8px;background:none;border:none;flex:none}
+.recview{max-width:100%;border-radius:12px;margin:8px 0}
 </style>
 </head>
 <body>
@@ -343,7 +361,7 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
         <div class="am-pill off" id="am-pill"><span class="dot"></span><span id="am-pill-t">Add vehicle</span></div>
       </div>
       <div class="am-status-body">
-        <div class="am-car"><i class="fa-solid fa-car-side"></i></div>
+        <div class="am-car" id="am-car"><i class="fa-solid fa-car-side"></i></div>
         <div class="am-sys" id="am-sys"></div>
       </div>
       <div class="am-note" id="am-note" style="display:none"><i class="fa-solid fa-circle-info"></i><div>Estimates from your vehicle's age &amp; mileage — <b>not a live OBD reading</b>. Run a scan to check what's actually lit.</div></div>
@@ -359,7 +377,8 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
       <button class="am-qa-b" onclick="go('vision')"><div class="qc"><i class="fa-solid fa-magnifying-glass"></i></div><span>Scan Now</span></button>
       <button class="am-qa-b" onclick="go('sound')"><div class="qc"><i class="fa-solid fa-wave-square"></i></div><span>SoundPrint</span></button>
       <button class="am-qa-b" onclick="openResults()"><div class="qc"><i class="fa-solid fa-heart-pulse"></i></div><span>Health</span></button>
-      <button class="am-qa-b" onclick="openMaint()"><div class="qc"><i class="fa-solid fa-screwdriver-wrench"></i></div><span>Maintenance</span></button>
+      <button class="am-qa-b" onclick="openMaint()"><div class="qc"><i class="fa-solid fa-screwdriver-wrench"></i></div><span>Service</span></button>
+      <button class="am-qa-b" onclick="go('records')"><div class="qc"><i class="fa-solid fa-folder-open"></i></div><span>Records</span></button>
     </div>
 
     <div class="section-h">Recent</div>
@@ -373,6 +392,7 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     <div class="sub">Add a car by VIN for accurate, model-specific guidance.</div>
     <div id="garage-list"></div>
     <button class="btn primary" style="margin-top:6px" onclick="openAddVehicle()"><i class="fa-solid fa-plus"></i> Add a vehicle</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="go('records')"><i class="fa-solid fa-folder-open"></i> Service records &amp; receipts</button>
   </div></div>
 
   <!-- VISION -->
@@ -436,6 +456,19 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     <div class="set-row" onclick="showPrivacy()"><div><div class="sl">Privacy &amp; data</div><div class="sd">What we collect and why</div></div><i class="fa-solid fa-chevron-right" style="color:var(--mut2)"></i></div>
     <div class="set-row danger-row" onclick="clearData()"><div><div class="sl" style="color:var(--red)">Clear all data</div><div class="sd">Erase vehicles &amp; history on this device</div></div><i class="fa-solid fa-trash" style="color:var(--red)"></i></div>
     <p class="tiny" style="text-align:center;margin:14px 0 4px">DriveIQ provides informational estimates only.<br/>Not a professional diagnosis or safety certification.</p>
+  </div></div>
+
+  <!-- RECORDS -->
+  <div class="screen" id="screen-records"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-folder-open"></i> Service Records</div>
+    <h1 class="h" style="font-size:25px">Receipts &amp; documents</h1>
+    <div class="sub">Keep mechanic receipts, invoices and repair photos together. Saved privately on your device.</div>
+    <label class="rec-up"><i class="fa-solid fa-cloud-arrow-up"></i> Upload a receipt or document
+      <input type="file" id="rec-file" accept="image/*,application/pdf" onchange="uploadReceipt(this)"/>
+    </label>
+    <div class="tiny" style="margin:4px 2px 16px">Photos or PDF · tap a saved item to view</div>
+    <div id="rec-list"></div>
+    <div class="disc"><i class="fa-solid fa-lock"></i><div>Documents are stored <b>only on this device</b> in private app storage — nothing is uploaded to a server. Clearing the app's data will remove them.</div></div>
   </div></div>
 
   <div id="nav">
@@ -518,7 +551,7 @@ function go(s){
   document.getElementById("screen-"+s).classList.add("active");
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
   const sc=document.querySelector("#screen-"+s+" .scroll"); if(sc)sc.scrollTop=0;
-  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound();
+  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound(); if(s==="records")renderRecords();
 }
 
 /* ===================== GATE ===================== */
@@ -538,6 +571,16 @@ function vinCheckDigit(vin){
 }
 function vinValid(vin){ const c=vinCheckDigit(vin); return c!==null && c===vin[8]; }
 
+let pendingVeh=null;
+async function carImage(v){
+  if(!v||(!v.make&&!v.model))return null;
+  const term=[v.year,v.make,v.model].filter(Boolean).join(" ")+" car";
+  try{
+    const r=await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=640&redirects=1&generator=search&gsrsearch=${encodeURIComponent(term)}&gsrlimit=1`);
+    const j=await r.json(); const pages=j.query&&j.query.pages; if(!pages)return null;
+    const p=Object.values(pages)[0]; return (p.thumbnail&&p.thumbnail.source)||null;
+  }catch(e){return null;}
+}
 function openAddVehicle(){
   sheet(`
     <div class="grab"></div>
@@ -571,6 +614,7 @@ async function decodeVin(){
     trim:data.Trim||"", body:data.BodyClass||"", engine:[data.DisplacementL?(Math.round(parseFloat(data.DisplacementL)*10)/10)+"L":"",data.EngineCylinders?data.EngineCylinders+"-cyl":"",data.FuelTypePrimary||""].filter(Boolean).join(" · "),
     drive:data.DriveType||"", mileage:0};
   out.innerHTML=`
+    <div id="vin-img"></div>
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><div class="row .ic" style="width:46px;height:46px;border-radius:12px;background:var(--blue-dim);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:19px"><i class="fa-solid fa-car-side"></i></div><div><div style="font-weight:800;font-size:16px">${v.year} ${v.make} ${v.model}</div><div class="tiny">${v.trim||v.body||""}</div></div></div>
       <div class="kv"><span class="k">Engine</span><span class="v">${v.engine||"—"}</span></div>
@@ -578,7 +622,15 @@ async function decodeVin(){
       <div class="kv"><span class="k">VIN check digit</span><span class="v" style="color:${cd?'var(--green)':'var(--amber)'}">${cd?"Valid ✓":"Unverified"}</span></div>
     </div>
     <input class="field" id="mi-in" type="number" inputmode="numeric" placeholder="Current mileage (optional)" style="margin-bottom:10px"/>
-    <button class="btn primary" onclick='saveVehicle(${JSON.stringify(v).replace(/'/g,"&#39;")})'><i class="fa-solid fa-check"></i> Add to garage</button>`;
+    <button class="btn primary" onclick='saveVehicle()'><i class="fa-solid fa-check"></i> Add to garage</button>`;
+  pendingVeh=v;
+  const imgHolder=document.getElementById("vin-img");
+  if(imgHolder)imgHolder.innerHTML=`<div style="text-align:center;padding:4px 0 12px"><div class="spin"></div><div class="tiny" style="margin-top:8px">Finding a photo of your car…</div></div>`;
+  carImage(v).then(url=>{
+    if(pendingVeh)pendingVeh.img=url||"";
+    const h=document.getElementById("vin-img");
+    if(h)h.innerHTML=url?`<img class="vinimg" src="${url}" alt="${v.year} ${v.make} ${v.model}"/><div class="vincap">Representative image of this model</div>`:"";
+  });
 }
 function addManual(){
   sheet(`<div class="grab"></div><h3>Add without VIN</h3>
@@ -594,8 +646,9 @@ function saveManual(){
   saveVehicle({id:"v"+Date.now(),vin:"",year:y,make:mk,model:md,trim:"",body:"",engine:"",drive:"",mileage:mi});
 }
 function saveVehicle(v){
+  v=v||pendingVeh; if(!v)return;
   const miEl=document.getElementById("mi-in"); if(miEl)v.mileage=+miEl.value||0;
-  S.vehicles.push(v); S.activeId=v.id; save(); closeSheet(); renderGarage(); renderHome();
+  S.vehicles.push(v); S.activeId=v.id; pendingVeh=null; save(); closeSheet(); renderGarage(); renderHome();
   flash(`${v.year} ${v.make} ${v.model} added`);
   go("home");
 }
@@ -638,13 +691,17 @@ function renderHome(){
   // vehicle status card
   const sys=document.getElementById("am-sys"), note=document.getElementById("am-note"),
         pill=document.getElementById("am-pill"), pillT=document.getElementById("am-pill-t"), veh=document.getElementById("am-veh");
+  const carEl=document.getElementById("am-car");
   if(!v){
     veh.textContent="No vehicle linked";
     pill.className="am-pill off"; pillT.textContent="Add vehicle"; note.style.display="none";
+    if(carEl)carEl.innerHTML=`<i class="fa-solid fa-car-side"></i>`;
     sys.innerHTML=`<div class="am-empty">Add a vehicle by VIN to see a real status snapshot.<button class="btn primary" style="margin-top:12px" onclick="go('garage')"><i class="fa-solid fa-plus"></i> Add a vehicle</button></div>`;
   }else{
     veh.textContent=`${v.year} ${v.make} ${v.model}`.trim();
     pill.className="am-pill on"; pillT.textContent=v.mileage?v.mileage.toLocaleString()+" mi":"Linked"; note.style.display="";
+    if(carEl)carEl.innerHTML=v.img?`<img src="${v.img}" alt=""/>`:`<i class="fa-solid fa-car-side"></i>`;
+    if(!v.img){carImage(v).then(url=>{ if(!url)return; v.img=url; save(); const c=document.getElementById("am-car"); const av=activeVehicle(); if(c&&av&&av.id===v.id)c.innerHTML=`<img src="${url}" alt=""/>`; });}
     sys.innerHTML=estSystems(v).map(s=>`<div class="am-sysrow"><div class="am-sic" style="background:${s.bg};color:${s.ic}"><i class="fa-solid ${s.icon}"></i></div><div class="am-smeta"><div class="am-sn">${s.name}</div><div class="am-ss" style="color:${s.col}">${s.status}</div></div><div class="am-sv">${s.note}</div></div>`).join("");
   }
   // maintenance overview
@@ -657,11 +714,12 @@ function renderHome(){
 function renderGarage(){
   const l=document.getElementById("garage-list");
   if(!S.vehicles.length){l.innerHTML=`<div class="muted" style="padding:6px 2px 14px">No vehicles yet. Add one by VIN for model-specific guidance.</div>`;return;}
-  l.innerHTML=S.vehicles.map(v=>`<div class="row" onclick="vehicleSheet('${v.id}')"><div class="ic"><i class="fa-solid fa-car-side"></i></div><div class="meta"><div class="t">${v.year} ${v.make} ${v.model} ${v.id===S.activeId?'<span class="chip lo" style="margin-left:6px">Active</span>':''}</div><div class="s">${[v.engine,v.mileage?v.mileage.toLocaleString()+' mi':''].filter(Boolean).join(' · ')||(v.vin?'VIN '+v.vin:'—')}</div></div><i class="fa-solid fa-chevron-right chev"></i></div>`).join("");
+  l.innerHTML=S.vehicles.map(v=>`<div class="row" onclick="vehicleSheet('${v.id}')"><div class="ic${v.img?' gthumb':''}">${v.img?`<img src="${v.img}" alt=""/>`:'<i class="fa-solid fa-car-side"></i>'}</div><div class="meta"><div class="t">${v.year} ${v.make} ${v.model} ${v.id===S.activeId?'<span class="chip lo" style="margin-left:6px">Active</span>':''}</div><div class="s">${[v.engine,v.mileage?v.mileage.toLocaleString()+' mi':''].filter(Boolean).join(' · ')||(v.vin?'VIN '+v.vin:'—')}</div></div><i class="fa-solid fa-chevron-right chev"></i></div>`).join("");
 }
 function vehicleSheet(id){
   const v=S.vehicles.find(x=>x.id===id);if(!v)return;
   sheet(`<div class="grab"></div><h3>${v.year} ${v.make} ${v.model}</h3>
+    ${v.img?`<img class="vinimg" style="margin-top:12px" src="${v.img}" alt=""/><div class="vincap">Representative image of this model</div>`:''}
     <div class="card" style="margin:12px 0">
       ${v.vin?`<div class="kv"><span class="k">VIN</span><span class="v" style="font-family:ui-monospace,monospace;font-size:12px">${v.vin}</span></div>`:''}
       ${v.engine?`<div class="kv"><span class="k">Engine</span><span class="v">${v.engine}</span></div>`:''}
@@ -880,6 +938,54 @@ function hex(c,a){const n=parseInt(c.slice(1),16);return `rgba(${n>>16&255},${n>
 function sevLabel(s){return s==='hi'?'High priority':s==='md'?'Worth checking':'Low priority';}
 function rel(ts){const d=(Date.now()-ts)/1000;if(d<60)return"just now";if(d<3600)return Math.floor(d/60)+"m ago";if(d<86400)return Math.floor(d/3600)+"h ago";return new Date(ts).toLocaleDateString(undefined,{month:"short",day:"numeric"});}
 let toastT=null;function flash(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1700);}
+
+/* ===================== SERVICE RECORDS (on-device) ===================== */
+function escHtml(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+let _db=null;
+function idb(){return new Promise((res,rej)=>{ if(_db)return res(_db);
+  let q; try{q=indexedDB.open("driveiq_db",1);}catch(e){return rej(e);}
+  q.onupgradeneeded=e=>{const db=e.target.result; if(!db.objectStoreNames.contains("receipts"))db.createObjectStore("receipts",{keyPath:"id"});};
+  q.onsuccess=e=>{_db=e.target.result;res(_db);}; q.onerror=e=>rej(e.target&&e.target.error); });}
+function idbAdd(rec){return idb().then(db=>new Promise((res,rej)=>{const t=db.transaction("receipts","readwrite");t.objectStore("receipts").put(rec);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);}));}
+function idbAll(){return idb().then(db=>new Promise((res,rej)=>{const t=db.transaction("receipts","readonly");const rq=t.objectStore("receipts").getAll();rq.onsuccess=()=>res(rq.result||[]);rq.onerror=()=>rej(rq.error);}));}
+function idbDel(id){return idb().then(db=>new Promise((res,rej)=>{const t=db.transaction("receipts","readwrite");t.objectStore("receipts").delete(id);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);}));}
+function uploadReceipt(input){
+  const f=input.files&&input.files[0]; if(!f)return;
+  if(f.size>20*1024*1024){flash("That file is over 20MB — try a photo instead.");input.value="";return;}
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const v=activeVehicle();
+    const rec={id:"r"+Date.now(),name:f.name||"Receipt",type:f.type||"",size:f.size,date:Date.now(),
+      vehicleId:v?v.id:null,vehicleName:v?`${v.year} ${v.make} ${v.model}`.trim():"No vehicle",data:rd.result};
+    idbAdd(rec).then(()=>{flash("Saved to your records");renderRecords();}).catch(()=>flash("Couldn't save — storage may be full."));
+  };
+  rd.onerror=()=>flash("Couldn't read that file");
+  rd.readAsDataURL(f); input.value="";
+}
+function renderRecords(){
+  const l=document.getElementById("rec-list"); if(!l)return;
+  l.innerHTML=`<div class="muted" style="padding:8px 2px">Loading…</div>`;
+  idbAll().then(list=>{
+    list.sort((a,b)=>b.date-a.date);
+    if(!list.length){l.innerHTML=`<div class="muted" style="padding:8px 2px 4px">No documents yet. Upload a mechanic's receipt, invoice, or a photo of a repair to start your service history.</div>`;return;}
+    l.innerHTML=list.map(r=>{
+      const isImg=(r.type||"").indexOf("image/")===0;
+      const thumb=isImg?`<img src="${r.data}" alt=""/>`:`<i class="fa-solid fa-file-pdf"></i>`;
+      const d=new Date(r.date).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"});
+      return `<div class="rec"><div class="rt" onclick="viewReceipt('${r.id}')">${thumb}</div><div class="rm" onclick="viewReceipt('${r.id}')"><div class="a">${escHtml(r.name)}</div><div class="b">${d} · ${escHtml(r.vehicleName)}</div></div><button class="rx" onclick="delReceipt('${r.id}')"><i class="fa-solid fa-trash"></i></button></div>`;
+    }).join("");
+  }).catch(()=>{l.innerHTML=`<div class="muted" style="padding:8px 2px">Couldn't load saved documents on this device.</div>`;});
+}
+function viewReceipt(id){
+  idbAll().then(list=>{const r=list.find(x=>x.id===id); if(!r)return;
+    if((r.type||"").indexOf("image/")===0){
+      sheet(`<div class="grab"></div><h3 style="font-size:16px">${escHtml(r.name)}</h3><div class="tiny" style="margin:2px 0 6px">${escHtml(r.vehicleName)}</div><img class="recview" src="${r.data}" alt=""/><button class="btn ghost" onclick="closeSheet()">Close</button>`);
+    } else {
+      try{ const b64=r.data.split(",")[1]; const bin=atob(b64); const arr=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i); const blob=new Blob([arr],{type:r.type||"application/pdf"}); const url=URL.createObjectURL(blob); window.open(url,"_blank"); setTimeout(()=>URL.revokeObjectURL(url),60000); }catch(e){flash("Couldn't open this document");}
+    }
+  });
+}
+function delReceipt(id){ if(confirm("Delete this document? This can't be undone.")) idbDel(id).then(()=>{flash("Deleted");renderRecords();}).catch(()=>flash("Couldn't delete")); }
 
 /* ===================== BOOT ===================== */
 window.addEventListener("load",()=>{ if(localStorage.getItem("driveiq.ack")){document.getElementById("gate").style.display="none";boot();} });
