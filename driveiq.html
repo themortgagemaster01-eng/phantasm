@@ -367,6 +367,30 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
 .lib-row .lm .a{font-size:14px;font-weight:700}
 .lib-row .lm .b{font-size:11px;color:var(--mut2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lib-row .chev{color:var(--mut2);font-size:12px}
+
+/* ===================== CONNECTED CAR (DEMO) ===================== */
+.cc-card{position:relative;overflow:hidden;border:1px solid var(--line2);border-radius:18px;padding:18px;margin-top:8px;background:linear-gradient(135deg, rgba(0,240,255,.08), rgba(12,18,32,.4) 60%)}
+.cc-badge{position:absolute;top:14px;right:14px;font-size:9.5px;font-weight:800;letter-spacing:.1em;color:var(--amber);background:rgba(255,181,78,.14);border:1px solid rgba(255,181,78,.32);border-radius:20px;padding:4px 9px}
+.cc-h{display:flex;align-items:center;gap:12px}
+.cc-h .cc-ic{width:44px;height:44px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--blue);background:rgba(0,240,255,.10);border:1px solid rgba(0,240,255,.22)}
+.cc-h .a{font-weight:700;font-size:16px;font-family:"Space Grotesk",sans-serif}
+.cc-h .b{font-size:11.5px;color:var(--mut);margin-top:1px}
+.tz-veh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 14px}
+.tz-veh .a{font-size:15px;font-weight:700}.tz-veh .b{font-size:11px;color:var(--mut2);font-family:"JetBrains Mono",monospace;margin-top:2px}
+.tz-bat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:12px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tz-big{font-size:40px;font-weight:800;font-family:"Space Grotesk",sans-serif;line-height:1}
+.tz-big small{font-size:16px;color:var(--mut)}
+.tz-batbar{height:12px;border-radius:8px;background:var(--line2);overflow:hidden;margin:12px 0 0;border:1px solid var(--line)}
+.tz-batbar>i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--green),#7CFFB2);transition:.4s}
+.tz-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.tz-tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tz-tile .lbl{font-size:10.5px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.tz-tile .val{font-size:22px;font-weight:800;margin-top:5px;font-family:"Space Grotesk",sans-serif}
+.tz-tile .val small{font-size:12px;color:var(--mut);font-weight:600}
+.tz-ctrls{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:6px 0 4px}
+.tz-ctrl{display:flex;flex-direction:column;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:13px 4px;color:var(--txt);font-size:10px;font-weight:600;transition:transform .12s}
+.tz-ctrl i{font-size:17px;color:var(--blue)}
+.tz-ctrl:active{transform:scale(.94)}
 </style>
 </head>
 <body>
@@ -439,6 +463,12 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
       <button class="am-qa-b" onclick="openResults()"><div class="qc"><i class="fa-solid fa-heart-pulse"></i></div><span>Health</span></button>
       <button class="am-qa-b" onclick="openMaint()"><div class="qc"><i class="fa-solid fa-screwdriver-wrench"></i></div><span>Service</span></button>
       <button class="am-qa-b" onclick="go('records')"><div class="qc"><i class="fa-solid fa-folder-open"></i></div><span>Records</span></button>
+    </div>
+
+    <div class="cc-card">
+      <div class="cc-badge">DEMO</div>
+      <div class="cc-h"><div class="cc-ic"><i class="fa-solid fa-bolt-lightning"></i></div><div><div class="a">Connected Car</div><div class="b" id="cc-sub">Simulated Tesla connect — make it live later</div></div></div>
+      <button class="btn primary" style="margin-top:13px" id="cc-btn" onclick="ccAction()"><i class="fa-solid fa-link"></i> Connect (Demo)</button>
     </div>
 
     <div class="section-h">Recent</div>
@@ -520,6 +550,14 @@ h1.h, .hero h2, .brand .nm, #gate h2, .sheet h3, .gscore, .res-big{
     <div class="set-row" onclick="showPrivacy()"><div><div class="sl">Privacy &amp; data</div><div class="sd">What we collect and why</div></div><i class="fa-solid fa-chevron-right" style="color:var(--mut2)"></i></div>
     <div class="set-row danger-row" onclick="clearData()"><div><div class="sl" style="color:var(--red)">Clear all data</div><div class="sd">Erase vehicles &amp; history on this device</div></div><i class="fa-solid fa-trash" style="color:var(--red)"></i></div>
     <p class="tiny" style="text-align:center;margin:14px 0 4px">DriveIQ provides informational estimates only.<br/>Not a professional diagnosis or safety certification.</p>
+  </div></div>
+
+  <!-- CONNECTED CAR (DEMO) -->
+  <div class="screen" id="screen-tesla"><div class="scroll">
+    <div class="eyebrow"><i class="fa-solid fa-bolt-lightning"></i> Connected Car · <span style="color:var(--amber)">Demo</span></div>
+    <h1 class="h" style="font-size:25px">Vehicle dashboard</h1>
+    <div class="sub">A simulated connected-car view. Numbers and buttons are placeholders until we wire your real Tesla.</div>
+    <div id="tesla-body"></div>
   </div></div>
 
   <!-- TIRE PRESSURE -->
@@ -658,7 +696,7 @@ function go(s){
   document.getElementById("screen-"+s).classList.add("active");
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.s===s));
   const sc=document.querySelector("#screen-"+s+" .scroll"); if(sc)sc.scrollTop=0;
-  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound(); if(s==="records")renderRecords(); if(s==="vision")setScanContext(); if(s==="tires")renderTires(); if(s==="lights")renderLights();
+  if(s==="garage")renderGarage(); if(s==="home")renderHome(); if(s==="sound")resetSound(); if(s==="records")renderRecords(); if(s==="vision")setScanContext(); if(s==="tires")renderTires(); if(s==="lights")renderLights(); if(s==="tesla")renderTesla();
 }
 
 /* ===================== GATE ===================== */
@@ -825,6 +863,12 @@ function renderHome(){
   }
   // maintenance overview
   document.getElementById("am-maint").innerHTML=estMaint(v).map(m=>`<div class="am-mcard"><div class="am-mic" style="background:${m.bg};color:${m.ic}"><i class="fa-solid ${m.icon}"></i></div><div class="am-mt">${m.t}</div><div class="am-md">${m.due}</div><div class="am-bar"><i style="width:${m.pct}%;background:${m.ic}"></i></div><div class="am-mp">${m.pct}%</div></div>`).join("");
+  // connected car (demo) card
+  const ccSub=document.getElementById("cc-sub"), ccBtn=document.getElementById("cc-btn");
+  if(ccSub&&ccBtn){
+    if(S.tesla&&S.tesla.connected){ ccSub.textContent=`${S.tesla.model} · ${S.tesla.battery}% battery · demo`; ccBtn.innerHTML='<i class="fa-solid fa-gauge-high"></i> Open dashboard'; }
+    else{ ccSub.textContent="Simulated Tesla connect — make it live later"; ccBtn.innerHTML='<i class="fa-solid fa-link"></i> Connect (Demo)'; }
+  }
   // recent
   const rl=document.getElementById("recent-list");
   if(!S.history.length){rl.innerHTML=`<div class="muted" style="padding:8px 2px">No checks yet. Run a Dashboard Vision or SoundPrint scan to get started.</div>`;}
@@ -1204,6 +1248,72 @@ function lightInfo(k){
     ${L.causes.map(c=>`<div class="flag" style="padding:11px 14px;margin-bottom:8px"><div class="fh" style="margin:0"><div class="ft" style="font-size:13.5px">${c}</div></div></div>`).join("")}
     <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">Close</button>
     <div class="disc"><i class="fa-solid fa-triangle-exclamation"></i><div>Reference only, not a diagnosis. ${L.sev==='hi'?'<b>This can be safety-critical — have it checked before driving.</b>':'Confirm with a qualified mechanic.'}</div></div>`);
+}
+
+/* ===================== CONNECTED CAR (DEMO) =====================
+   Simulated only. To make live later: register at developer.tesla.com,
+   add a backend for OAuth token exchange, then replace the demo values
+   below with Tesla Fleet API vehicle_data (battery, range, climate, tpms). */
+const TESLA_MODELS={ "Model 3":272, "Model Y":303, "Model S":405, "Model X":348 };
+function ccAction(){ if(S.tesla&&S.tesla.connected)go("tesla"); else openTeslaConnect(); }
+function openTeslaConnect(){
+  const t=S.tesla||{};
+  sheet(`<div class="grab"></div><h3>Connect Tesla <span class="chip md" style="vertical-align:middle;margin-left:4px">Demo</span></h3>
+    <p class="muted" style="margin:8px 0 14px">This is a <b>simulated</b> connection for preview — no Tesla account is contacted. We'll wire the real Fleet API later.</p>
+    <label class="tiny" style="display:block;margin-bottom:5px">Model</label>
+    <select class="field" id="tz-model" style="margin-bottom:10px">${Object.keys(TESLA_MODELS).map(m=>`<option ${t.model===m?"selected":""}>${m}</option>`).join("")}</select>
+    <input class="field" id="tz-vin" maxlength="17" placeholder="VIN (optional)" value="${t.vin||""}" style="margin-bottom:10px;text-transform:uppercase"/>
+    <input class="field" id="tz-odo" type="number" inputmode="numeric" placeholder="Odometer (mi, optional)" value="${t.odo||""}" style="margin-bottom:14px"/>
+    <button class="btn primary" onclick="teslaConnect()"><i class="fa-solid fa-link"></i> Connect (Demo)</button>`);
+}
+function teslaConnect(){
+  const model=document.getElementById("tz-model").value;
+  const vin=(document.getElementById("tz-vin").value||"").toUpperCase();
+  const odo=+document.getElementById("tz-odo").value||0;
+  S.tesla={connected:true,model,vin,odo,battery:72,interior:68,charging:false,locked:true,ts:Date.now()};
+  save(); closeSheet(); renderHome(); go("tesla"); flash("Connected (demo)");
+}
+function teslaDisconnect(){ if(confirm("Disconnect the demo car?")){ S.tesla={connected:false}; save(); renderHome(); go("home"); flash("Disconnected"); } }
+function teslaCmd(msg){ flash("Demo: "+msg); }
+function teslaToggleCharge(){ if(!S.tesla)return; S.tesla.charging=!S.tesla.charging; save(); renderTesla(); }
+function teslaScan(){
+  const b=document.getElementById("tz-scan"); if(!b)return; b.innerHTML='<span class="recdot"></span> Scanning…'; b.disabled=true;
+  setTimeout(()=>{
+    const r=document.getElementById("tz-scan-res");
+    if(r)r.innerHTML=`<div class="card" style="margin-top:12px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><i class="fa-solid fa-circle-check" style="color:var(--green);font-size:18px"></i><b>No active faults found</b></div><div class="kv"><span class="k">Battery health</span><span class="v" style="color:var(--green)">Good</span></div><div class="kv"><span class="k">Drivetrain</span><span class="v" style="color:var(--green)">Nominal</span></div><div class="kv"><span class="k">12V system</span><span class="v" style="color:var(--green)">OK</span></div><div class="tiny" style="margin-top:8px">Demo result — illustrative only.</div></div>`;
+    b.innerHTML='<i class="fa-solid fa-rotate"></i> Re-run scan (demo)'; b.disabled=false; flash("Demo scan complete");
+  },2000);
+}
+function renderTesla(){
+  const body=document.getElementById("tesla-body"); if(!body)return;
+  const t=S.tesla;
+  if(!t||!t.connected){ body.innerHTML=`<div class="muted" style="padding:8px 2px">No car connected yet.<button class="btn primary" style="margin-top:12px" onclick="openTeslaConnect()"><i class="fa-solid fa-link"></i> Connect (Demo)</button></div>`; return; }
+  const full=TESLA_MODELS[t.model]||300, range=Math.round(full*t.battery/100);
+  body.innerHTML=`
+    <div class="tz-veh"><div><div class="a">${t.model}</div><div class="b">${t.vin?("VIN ···"+t.vin.slice(-4)+" · "):""}${t.odo?t.odo.toLocaleString()+" mi":"demo vehicle"}</div></div><span class="cc-badge" style="position:static">DEMO</span></div>
+    <div class="tz-bat">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div><div class="tz-big">${t.battery}<small>%</small></div><div class="tiny" style="margin-top:5px">${t.charging?'<span style="color:var(--green)"><i class="fa-solid fa-bolt"></i> Charging</span>':"Not charging"}</div></div>
+        <div style="text-align:right"><div style="font-size:21px;font-weight:800;font-family:'Space Grotesk',sans-serif">${range}<small style="font-size:12px;color:var(--mut);font-weight:600"> mi</small></div><div class="tiny">est. range</div></div>
+      </div>
+      <div class="tz-batbar"><i style="width:${t.battery}%"></i></div>
+    </div>
+    <div class="tz-2">
+      <div class="tz-tile"><div class="lbl">Interior</div><div class="val">${t.interior}<small>°F</small></div></div>
+      <div class="tz-tile"><div class="lbl">Doors</div><div class="val" style="font-size:17px;color:${t.locked?"var(--green)":"var(--amber)"}">${t.locked?"Locked":"Unlocked"}</div></div>
+    </div>
+    <button class="btn" onclick="teslaToggleCharge()"><i class="fa-solid fa-bolt"></i> ${t.charging?"Stop charging":"Start charging"} (demo)</button>
+    <div class="section-h" style="margin-top:18px">Controls</div>
+    <div class="tz-ctrls">
+      <button class="tz-ctrl" onclick="teslaCmd('Preconditioning started')"><i class="fa-solid fa-temperature-half"></i>Precondition</button>
+      <button class="tz-ctrl" onclick="teslaCmd('Lights flashed')"><i class="fa-solid fa-lightbulb"></i>Flash</button>
+      <button class="tz-ctrl" onclick="teslaCmd('Horn honked')"><i class="fa-solid fa-volume-high"></i>Honk</button>
+      <button class="tz-ctrl" onclick="teslaCmd('Frunk opened')"><i class="fa-solid fa-box-open"></i>Frunk</button>
+    </div>
+    <button class="btn primary" style="margin-top:16px" id="tz-scan" onclick="teslaScan()"><i class="fa-solid fa-stethoscope"></i> Run full vehicle scan (demo)</button>
+    <div id="tz-scan-res"></div>
+    <button class="btn ghost" style="margin-top:14px" onclick="teslaDisconnect()"><i class="fa-solid fa-link-slash"></i> Disconnect demo</button>
+    <div class="disc"><i class="fa-solid fa-circle-info"></i><div><b>Simulated demo data.</b> The numbers and controls here are placeholders. To show your real battery, range, climate and tire pressures, we'll connect Tesla's <b>Fleet API</b> later (needs a Tesla developer account + a small sign-in backend).</div></div>`;
 }
 
 /* ===================== BOOT ===================== */
