@@ -10,36 +10,21 @@
 <meta name="apple-mobile-web-app-title" content="DriveIQ"/>
 <meta name="description" content="Hardware-free vehicle diagnostics from your iPhone. Informational AI estimates — not a replacement for a certified mechanic."/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#04060a; --bg2:#070a10; --panel:rgba(17,23,37,.5); --panel-solid:#0a0f18; --panel2:rgba(22,30,48,.55); --panel3:#131c2e;
-  --line:rgba(255,255,255,.06); --line2:rgba(255,255,255,.11); --line3:rgba(255,255,255,.17);
-  --txt:#eef3fc; --mut:#828ca3; --mut2:#525c72;
-  --blue:#2F9BFF; --blue-dim:rgba(47,155,255,.13); --blue-glow:rgba(47,155,255,.55);
-  --cyan:#41E0FF; --green:#3DDC97; --amber:#FFB54E; --red:#FF5A5F;
+  --bg:#06080d; --bg2:#0a0d15; --panel:#0e1320; --panel2:#131a2a; --panel3:#172033;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.13);
+  --txt:#eaf0fb; --mut:#8b96ad; --mut2:#5a6478;
+  --blue:#2F9BFF; --blue-dim:rgba(47,155,255,.14); --blue-glow:rgba(47,155,255,.5);
+  --green:#3DDC97; --amber:#FFB54E; --red:#FF5A5F;
   --green-bg:rgba(61,220,151,.13); --amber-bg:rgba(255,181,78,.14); --red-bg:rgba(255,90,95,.14);
   --r:20px;
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  --disp:"Space Grotesk","Inter",system-ui,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 html,body{height:100%}
-body{background:radial-gradient(120% 75% at 50% -8%, #0a1220 0%, #05080e 48%, #02040a 100%) fixed,#02040a;color:var(--txt);
-  font-family:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased;
-  overflow:hidden;position:fixed;inset:0;letter-spacing:.004em}
-/* ===== continuously-alive overlay: film grain + scanlines ===== */
-#fx{position:fixed;inset:0;z-index:200;pointer-events:none;mix-blend-mode:overlay;opacity:.5}
-#fx::before{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");animation:grain .5s steps(2) infinite}
-#fx::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(0,0,0,.16) 2px 3px);opacity:.4}
-@keyframes grain{0%{transform:translate(0,0)}50%{transform:translate(-4px,3px)}100%{transform:translate(3px,-2px)}}
-/* sweeping scan beam */
-#beam{position:fixed;left:0;right:0;top:0;height:140px;z-index:199;pointer-events:none;background:linear-gradient(to bottom,rgba(47,155,255,.05),transparent);animation:beam 7s linear infinite;opacity:.7}
-@keyframes beam{0%{top:-140px}100%{top:110%}}
-@keyframes heart{0%,100%{transform:scale(1);opacity:.85}14%{transform:scale(1.5);opacity:1}28%{transform:scale(1)}42%{transform:scale(1.35)}56%{transform:scale(1)}}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 8px var(--green);animation:heart 1.4s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){#fx,#beam,.live-dot{animation:none!important}}
+body{background:radial-gradient(130% 90% at 50% -10%, #0c1322 0%, #05070c 58%) fixed,#05070c;color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  overflow:hidden;position:fixed;inset:0;letter-spacing:.01em}
 #app{position:absolute;inset:0;display:flex;flex-direction:column}
 .screen{display:none;flex:1;min-height:0;animation:fade .4s ease}
 .screen.active{display:flex;flex-direction:column}
@@ -207,45 +192,9 @@ a{color:var(--blue);text-decoration:none}
 .pick{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line2);border-radius:13px;padding:12px;text-align:left;color:var(--txt)}
 .pick i{font-size:18px;width:24px;text-align:center}
 .pick .pn{font-size:12.5px;font-weight:600;line-height:1.2}
-
-/* ============ PREMIUM v2 OVERRIDES ============ */
-h1.h,.hero h2,.brand .nm,.sheet h3,.gscore,.g-big{font-family:var(--disp);letter-spacing:-.015em}
-.brand .nm{letter-spacing:.01em}
-/* layered glass on surfaces */
-.card,.hero,.qcard,.row,.veh-pill,.flag,.set-row,.viewfinder,.disc,.pick{
-  backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%)}
-.card,.hero{box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 24px 50px -28px #000;position:relative;overflow:hidden}
-.card::before,.hero::after{content:"";position:absolute;left:14%;right:14%;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(120,190,255,.35),transparent);z-index:2}
-.qcard{box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-.qcard .ic{box-shadow:0 0 18px -6px var(--blue-glow)}
-/* technical / system labels */
-.tech{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut2)}
-.tech b{color:var(--blue);font-weight:500}
-/* telemetry strip */
-.telemetry{display:flex;gap:0;border:1px solid var(--line2);border-radius:14px;overflow:hidden;margin:16px 0 4px;background:rgba(8,12,20,.5);backdrop-filter:blur(14px)}
-.telemetry .tcell{flex:1;padding:10px 8px;border-right:1px solid var(--line);text-align:center}
-.telemetry .tcell:last-child{border-right:none}
-.telemetry .tl{font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--mut2);text-transform:uppercase;white-space:nowrap}
-.telemetry .tv{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--txt);margin-top:3px;font-variant-numeric:tabular-nums}
-.telemetry .tv.warn{color:var(--amber)}.telemetry .tv.ok{color:var(--green)}
-/* neural orb hero */
-.orbstage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 0 0}
-.norb{width:264px;max-width:72vw;height:264px;max-height:72vw}
-.orb-status{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
-.orb-status .os1{font-family:var(--mono);font-size:9px;letter-spacing:.22em;color:var(--mut);text-transform:uppercase}
-.orb-status .os2{font-family:var(--disp);font-size:17px;font-weight:600;margin-top:5px;letter-spacing:.01em}
-.orb-status .os3{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--mut2);margin-top:5px}
-.hero.orb-hero{padding-top:16px;padding-bottom:18px;text-align:center}
-.hero.orb-hero .hl{justify-content:center;display:flex}
-/* live chip */
-.livechip{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);border:1px solid var(--line2);border-radius:20px;padding:5px 11px;background:rgba(8,12,20,.4)}
-.gscore{font-family:var(--disp)}
-.btn{font-family:var(--disp);letter-spacing:.01em}
 </style>
 </head>
 <body>
-<div id="fx"></div>
-<div id="beam"></div>
 
 <!-- ONBOARDING / CONSENT GATE -->
 <div id="gate">
@@ -273,22 +222,8 @@ h1.h,.hero h2,.brand .nm,.sheet h3,.gscore,.g-big{font-family:var(--disp);letter
         <i class="fa-solid fa-chevron-down chev"></i>
       </button>
     </div>
-    <div class="orbstage" onclick="go('vision')">
-      <canvas class="norb" id="orb-home" width="600" height="600"></canvas>
-      <div class="orb-status">
-        <div class="os1">DriveIQ&nbsp;Core</div>
-        <div class="os2" id="orb-label">Standing by</div>
-        <div class="os3" id="orb-sub">tap to run a scan</div>
-      </div>
-    </div>
-    <div style="text-align:center;margin:0 0 14px"><span class="livechip"><span class="live-dot"></span> <span id="live-msg">System nominal · monitoring</span></span></div>
-
-    <div class="telemetry">
-      <div class="tcell"><div class="tl">Velocity_Vector</div><div class="tv" id="t-vel">0.0</div></div>
-      <div class="tcell"><div class="tl">Thermal_Load</div><div class="tv ok" id="t-therm">NOM</div></div>
-      <div class="tcell"><div class="tl">Vibration_Sig</div><div class="tv" id="t-vib">0.02g</div></div>
-      <div class="tcell"><div class="tl">Cognitive_Load</div><div class="tv" id="t-cog">12%</div></div>
-    </div>
+    <h1 class="h" id="home-greet">What's your car telling you?</h1>
+    <div class="sub">Run a quick check with your camera or microphone — no adapters, no dongles.</div>
 
     <div class="hero" onclick="go('vision')">
       <div class="hl"><i class="fa-solid fa-bolt"></i>&nbsp; Dashboard Vision</div>
@@ -467,7 +402,7 @@ function go(s){
 let consent=false;
 function toggleConsent(){consent=!consent;document.getElementById("gcheck").classList.toggle("on",consent);document.getElementById("gate-btn").style.opacity=consent?"1":".5";}
 function acknowledge(){ if(!consent){flash("Please confirm you understand to continue");return;} localStorage.setItem("driveiq.ack","1"); document.getElementById("gate").style.display="none"; boot(); }
-function boot(){ document.getElementById("app").style.visibility="visible"; renderHome(); renderGarage(); drawOrb(); startTelemetry(); }
+function boot(){ document.getElementById("app").style.visibility="visible"; renderHome(); renderGarage(); }
 
 /* ===================== VIN ===================== */
 const TRANS={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,J:1,K:2,L:3,M:4,N:5,P:7,R:9,S:2,T:3,U:4,V:5,W:6,X:7,Y:8,Z:9,"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9};
@@ -609,7 +544,6 @@ async function openCamera(){
     document.getElementById("vf-hint").style.display="block";
     document.getElementById("shutter").style.display="block";
     document.getElementById("vision-open").style.display="none";
-    setOrb("scan","Scanning","reading dashboard");
   }catch(e){
     document.getElementById("vf-ph").innerHTML=`<i class="fa-solid fa-camera-rotate"></i>Camera unavailable here.<br/><span class="tiny">On your phone it opens the rear camera. For now, pick the light manually.</span>`;
     flash("Camera needs your phone + permission");
@@ -636,7 +570,6 @@ function pickLightManually(){
 function visionResult(k){
   const L=LIGHTS[k]; const conf=62+Math.floor(Math.random()*30);
   addHistory({title:L.name+" light",sub:"Dashboard Vision",icon:L.fa,color:L.color});
-  setOrb(L.sev==='hi'?'alert':'idle', L.sev==='hi'?L.name:'Check complete', L.sev==='hi'?'attention needed':'tap to run again');
   sheet(`<div class="grab"></div>
     <div style="display:flex;align-items:center;gap:13px;margin-bottom:12px"><div style="width:50px;height:50px;border-radius:13px;background:${hex(L.color,.16)};color:${L.color};display:flex;align-items:center;justify-content:center;font-size:22px"><i class="fa-solid ${L.fa}"></i></div><div><h3 style="margin:0">${L.name}</h3><span class="chip ${L.sev}">${sevLabel(L.sev)}</span></div></div>
     <p class="muted" style="margin-bottom:12px">${L.expl}</p>
@@ -663,7 +596,7 @@ async function soundToggle(){
     AC=AC||new (window.AudioContext||window.webkitAudioContext)();
     micStream=await navigator.mediaDevices.getUserMedia({audio:true});
     const src=AC.createMediaStreamSource(micStream); analyser=AC.createAnalyser(); analyser.fftSize=2048; src.connect(analyser);
-    soundOn=true; soundStep=1; renderSteps(); setOrb("scan","Listening","sampling engine audio");
+    soundOn=true; soundStep=1; renderSteps();
     document.getElementById("sound-btn").innerHTML='<span class="recdot"></span> Recording — tap to stop';
     drawWave();
     let st=1; stepTimer=setInterval(()=>{ st++; if(st<=3){soundStep=st;renderSteps();} if(st>=4){clearInterval(stepTimer); soundStep=4; renderSteps(); setTimeout(soundAnalyze,1500);} },2500);
@@ -690,7 +623,6 @@ function soundAnalyze(){
   ];
   const r=pool[Math.floor(Math.random()*pool.length)]; const conf=58+Math.floor(Math.random()*28);
   addHistory({title:r.t,sub:"SoundPrint AI",icon:"fa-waveform-lines",color:r.sev==='hi'?'#FF5A5F':r.sev==='md'?'#FFB54E':'#3DDC97'});
-  setOrb(r.sev==='hi'?'alert':'idle', r.sev==='hi'?'Attention':'Analysis complete', r.sev==='hi'?'review report':'tap to run again');
   sheet(`<div class="grab"></div><h3>What we heard</h3>
     <div style="display:flex;align-items:center;gap:10px;margin:10px 0 12px"><span class="chip ${r.sev}">${sevLabel(r.sev)}</span><span class="tiny">${conf}% pattern confidence</span></div>
     <div class="card" style="margin-bottom:12px"><div style="font-weight:800;font-size:16px;margin-bottom:6px">${r.t}</div><div class="muted">${r.note}</div></div>
@@ -714,9 +646,7 @@ function openResults(triggerKey){
   if(triggerKey&&LIGHTS[triggerKey]){const L=LIGHTS[triggerKey]; flags.unshift({t:L.name+" indicated",d:L.expl,sys:sysFor(triggerKey),sev:L.sev,like:78,lo:L.lo,hi:L.hi}); if(L.sev==='hi')score-=14; else if(L.sev==='md')score-=7;}
   score=Math.max(31,Math.min(98,score));
   drawGauge(score);
-  document.getElementById("g-score").innerHTML='<span id="g-num">0</span><small> /100</small>';
-  countUp(document.getElementById("g-num"),score,1100);
-  setOrb(score<60?"alert":"idle", score<60?"Attention":"Check complete", score<60?"review flagged items":"tap to run again");
+  document.getElementById("g-score").innerHTML=score+'<small> /100</small>';
   const lbl=score>=80?"Looking good":score>=60?"Watch a few items":"Needs attention";
   const lcol=score>=80?"var(--green)":score>=60?"var(--amber)":"var(--red)";
   const gl=document.getElementById("g-label"); gl.textContent=lbl; gl.style.color=lcol;
@@ -773,48 +703,6 @@ function hex(c,a){const n=parseInt(c.slice(1),16);return `rgba(${n>>16&255},${n>
 function sevLabel(s){return s==='hi'?'High priority':s==='md'?'Worth checking':'Low priority';}
 function rel(ts){const d=(Date.now()-ts)/1000;if(d<60)return"just now";if(d<3600)return Math.floor(d/60)+"m ago";if(d<86400)return Math.floor(d/3600)+"h ago";return new Date(ts).toLocaleDateString(undefined,{month:"short",day:"numeric"});}
 let toastT=null;function flash(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1700);}
-
-/* ===================== NEURAL ORB ===================== */
-let orbState="idle",orbT=0,orbParts=[];
-for(let i=0;i<42;i++)orbParts.push({a:Math.random()*6.28,r:.55+Math.random()*.42,sp:.0018+Math.random()*.005,sz:.5+Math.random()*1.7,ph:Math.random()*6});
-function orbRGB(){return orbState==="alert"?[255,90,95]:orbState==="scan"?[65,224,255]:[47,155,255];}
-function orbRate(){return orbState==="alert"?2.6:orbState==="scan"?1.6:0.7;}
-function drawOrb(){
-  const cv=document.getElementById("orb-home");
-  if(cv){const x=cv.getContext("2d"),w=cv.width,h=cv.height,cx=w/2,cy=h/2;x.clearRect(0,0,w,h);
-    const[cr,cg,cb]=orbRGB();const breathe=0.5+0.5*Math.sin(orbT*orbRate());const R=w*0.25*(0.92+breathe*0.06);
-    let g=x.createRadialGradient(cx,cy,R*0.2,cx,cy,R*2.5);g.addColorStop(0,`rgba(${cr},${cg},${cb},${0.20+breathe*0.18})`);g.addColorStop(.4,`rgba(${cr},${cg},${cb},0.07)`);g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.beginPath();x.arc(cx,cy,R*2.5,0,7);x.fill();
-    let g2=x.createRadialGradient(cx-R*.35,cy-R*.42,R*.1,cx,cy,R);g2.addColorStop(0,`rgba(${Math.min(255,cr+120)},${Math.min(255,cg+120)},${Math.min(255,cb+120)},.92)`);g2.addColorStop(.5,`rgba(${cr},${cg},${cb},.4)`);g2.addColorStop(1,"rgba(5,8,15,.55)");x.fillStyle=g2;x.beginPath();x.arc(cx,cy,R,0,7);x.fill();
-    x.save();x.globalCompositeOperation="screen";
-    const ang=orbT*(orbState==="scan"?2.4:0.6);let sg=x.createLinearGradient(cx,cy,cx+Math.cos(ang)*R*1.4,cy+Math.sin(ang)*R*1.4);sg.addColorStop(0,`rgba(${cr},${cg},${cb},.55)`);sg.addColorStop(1,"rgba(0,0,0,0)");x.strokeStyle=sg;x.lineWidth=2.4;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(ang)*R*1.32,cy+Math.sin(ang)*R*1.32);x.stroke();
-    for(let k=1;k<=3;k++){x.strokeStyle=`rgba(${cr},${cg},${cb},${.13-k*.026})`;x.lineWidth=1.2;x.beginPath();x.arc(cx,cy,R*(0.55+k*0.27),0,7);x.stroke();}
-    orbParts.forEach(p=>{p.a+=p.sp*(0.6+orbRate());const rad=R*(1.15+p.r*0.55)+Math.sin(orbT+p.ph)*6;const px=cx+Math.cos(p.a)*rad,py=cy+Math.sin(p.a)*rad;x.fillStyle=`rgba(${cr},${cg},${cb},${0.38+Math.sin(orbT*2+p.ph)*0.34})`;x.beginPath();x.arc(px,py,p.sz,0,7);x.fill();});
-    x.restore();
-    let hl=x.createRadialGradient(cx-R*.36,cy-R*.42,1,cx-R*.36,cy-R*.42,R*.5);hl.addColorStop(0,"rgba(255,255,255,.5)");hl.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=hl;x.beginPath();x.arc(cx-R*.36,cy-R*.42,R*.5,0,7);x.fill();
-  }
-  orbT+=0.016;requestAnimationFrame(drawOrb);
-}
-function setOrb(state,label,sub){
-  orbState=state;
-  const L=document.getElementById("orb-label"),Sb=document.getElementById("orb-sub"),lm=document.getElementById("live-msg"),lc=document.querySelector(".live-dot");
-  if(L&&label)L.textContent=label; if(Sb&&sub!=null)Sb.textContent=sub;
-  if(lm)lm.textContent=state==="alert"?"Attention needed · review report":state==="scan"?"Analyzing · sensors active":"System nominal · monitoring";
-  const c=state==="alert"?"var(--red)":state==="scan"?"var(--cyan)":"var(--green)";
-  if(lc){lc.style.background=c;lc.style.boxShadow="0 0 8px "+c;}
-}
-/* ===================== TELEMETRY ===================== */
-function startTelemetry(){
-  setInterval(()=>{
-    const v=document.getElementById("t-vel"); if(!v)return; const sc=orbState==="scan",al=orbState==="alert";
-    v.textContent=(sc?Math.random()*2.6:Math.random()*0.5).toFixed(1);
-    const th=document.getElementById("t-therm"),tt=88+Math.floor(Math.random()*(al?14:6));
-    th.textContent=sc||al?tt+"°":"NOM"; th.className="tv "+(tt>97?"warn":"ok");
-    document.getElementById("t-vib").textContent=(0.01+Math.random()*(al?0.6:sc?0.35:0.05)).toFixed(2)+"g";
-    document.getElementById("t-cog").textContent=(sc?42+Math.floor(Math.random()*54):8+Math.floor(Math.random()*12))+"%";
-  },850);
-}
-/* ===================== COUNT-UP ===================== */
-function countUp(el,to,dur){const t0=performance.now();function step(t){const p=Math.min(1,(t-t0)/dur);const e=1-Math.pow(1-p,3);el.textContent=Math.round(to*e);if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
 
 /* ===================== BOOT ===================== */
 window.addEventListener("load",()=>{ if(localStorage.getItem("driveiq.ack")){document.getElementById("gate").style.display="none";boot();} });
