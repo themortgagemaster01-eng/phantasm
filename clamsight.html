@@ -166,6 +166,25 @@ a{color:var(--teal);text-decoration:none}
 .vf-chips{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;gap:8px;z-index:3}
 .vf-chip{background:rgba(6,35,31,.62);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11.5px;font-weight:700;padding:7px 13px;border-radius:20px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);cursor:pointer}
 .vf-chip.on{background:var(--teal);border-color:var(--teal)}
+
+/* tide timer */
+.spin{width:30px;height:30px;border:3px solid var(--line2);border-top-color:var(--teal);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tide-card{padding:16px}
+.tide-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.tide-loc{font-size:12.5px;font-weight:700;color:var(--ink2);display:flex;align-items:center;gap:7px;min-width:0}
+.tide-loc i{color:var(--teal);flex:none}
+.tide-loc span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tide-chg{font-size:11px;color:var(--teal);font-weight:700;background:none;border:none;cursor:pointer;flex:none}
+.tide-next{display:flex;align-items:center;gap:13px}
+.tide-ic{width:46px;height:46px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--teal-soft);color:var(--teal)}
+.tide-big{font-size:19px;font-weight:600;font-family:"Fraunces",serif;line-height:1.1}
+.tide-sub{font-size:12px;color:var(--mut);margin-top:2px}
+.tide-sched{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}
+.tide-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:6px 10px;border-radius:20px}
+.tide-pill.lowt{background:#e3f5ea;color:#1f8a4d}
+.tide-pill.hight{background:#e7eef7;color:#2c6e9e}
+.tide-pill.now{box-shadow:0 0 0 2px var(--teal)}
 </style>
 </head>
 <body>
@@ -208,6 +227,7 @@ a{color:var(--teal);text-decoration:none}
         <div class="muted" style="margin-bottom:14px">Use your camera to scan the wet sand for siphon holes and movement.</div>
         <button class="btn primary" onclick="go('identify')"><i class="fa-solid fa-camera"></i> Start scanning</button>
       </div>
+      <div class="card tide-card" id="tide-card" style="margin-top:14px"></div>
       <div class="qgrid">
         <button class="qcard" onclick="go('identify')"><div class="ic"><i class="fa-solid fa-location-crosshairs"></i></div><div class="qt">Scan sand</div><div class="qd">Find holes &amp; movement</div></button>
         <button class="qcard" onclick="openLog()"><div class="ic"><i class="fa-solid fa-plus"></i></div><div class="qt">Log a haul</div><div class="qd">Record today's catch</div></button>
@@ -348,10 +368,13 @@ function go(s){
 let ack=false;
 function toggleAck(){ack=!ack;document.getElementById("gcheck").classList.toggle("on",ack);document.getElementById("gate-btn").style.opacity=ack?"1":".5";}
 function acknowledge(){ if(!ack){flash("Please confirm to continue");return;} S.ack=true;save();localStorage.setItem("clamsight.ack","1");document.getElementById("gate").style.display="none";boot(); }
-function boot(){ document.getElementById("app").style.visibility="visible"; const h=new Date().getHours(); document.getElementById("greet").textContent=h<11?"Morning tide, morning dig.":h<17?"Good day for a dig.":"Evening flats are calling."; renderHome(); renderSpecies(); renderIdPick(); }
+function boot(){ document.getElementById("app").style.visibility="visible"; const h=new Date().getHours(); document.getElementById("greet").textContent=h<11?"Morning tide, morning dig.":h<17?"Good day for a dig.":"Evening flats are calling."; renderHome(); renderSpecies(); renderIdPick();
+  if(S.tide)loadTide();
+  if(!window._tideInt)window._tideInt=setInterval(()=>{ if(tidePreds&&document.getElementById("screen-home").classList.contains("active"))drawTide(); },30000); }
 
 /* ===================== HOME / LOG LIST ===================== */
 function renderHome(){
+  renderTide();
   const el=document.getElementById("home-recent"); if(!el)return;
   if(!S.sessions.length){el.innerHTML=`<div class="muted" style="padding:4px 2px">No sessions yet. Tap <b>Log a haul</b> after your next dig.</div>`;return;}
   el.innerHTML=S.sessions.slice(0,3).map(sessionRow).join("");
@@ -590,6 +613,70 @@ function bragReport(id){
     <img src="${url}" style="width:100%;border-radius:16px;border:1px solid var(--line2)"/>
     <a class="btn primary" style="margin-top:14px" href="${url}" download="clamsight-haul-${s.date}.png"><i class="fa-solid fa-download"></i> Save image</a>
     <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
+}
+
+/* ===================== TIDE TIMER (NOAA CO-OPS, real predictions) ===================== */
+const STATIONS=[
+  {id:"8469549",n:"Cos Cob / Greenwich",la:41.017,lo:-73.597},
+  {id:"8467726",n:"Southport",la:41.133,lo:-73.283},
+  {id:"8467150",n:"Bridgeport",la:41.176,lo:-73.184},
+  {id:"8465705",n:"New Haven",la:41.283,lo:-72.908},
+  {id:"8463701",n:"Clinton Harbor",la:41.268,lo:-72.532},
+  {id:"8461490",n:"New London",la:41.372,lo:-72.096},
+  {id:"8458694",n:"Watch Hill Point",la:41.305,lo:-71.860},
+  {id:"8516945",n:"Kings Point",la:40.810,lo:-73.765},
+  {id:"8514560",n:"Port Jefferson",la:40.950,lo:-73.077},
+  {id:"8512668",n:"Mattituck Inlet",la:41.015,lo:-72.562},
+  {id:"8512114",n:"Southold",la:41.060,lo:-72.413},
+  {id:"8510560",n:"Montauk",la:41.048,lo:-71.959},
+  {id:"8516881",n:"Atlantic Beach (Rockaway)",la:40.595,lo:-73.743}
+];
+let tidePreds=null;
+function _d2(a,b,c,d){const dy=a-c,dx=(b-d)*Math.cos(a*Math.PI/180);return dy*dy+dx*dx;}
+function nearestStation(la,lo){let best=STATIONS[0],bd=1e9;for(const s of STATIONS){const d=_d2(la,lo,s.la,s.lo);if(d<bd){bd=d;best=s;}}return best;}
+function fmtTime(d){return d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});}
+function ymd(d){return ""+d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");}
+function locateTide(){
+  if(!navigator.geolocation){pickStation();return;}
+  flash("Getting your location…");
+  navigator.geolocation.getCurrentPosition(
+    p=>{ const s=nearestStation(p.coords.latitude,p.coords.longitude); S.tide={id:s.id,name:s.n}; save(); loadTide(); },
+    e=>{ flash("Couldn't get location — pick a spot."); pickStation(); }, {timeout:9000,maximumAge:600000});
+}
+function pickStation(){
+  sheet(`<div class="grab"></div><h3>Pick your tide spot</h3><p class="muted" style="margin:6px 0 12px">Choose the NOAA station nearest where you'll be clamming.</p>${STATIONS.map(s=>`<button class="row" onclick="setStation('${s.id}',&quot;${s.n}&quot;)"><div class="ic"><i class="fa-solid fa-location-dot"></i></div><div class="meta"><div class="t">${s.n}</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`).join("")}`);
+}
+function setStation(id,n){ S.tide={id,name:n}; save(); closeSheet(); loadTide(); }
+function changeTide(){ pickStation(); }
+function renderTide(){
+  const el=document.getElementById("tide-card"); if(!el)return;
+  const st=S.tide;
+  if(!st){ el.innerHTML=`<div class="tide-loc" style="margin-bottom:8px"><i class="fa-solid fa-water"></i> Tide timer</div><div class="muted" style="margin-bottom:13px">See the next high &amp; low tide for your spot — clamming is best around <b>low tide</b>.</div><button class="btn primary" onclick="locateTide()"><i class="fa-solid fa-location-crosshairs"></i> Use my location</button><button class="btn ghost" style="margin-top:9px" onclick="pickStation()">Pick a spot manually</button>`; return; }
+  if(!tidePreds){ el.innerHTML=`<div class="tide-top"><div class="tide-loc"><i class="fa-solid fa-water"></i> <span>${esc(st.name)}</span></div><button class="tide-chg" onclick="changeTide()">Change</button></div><div style="text-align:center;padding:14px 0"><div class="spin"></div><div class="tiny" style="margin-top:8px">Loading tides…</div></div>`; return; }
+  drawTide();
+}
+async function loadTide(){
+  tidePreds=null; renderTide();
+  const st=S.tide; if(!st)return;
+  const now=new Date(), end=new Date(now.getTime()+2*864e5);
+  const u=`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=ClamSight&begin_date=${ymd(now)}&end_date=${ymd(end)}&datum=MLLW&station=${st.id}&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+  try{ const r=await fetch(u); const j=await r.json(); tidePreds=(j.predictions||[]).map(p=>({t:new Date(p.t.replace(" ","T")),type:p.type,v:+p.v})); }
+  catch(e){ tidePreds=[]; }
+  drawTide();
+}
+function drawTide(){
+  const el=document.getElementById("tide-card"); if(!el)return; const st=S.tide; if(!st)return;
+  if(!tidePreds||!tidePreds.length){ el.innerHTML=`<div class="tide-top"><div class="tide-loc"><i class="fa-solid fa-water"></i> <span>${esc(st.name)}</span></div><button class="tide-chg" onclick="changeTide()">Change</button></div><div class="muted" style="margin-bottom:10px">Couldn't load tides right now.</div><button class="btn ghost" onclick="loadTide()"><i class="fa-solid fa-rotate"></i> Retry</button>`; return; }
+  const now=new Date(), next=tidePreds.find(p=>p.t>now), todays=tidePreds.filter(p=>p.t.toDateString()===now.toDateString());
+  let body;
+  if(next){ const ms=next.t-now,h=Math.floor(ms/3.6e6),m=Math.floor((ms%3.6e6)/6e4),low=next.type==="L";
+    body=`<div class="tide-next"><div class="tide-ic"><i class="fa-solid ${low?'fa-arrow-down-long':'fa-arrow-up-long'}"></i></div><div><div class="tide-big">${low?'Low':'High'} tide in ${h>0?h+'h ':''}${m}m</div><div class="tide-sub">at ${fmtTime(next.t)} · ${next.v.toFixed(1)} ft${low?' · good digging':''}</div></div></div>`;
+  } else body=`<div class="muted">No more tide changes today.</div>`;
+  const sched=todays.map(p=>`<span class="tide-pill ${p.type==='L'?'lowt':'hight'}${p===next?' now':''}"><i class="fa-solid ${p.type==='L'?'fa-arrow-down':'fa-arrow-up'}"></i>${fmtTime(p.t)}</span>`).join("");
+  el.innerHTML=`<div class="tide-top"><div class="tide-loc"><i class="fa-solid fa-water"></i> <span>${esc(st.name)}</span></div><button class="tide-chg" onclick="changeTide()">Change</button></div>
+    ${body}
+    <div class="tide-sched">${sched}</div>
+    <div class="tiny" style="margin-top:10px">Best clamming is around <b>low tide</b>, when the flats are exposed. Predictions from <b>NOAA</b> for the nearest station — your exact spot may vary a little.</div>`;
 }
 
 /* ===================== SHEETS / UTIL ===================== */
