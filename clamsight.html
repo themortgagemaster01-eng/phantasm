@@ -256,6 +256,10 @@ h1.h,.section-h,.tide-big,.am-title,.gfeat-name,.spec-hero h3,.sheet h3,.am-feat
 .istep .it b{color:var(--ink);font-size:14.5px}
 .istep .it div{font-size:13px;line-height:1.45;color:var(--ink2);margin-top:2px}
 .intro-creed{font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin-bottom:18px}
+/* home: keep the hero photo at top, soft sand veil below so text reads */
+#screen-home .scroll{background:linear-gradient(to bottom, transparent 0, transparent 300px, rgba(244,241,234,.5) 480px, rgba(244,241,234,.86) 740px)}
+#screen-home .section-h{color:var(--ink)}
+#screen-home .muted{color:var(--ink2)}
 </style>
 </head>
 <body>
@@ -435,14 +439,14 @@ h1.h,.section-h,.tide-big,.am-title,.gfeat-name,.spec-hero h3,.sheet h3,.am-feat
 "use strict";
 /* ===================== DATA ===================== */
 const SPECIES={
-  quahog:{name:"Hard Clam (Quahog)",sci:"Mercenaria mercenaria",icon:"fa-circle",tag:"The classic",
+  quahog:{name:"Hard Clam (Quahog)",sci:"Mercenaria mercenaria",icon:"fa-circle",tag:"The classic",img:"clam_quahog.jpg",
     id:["Thick, heavy off-white shell","Concentric growth rings","Purple stain inside the rim","Rounded, slightly triangular"],
     ny:"1 in. thick across the hinge",ct:"1 in. thick (or won't pass a 1.5 in. ring)",
     grades:[["Littleneck","≈1–2 in","Best raw on the half shell"],["Topneck","≈2 in","Raw or grilled"],["Cherrystone","≈2.5–3 in","Grilled, stuffed"],["Chowder","3 in+","Chowder &amp; sauce"]],
     habitat:"Sandy-mud bottoms, intertidal out to ~30 ft",
     find:"Tread barefoot or rake the sandy mud at low tide — feel for the hard 'click'.",
     eat:"Littlenecks raw; bigger ones for chowder, stuffies, or the grill."},
-  cherrystone:{name:"Cherrystone",sci:"Mercenaria mercenaria",icon:"fa-circle-dot",tag:"A quahog size grade",
+  cherrystone:{name:"Cherrystone",sci:"Mercenaria mercenaria",icon:"fa-circle-dot",tag:"A quahog size grade",img:"clam_quahog.jpg",
     id:["A hard clam — same animal as the quahog","Mid-size: roughly 2.5–3 in across","Thick shell, concentric rings","Purple interior margin"],
     ny:"Legal (over the 1 in. hinge minimum)",ct:"Legal (over 1 in. / 1.5 in. ring)",
     note:"\"Cherrystone\" isn't a separate species — it's a market size of the hard clam, bigger than a littleneck and smaller than a chowder.",
@@ -641,11 +645,12 @@ function tapDetection(id){ const d=detections.find(x=>x.id===id);
 /* ===================== SPECIES ===================== */
 function renderSpecies(){
   const el=document.getElementById("species-list"); if(!el)return;
-  el.innerHTML=SPEC_ORDER.map(k=>{const s=SPECIES[k];return `<button class="row" onclick="speciesSheet('${k}')"><div class="ic"><i class="fa-solid ${s.icon}"></i></div><div class="meta"><div class="t">${s.name}</div><div class="s">${s.tag} · legal ${s.ny.split(" (")[0]}</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`;}).join("");
+  el.innerHTML=SPEC_ORDER.map(k=>{const s=SPECIES[k];return `<button class="row" onclick="speciesSheet('${k}')"><div class="ic" style="${s.img?'overflow:hidden;padding:0':''}">${s.img?`<img src="${s.img}" alt="" style="width:100%;height:100%;object-fit:cover"/>`:`<i class="fa-solid ${s.icon}"></i>`}</div><div class="meta"><div class="t">${s.name}</div><div class="s">${s.tag} · legal ${s.ny.split(" (")[0]}</div></div><i class="fa-solid fa-chevron-right chev"></i></button>`;}).join("");
 }
 function speciesSheet(k){
   const s=SPECIES[k];
   sheet(`<div class="grab"></div>
+    ${s.img?`<img src="${s.img}" alt="" style="width:100%;height:190px;object-fit:cover;border-radius:18px;margin-bottom:12px"/>`:""}
     <div class="spec-hero"><div class="si"><i class="fa-solid ${s.icon}"></i></div><h3>${s.name}</h3><div class="sci">${s.sci}</div></div>
     ${s.note?`<div class="disc" style="margin-top:0;margin-bottom:14px"><i class="fa-solid fa-circle-info"></i><div>${s.note}</div></div>`:""}
     <div class="section-h" style="margin-top:0">How to ID it</div>
