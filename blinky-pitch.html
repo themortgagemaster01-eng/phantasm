@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blinky & The Mystery Garage — Series Pitch</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#06080f; --bg2:#0a0e1a; --panel:rgba(255,255,255,.04); --line:rgba(120,180,255,.14);
+  --cyan:#38e8ff; --amber:#ffb14e; --gold:#ffd877; --purple:#9b8cff; --ink:#eaf2ff; --mut:#9fb0cc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+section{padding:90px 0;position:relative}
+.display{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-.02em}
+.serif{font-family:'Fraunces',serif}
+.eyebrow{font-family:'Space Grotesk';text-transform:uppercase;letter-spacing:.32em;font-size:.72rem;color:var(--cyan);font-weight:600}
+.glow{text-shadow:0 0 24px rgba(56,232,255,.45)}
+.mut{color:var(--mut)}
+.amber{color:var(--amber)} .cyan{color:var(--cyan)} .gold{color:var(--gold)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;
+  background:
+   radial-gradient(900px 500px at 50% 18%, rgba(56,232,255,.16), transparent 60%),
+   radial-gradient(700px 500px at 80% 90%, rgba(255,177,78,.12), transparent 60%),
+   radial-gradient(700px 500px at 12% 80%, rgba(155,140,255,.12), transparent 60%),
+   var(--bg);
+  overflow:hidden}
+.hero .scene{position:absolute;inset:0;z-index:0;opacity:.9}
+.hero .content{position:relative;z-index:2;padding:40px 0}
+.kicker{display:inline-block;border:1px solid var(--line);background:var(--panel);border-radius:999px;
+  padding:8px 18px;font-family:'Space Grotesk';font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:26px}
+.hero h1{font-size:clamp(2.7rem,8vw,5.6rem);line-height:.95;font-weight:800}
+.hero h1 .l2{display:block;background:linear-gradient(100deg,var(--cyan),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .tag{font-family:'Fraunces',serif;font-size:clamp(1.1rem,2.6vw,1.6rem);color:var(--ink);margin-top:22px;font-weight:600}
+.hero .sub{color:var(--mut);max-width:620px;margin:18px auto 0;font-size:1.02rem}
+.meta{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:34px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 16px;font-size:.82rem;color:var(--mut);font-family:'Space Grotesk'}
+.chip b{color:var(--ink);font-weight:600}
+.scrollcue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--mut);font-size:.74rem;letter-spacing:.2em;z-index:3;font-family:'Space Grotesk'}
+
+h2.sh{font-size:clamp(1.8rem,4.4vw,3rem);font-weight:800;line-height:1.04;margin:10px 0 8px}
+.lead{font-size:1.12rem;color:var(--mut);max-width:760px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);border:0;margin:0}
+
+.grid{display:grid;gap:20px}
+.g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:780px){.g2,.g3{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid var(--line);
+  border-radius:20px;padding:26px;backdrop-filter:blur(12px);transition:.3s}
+.card:hover{transform:translateY(-4px);border-color:rgba(56,232,255,.35);box-shadow:0 20px 50px -20px rgba(56,232,255,.25)}
+.card h3{font-family:'Space Grotesk';font-size:1.18rem;margin-bottom:8px}
+.card p{color:var(--mut);font-size:.96rem}
+.thesis{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.5rem,4vw,2.4rem);line-height:1.25;max-width:880px}
+.thesis .hl{background:linear-gradient(100deg,var(--cyan),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* character */
+.char{display:grid;grid-template-columns:200px 1fr;gap:26px;align-items:center}
+@media(max-width:640px){.char{grid-template-columns:1fr;text-align:center}.char .art{margin:0 auto}}
+.art{width:200px;height:200px;border-radius:24px;border:1px solid var(--line);
+  background:radial-gradient(circle at 50% 40%,rgba(56,232,255,.12),rgba(10,14,26,.6));display:flex;align-items:center;justify-content:center}
+.tagrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.mini{font-size:.74rem;font-family:'Space Grotesk';color:var(--cyan);border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+
+/* episodes */
+.ep{display:grid;grid-template-columns:64px 1fr auto;gap:18px;align-items:center;border:1px solid var(--line);
+  border-radius:18px;padding:20px 22px;background:var(--panel);margin-bottom:14px;transition:.25s}
+.ep:hover{border-color:rgba(255,177,78,.4);transform:translateX(4px)}
+.epn{font-family:'Space Grotesk';font-weight:700;font-size:1.5rem;color:var(--gold);text-align:center}
+.ep h4{font-family:'Space Grotesk';font-size:1.12rem}
+.ep p{color:var(--mut);font-size:.92rem;margin-top:3px}
+.lesson{font-size:.76rem;color:var(--cyan);font-family:'Space Grotesk';white-space:nowrap}
+@media(max-width:640px){.ep{grid-template-columns:48px 1fr}.lesson{display:none}}
+
+/* swatches */
+.sw{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+.swat{width:96px}
+.swat .b{height:64px;border-radius:14px;border:1px solid var(--line)}
+.swat small{display:block;margin-top:8px;color:var(--mut);font-size:.74rem;font-family:'Space Grotesk'}
+
+/* table */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:780px){.tiers{grid-template-columns:1fr}}
+.tier{border:1px solid var(--line);border-radius:20px;padding:26px;background:var(--panel)}
+.tier.feat{border-color:rgba(56,232,255,.4);box-shadow:0 0 40px -16px rgba(56,232,255,.4)}
+.tier .lvl{font-family:'Space Grotesk';color:var(--cyan);font-size:.78rem;letter-spacing:.2em;text-transform:uppercase}
+.tier .cost{font-family:'Space Grotesk';font-weight:700;font-size:1.7rem;margin:10px 0}
+.tier ul{list-style:none;margin-top:10px}
+.tier li{color:var(--mut);font-size:.92rem;padding:6px 0;border-top:1px solid rgba(255,255,255,.05)}
+.tier li::before{content:'›';color:var(--cyan);margin-right:8px}
+
+.note{border-left:3px solid var(--amber);background:rgba(255,177,78,.06);border-radius:0 14px 14px 0;padding:18px 22px;color:var(--mut);font-size:.96rem}
+.note b{color:var(--amber)}
+
+.ask{background:
+  radial-gradient(700px 400px at 50% 0%, rgba(255,216,119,.14), transparent 60%),
+  linear-gradient(180deg,rgba(255,255,255,.04),transparent);
+  border:1px solid var(--line);border-radius:28px;padding:54px 40px;text-align:center}
+.cta{display:inline-block;margin-top:18px;font-family:'Space Grotesk';font-weight:600;background:linear-gradient(100deg,var(--cyan),var(--gold));
+  color:#06080f;padding:14px 30px;border-radius:999px;text-decoration:none}
+footer{padding:50px 0;text-align:center;color:var(--mut);font-size:.84rem;border-top:1px solid var(--line)}
+.promptbox{font-family:'Space Grotesk';font-size:.78rem;color:var(--mut);background:rgba(0,0,0,.35);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;margin-top:14px;line-height:1.5}
+.promptbox b{color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <svg class="scene" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="gsign" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#38e8ff" stop-opacity=".5"/><stop offset="100%" stop-color="#38e8ff" stop-opacity="0"/></radialGradient>
+      <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1224"/><stop offset="100%" stop-color="#05070e"/></linearGradient>
+    </defs>
+    <rect width="1200" height="800" fill="#05070e"/>
+    <!-- rain streaks -->
+    <g stroke="#2a6fff" stroke-opacity=".10" stroke-width="2">
+      <line x1="120" y1="0" x2="90" y2="120"/><line x1="320" y1="0" x2="290" y2="140"/><line x1="560" y1="0" x2="530" y2="120"/>
+      <line x1="820" y1="0" x2="790" y2="150"/><line x1="1040" y1="0" x2="1010" y2="130"/><line x1="980" y1="0" x2="950" y2="120"/>
+      <line x1="220" y1="0" x2="190" y2="120"/><line x1="700" y1="0" x2="675" y2="130"/>
+    </g>
+    <!-- garage glow -->
+    <ellipse cx="600" cy="330" rx="520" ry="280" fill="url(#gsign)"/>
+    <!-- garage building -->
+    <rect x="300" y="250" width="600" height="320" rx="14" fill="#0c1430" stroke="#244" stroke-opacity=".4"/>
+    <rect x="345" y="320" width="510" height="250" rx="10" fill="#0a1024"/>
+    <!-- neon sign -->
+    <rect x="430" y="270" width="340" height="44" rx="22" fill="none" stroke="#38e8ff" stroke-width="3" stroke-opacity=".9"/>
+    <text x="600" y="300" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="22" letter-spacing="4" fill="#bff4ff">MYSTERY GARAGE</text>
+    <!-- ghost bus silhouette -->
+    <g opacity=".85">
+      <rect x="470" y="430" width="260" height="110" rx="20" fill="#1b2b1a" stroke="#ffd877" stroke-opacity=".5"/>
+      <rect x="490" y="450" width="50" height="40" rx="6" fill="#0a1408" stroke="#9fe6ff" stroke-opacity=".4"/>
+      <rect x="555" y="450" width="50" height="40" rx="6" fill="#0a1408" stroke="#9fe6ff" stroke-opacity=".4"/>
+      <rect x="620" y="450" width="50" height="40" rx="6" fill="#0a1408" stroke="#9fe6ff" stroke-opacity=".4"/>
+      <circle cx="500" cy="545" r="16" fill="#0b0b0b" stroke="#444"/><circle cx="700" cy="545" r="16" fill="#0b0b0b" stroke="#444"/>
+      <circle cx="488" cy="520" r="7" fill="#ffe9a8"/><circle cx="712" cy="520" r="7" fill="#ffe9a8"/>
+    </g>
+    <!-- Blinky -->
+    <g transform="translate(880,360)">
+      <circle r="46" fill="#0e1830"/>
+      <circle r="40" fill="#f3f8ff"/><circle r="40" fill="none" stroke="#38e8ff" stroke-width="2" stroke-opacity=".7"/>
+      <circle r="18" fill="#0a1430"/><circle r="13" fill="#38e8ff"/><circle r="5" cx="-4" cy="-4" fill="#eafdff"/>
+      <ellipse cx="0" cy="48" rx="22" ry="7" fill="#38e8ff" opacity=".25"/>
+    </g>
+    <!-- fog -->
+    <rect x="0" y="540" width="1200" height="260" fill="url(#floor)"/>
+    <ellipse cx="600" cy="560" rx="640" ry="60" fill="#9fb0cc" opacity=".07"/>
+  </svg>
+  <div class="content wrap">
+    <span class="kicker">Original Animated Series · Ages 4–10</span>
+    <h1 class="display">BLINKY<span class="l2">& THE MYSTERY GARAGE</span></h1>
+    <p class="tag serif">Where every broken thing has a story… and a feeling.</p>
+    <p class="sub">A heartfelt animated adventure-comedy about a boy mechanic, his witty robot, and the magical, mysterious vehicles that roll into their garage — because sometimes the problem isn't broken parts. It's feelings.</p>
+    <div class="meta">
+      <span class="chip"><b>Format</b> · 20-min episodes + Shorts</span>
+      <span class="chip"><b>Genre</b> · Adventure · Comedy · Gentle mystery</span>
+      <span class="chip"><b>Platform</b> · YouTube Kids → streaming</span>
+    </div>
+  </div>
+  <div class="scrollcue">scroll ↓</div>
+</header>
+
+<!-- THESIS -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">The Heart of the Show</span>
+    <p class="thesis">Every episode, a strange vehicle arrives with a problem that <span class="hl">looks mechanical</span> — but the real fix is always emotional. <span class="hl">Blinky & The Mystery Garage</span> teaches kids to look past the surface and ask the kindest question: <em>"How are you really feeling?"</em></p>
+    <div class="grid g3" style="margin-top:40px">
+      <div class="card"><h3>💙 Pixar-style heart</h3><p>Real emotion — loneliness, courage, big feelings, kindness — wrapped in warmth a 4-year-old understands and a parent feels.</p></div>
+      <div class="card"><h3>😄 Funny for kids</h3><p>Blinky's deadpan robot humor and silly vehicle antics keep it light, rewatchable, and quotable.</p></div>
+      <div class="card"><h3>✨ Gentle wonder</h3><p>Ghost buses, flying ships, friendly aliens — soft, glowing, never scary. A signature "cozy magic" tone that's safe for YouTube Kids.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"><!-- CHARACTERS -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">The Cast</span>
+    <h2 class="sh display">Two friends. One impossible garage.</h2>
+    <div style="display:flex;flex-direction:column;gap:34px;margin-top:36px">
+      <!-- MAX -->
+      <div class="char">
+        <div class="art">
+          <svg width="150" height="150" viewBox="0 0 150 150">
+            <circle cx="75" cy="78" r="46" fill="#e8b48a"/>
+            <path d="M30 60 Q75 8 120 60 Q120 38 75 30 Q30 38 30 60Z" fill="#2b2118"/>
+            <circle cx="60" cy="74" r="7" fill="#1a1a1a"/><circle cx="90" cy="74" r="7" fill="#1a1a1a"/>
+            <circle cx="62" cy="72" r="2.4" fill="#fff"/><circle cx="92" cy="72" r="2.4" fill="#fff"/>
+            <path d="M60 96 Q75 108 90 96" stroke="#7a4a2a" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M40 118 Q75 130 110 118 L112 150 L38 150 Z" fill="#2f6df0"/>
+            <rect x="58" y="116" width="34" height="22" rx="4" fill="#ff7a2f"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="display" style="font-size:1.5rem">MAX <span class="mut" style="font-size:1rem">· 8 · the heart</span></h3>
+          <p class="mut">A kind, curious boy mechanic who'd rather understand a problem than just fix it. He believes anything broken can be helped — you just have to listen first. Brave, gentle, a little goofy. His catchphrase: <span class="cyan">"Still counts."</span></p>
+          <div class="tagrow"><span class="mini">empathetic</span><span class="mini">curious</span><span class="mini">brave</span><span class="mini">kid-relatable</span></div>
+          <div class="promptbox"><b>Character-render prompt:</b> Pixar-quality 3D kid mechanic, warm brown skin, messy dark hair, big friendly eyes, blue hoodie + orange mechanic's vest, expressive, front/side/3-quarter turnaround + happy/curious/teary expressions, neutral studio light, character sheet.</div>
+        </div>
+      </div>
+      <!-- BLINKY -->
+      <div class="char">
+        <div class="art">
+          <svg width="150" height="150" viewBox="0 0 150 150">
+            <ellipse cx="75" cy="120" rx="40" ry="10" fill="#38e8ff" opacity=".25"/>
+            <circle cx="75" cy="70" r="50" fill="#0e1830"/>
+            <circle cx="75" cy="70" r="44" fill="#f3f8ff"/><circle cx="75" cy="70" r="44" fill="none" stroke="#38e8ff" stroke-width="3" stroke-opacity=".8"/>
+            <circle cx="75" cy="70" r="22" fill="#0a1430"/><circle cx="75" cy="70" r="16" fill="#38e8ff"/><circle cx="69" cy="64" r="6" fill="#eafdff"/>
+            <rect x="48" y="112" width="12" height="14" rx="4" fill="#cfe6ff"/><rect x="90" y="112" width="12" height="14" rx="4" fill="#cfe6ff"/>
+            <circle cx="54" cy="128" r="5" fill="#38e8ff"/><circle cx="96" cy="128" r="5" fill="#38e8ff"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="display" style="font-size:1.5rem">BLINKY <span class="mut" style="font-size:1rem">· the brains (& the laughs)</span></h3>
+          <p class="mut">A floating helper robot with a giant glowing eye, holographic scanners, and a perfectly deadpan sense of humor. He reads machines like an engineer — but his real superpower is a hidden scanner that detects <span class="gold">feelings.</span> Running gag: announcing oddly specific percentages ("You are 91% messy.").</p>
+          <div class="tagrow"><span class="mini">witty</span><span class="mini">loyal</span><span class="mini">merch-ready</span><span class="mini">scene-stealer</span></div>
+          <div class="promptbox"><b>Character-render prompt:</b> Pixar-quality floating helper robot, soccer-ball size, smooth white-and-blue rounded body, one big glowing cyan eye-lens, tiny hover thrusters, projects light-blue holograms, cute + expressive, turnaround + emotions sheet, soft studio light.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:30px"><b>Supporting world:</b> the Mystery Garage itself (a character — neon sign, floating tools, cozy magic), plus a growing family of rescued vehicles who return to help: the Ghost Bus, the Pirate Ship, the Baby Dragon, the lost Aliens, and the Ice-Cream Truck.</div>
+  </div>
+</section>
+
+<hr class="divider"><!-- PILOT -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Pilot · Episode 1</span>
+    <h2 class="sh display">"The Ghost Bus with the Humming Engine"</h2>
+    <p class="lead">A glowing, empty school bus rolls in at midnight, its engine humming a sad tune and the words <span class="gold">"HELP ME"</span> on its windshield. Every system scans perfectly — so why won't it run?</p>
+    <div class="grid g2" style="margin-top:30px">
+      <div class="card"><h3 class="cyan">The mystery</h3><p>Blinky's scans say the bus is mechanically flawless. The real reading: overwhelming <em>sadness.</em> "That's not a car problem," Max realizes. "That's a heart problem."</p></div>
+      <div class="card"><h3 class="cyan">The turn</h3><p>A memory-scan reveals the bus once carried laughing children every day — until the route went quiet. The bus isn't broken. It's <span class="gold">lonely.</span></p></div>
+      <div class="card"><h3 class="cyan">The fix</h3><p>Max cleans it, lights it up, and plays back the children's laughter. The hum brightens — and the happy spirits of the kids gently return to say one last, grateful goodbye.</p></div>
+      <div class="card"><h3 class="cyan">The payoff</h3><p>"HELP ME" fades to <span class="gold">"THANK YOU."</span> The bus rolls into the mist at peace. Then: a new alert — <em>"UNKNOWN: FLYING PIRATE SHIP."</em> The adventure continues.</p></div>
+    </div>
+    <p class="mut" style="margin-top:20px;font-size:.92rem">A complete shot-by-shot Picsart production breakdown (34 shots) accompanies this deck.</p>
+  </div>
+</section>
+
+<hr class="divider"><!-- SEASON SLATE -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Season One</span>
+    <h2 class="sh display">A vehicle. A feeling. A lesson.</h2>
+    <p class="lead">Each episode is self-contained and emotionally complete — built for binge-ability and a season-long thread of rescued friends who come back to help.</p>
+    <div style="margin-top:34px">
+      <div class="ep"><div class="epn">01</div><div><h4>The Ghost Bus with the Humming Engine</h4><p>An empty, glowing school bus that's not broken — it's lonely.</p></div><div class="lesson">Loneliness & memory</div></div>
+      <div class="ep"><div class="epn">02</div><div><h4>The Pirate Ship That Forgot to Fly</h4><p>A flying ship grounded not by broken sails, but by lost courage.</p></div><div class="lesson">Bravery after a fall</div></div>
+      <div class="ep"><div class="epn">03</div><div><h4>The Dragon Who Ran Too Hot</h4><p>A baby dragon whose scooter overheats because his big feelings do too.</p></div><div class="lesson">Big feelings & calm</div></div>
+      <div class="ep"><div class="epn">04</div><div><h4>The Aliens Who Were Just Lost</h4><p>A "scary" UFO invasion that's really three tiny aliens, lost and afraid.</p></div><div class="lesson">Don't judge · empathy</div></div>
+      <div class="ep"><div class="epn">05</div><div><h4>The Ice-Cream Truck With the Frozen Heart</h4><p>A truck that freezes everything because it felt forgotten.</p></div><div class="lesson">Kindness melts loneliness</div></div>
+    </div>
+    <div class="note" style="margin-top:22px"><b>Season finale hook:</b> every rescued vehicle pings the garage at once — they've all come back, because now <em>the garage</em> needs help. Built-in season arc + merch ensemble.</div>
+  </div>
+</section>
+
+<hr class="divider"><!-- VISUAL STYLE -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Look & Tone</span>
+    <h2 class="sh display">Cozy magic, cinematic warmth.</h2>
+    <p class="lead">Pixar-style 3D warmth meets soft cinematic neon. A nighttime garage glowing against the rain — premium, dreamy, and safe. The color does the emotional storytelling.</p>
+    <div class="grid g2" style="margin-top:30px">
+      <div class="card">
+        <h3>Color language</h3>
+        <p>Sadness and loneliness read <span class="cyan">cool blue</span>. Healing, love, and resolution bloom into <span class="gold">warm gold</span>. Kids feel the turn before they hear it.</p>
+        <div class="sw">
+          <div class="swat"><div class="b" style="background:#06080f"></div><small>Night #06080F</small></div>
+          <div class="swat"><div class="b" style="background:linear-gradient(180deg,#38e8ff,#1aa6c9)"></div><small>Blinky cyan</small></div>
+          <div class="swat"><div class="b" style="background:linear-gradient(180deg,#ffd877,#ffb14e)"></div><small>Magic gold</small></div>
+          <div class="swat"><div class="b" style="background:linear-gradient(180deg,#9b8cff,#5b4bd6)"></div><small>Mystery violet</small></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Cinematic toolkit</h3>
+        <p>Soft volumetric light, shallow depth of field, gentle camera moves (slow push-ins, parallax), glossy rounded shapes, big expressive eyes, rain-and-fog atmosphere. Every "scary" element is rendered soft and friendly.</p>
+        <div class="promptbox"><b>Key-art prompt:</b> Pixar-quality 3D, cozy neon garage at night in the rain, glowing "Mystery Garage" sign, floating tools, a soft glowing ghost bus in the fog, a boy mechanic and a small blue robot, warm amber + cool cyan, cinematic volumetric light, heartwarming, 4–10 audience.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"><!-- AUDIENCE / MARKET -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Audience & Market</span>
+    <h2 class="sh display">A proven, hungry lane.</h2>
+    <div class="grid g3" style="margin-top:30px">
+      <div class="card"><h3 class="gold">High rewatch</h3><p>Ages 4–10 rewatch emotionally satisfying, gently funny stories endlessly — the exact behavior YouTube Kids rewards.</p></div>
+      <div class="card"><h3 class="gold">Parent-safe</h3><p>Kindness, empathy, and emotional literacy are what parents actively search for and trust. No scares, no chaos.</p></div>
+      <div class="card"><h3 class="gold">Format-flexible</h3><p>Full 20-min episodes for watch-time + 45–60s Shorts (song clips, "the moment") for discovery. One world, two funnels.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"><!-- PRODUCTION -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">How It Gets Made</span>
+    <h2 class="sh display">A realistic road to cinematic.</h2>
+    <p class="lead">Honest framing: today's AI video tools can deliver <em>premium AI-animated</em> kids content now — and this same bible is the blueprint a real animation studio would use to take it fully cinematic later. Three tiers:</p>
+    <div class="tiers" style="margin-top:30px">
+      <div class="tier">
+        <div class="lvl">Tier 1 · Now</div>
+        <div class="cost">AI-Assisted</div>
+        <ul>
+          <li>Picsart / Runway / Kling for shots</li>
+          <li>CapCut assembly + songs + captions</li>
+          <li>Consistency via locked character DNA</li>
+          <li>Cost: ~tool subscriptions only</li>
+          <li>Output: premium AI kids series, shippable this month</li>
+        </ul>
+      </div>
+      <div class="tier feat">
+        <div class="lvl">Tier 2 · Hybrid</div>
+        <div class="cost">AI + Artist</div>
+        <ul>
+          <li>Freelance 2D/3D artist for character model + key frames</li>
+          <li>AI for in-betweens, backgrounds, effects</li>
+          <li>Pro sound design + original music</li>
+          <li>Cost: ~$2k–$15k / episode</li>
+          <li>Output: consistent, polished, "broadcast-feeling"</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <div class="lvl">Tier 3 · Studio</div>
+        <div class="cost">Full Cinematic</div>
+        <ul>
+          <li>Animation studio, full pipeline</li>
+          <li>Voice cast, score, render</li>
+          <li>True Pixar/DreamWorks quality</li>
+          <li>Cost: $100k–$1M+ / episode</li>
+          <li>Output: streaming / theatrical grade</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note" style="margin-top:24px"><b>Recommendation:</b> Launch at <b>Tier 1</b> to prove the audience cheaply, post consistently, and build the channel + IP. Use the traction to fund <b>Tier 2</b>, and let breakout success open the door to <b>Tier 3</b>. The story, characters, and brand carry across all three — that's the asset.</div>
+  </div>
+</section>
+
+<hr class="divider"><!-- MONETIZATION -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">The Business</span>
+    <h2 class="sh display">Built to become a brand.</h2>
+    <div class="grid g3" style="margin-top:30px">
+      <div class="card"><h3>▶ Watch-time revenue</h3><p>YouTube ad revenue from 20-min episodes; Shorts feed discovery and subscribers back to the long-form.</p></div>
+      <div class="card"><h3>🧸 Merch</h3><p>Blinky plush, glow-in-the-dark garage playset, the Ghost Bus toy, character tees. Blinky is purpose-built to be the merch hero.</p></div>
+      <div class="card"><h3>🎵 Music & apps</h3><p>The theme + episode songs as a kids' music channel/playlists; sing-along Shorts; future story app.</p></div>
+      <div class="card"><h3>📺 Licensing</h3><p>Proven YouTube traction is the on-ramp to streaming/network pickup and brand licensing deals.</p></div>
+      <div class="card"><h3>🌍 Localization</h3><p>Largely visual + simple songs = easy dubbing into Spanish, Hindi, Portuguese for global reach.</p></div>
+      <div class="card"><h3>📚 Spin-offs</h3><p>Books, coloring pages, an interactive "fix-it" game — one IP, many doors.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"><!-- ASK -->
+<section>
+  <div class="wrap">
+    <div class="ask">
+      <span class="eyebrow">What's Next</span>
+      <h2 class="display glow" style="font-size:clamp(2rem,5vw,3.2rem);margin:14px 0">Let's build the garage.</h2>
+      <p class="lead" style="margin:0 auto">Pilot script ✓ · 5-episode shot breakdown ✓ · Brand + bible ✓. Next: produce the Episode 1 teaser, lock the look, and launch the channel — then iterate toward Tier 2.</p>
+      <a class="cta" href="#">Blinky & The Mystery Garage · Series Bible v2</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Blinky &amp; The Mystery Garage — Original Series Pitch · Created for Robert Castro · 2026<br>
+  <span style="opacity:.6">Concept art shown is stylized; final renders produced in animation production.</span>
+</footer>
+
+</body>
+</html>
