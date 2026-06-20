@@ -238,9 +238,44 @@ h1.h,.section-h,.tide-big,.am-title,.gfeat-name,.spec-hero h3,.sheet h3,.am-feat
 .scan-stage,.teach-cam{background:#121E21}
 .vf-chip.on{background:var(--neon);border-color:var(--neon);color:#062a2c}
 .scan-badge i{color:var(--neon)}
+
+/* first-run welcome / AI intro */
+#intro{position:absolute;inset:0;z-index:110;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:28px 20px;overflow-y:auto;
+  background:linear-gradient(160deg,#1a7a76,#0c4346 70%)}
+#intro::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(108deg,rgba(255,255,255,.10) 0 2px,transparent 2px 26px);opacity:.5;-webkit-mask-image:linear-gradient(#000,transparent 70%);mask-image:linear-gradient(#000,transparent 70%)}
+.intro-card{position:relative;background:rgba(255,255,255,.92);border-radius:28px;padding:28px 22px;max-width:440px;width:100%;text-align:center;
+  box-shadow:0 34px 70px -24px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.intro-mascot{width:78px;height:78px;margin:0 auto 14px;background:#eafaf7;border-radius:24px;padding:9px}
+#intro h2{font-family:"Playfair Display",Georgia,serif;font-size:27px;font-weight:700;color:var(--ink);line-height:1.1}
+#intro h2 b{color:var(--teal)}
+.intro-tag{color:var(--mut);font-size:14px;margin:5px 0 8px;font-weight:600}
+.intro-ai{display:inline-flex;align-items:center;gap:7px;background:var(--teal-soft);color:var(--teal);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;margin-bottom:20px}
+.intro-steps{display:grid;gap:15px;text-align:left;margin-bottom:20px}
+.istep{display:flex;gap:13px;align-items:flex-start}
+.istep .in{width:32px;height:32px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:linear-gradient(125deg,#166063,#46c4b6);font-size:14px;box-shadow:0 6px 14px -6px rgba(22,96,99,.6)}
+.istep .it b{color:var(--ink);font-size:14.5px}
+.istep .it div{font-size:13px;line-height:1.45;color:var(--ink2);margin-top:2px}
+.intro-creed{font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin-bottom:18px}
 </style>
 </head>
 <body>
+
+<!-- FIRST-RUN WELCOME / AI INTRO -->
+<div id="intro">
+  <div class="intro-card">
+    <div class="intro-mascot"><svg viewBox="0 0 64 64" style="width:100%;height:100%"><path d="M32 5c-.4 0-5.2 6.4-5.2 10.2a5.2 5.2 0 0 0 10.4 0C37.2 11.4 32.4 5 32 5z" fill="#5cd0e3"/><path d="M13 35q19-3 38 0-2 14-19 16-17-2-19-16z" fill="#0e6f68"/><path d="M15 35q17-19 34 0-8-5-17-5-9 0-17 5z" fill="#16a99d"/><g stroke="#0c5f59" stroke-width="1.3" stroke-linecap="round" fill="none"><path d="M32 31v4"/><path d="M25 32l1.5 3.4"/><path d="M39 32l-1.5 3.4"/><path d="M19 33.5l3 3"/><path d="M45 33.5l-3 3"/></g><circle cx="32" cy="39" r="6.2" fill="#fff6e2"/><circle cx="29.7" cy="38.6" r="1.05" fill="#0e3b38"/><circle cx="34.3" cy="38.6" r="1.05" fill="#0e3b38"/><path d="M30 41q2 2 4 0" stroke="#0e3b38" stroke-width="1.1" fill="none" stroke-linecap="round"/><circle cx="27.4" cy="40.4" r="1.2" fill="#ff9bb0" opacity=".6"/><circle cx="36.6" cy="40.4" r="1.2" fill="#ff9bb0" opacity=".6"/></svg></div>
+    <h2>Welcome to <b>Clam Finder</b></h2>
+    <div class="intro-tag">Your AI clam-finding partner</div>
+    <div class="intro-ai"><i class="fa-solid fa-wand-magic-sparkles"></i> Powered by AI Vision</div>
+    <div class="intro-steps">
+      <div class="istep"><div class="in">1</div><div class="it"><b>Point your camera at the sand</b><div>At low tide, sweep slowly over the wet flats.</div></div></div>
+      <div class="istep"><div class="in">2</div><div class="it"><b>AI Vision spots the signs</b><div>It reads the live video for siphon holes, sand disturbances, bubbles &amp; little squirts of movement — the tell-tale signs of buried clams.</div></div></div>
+      <div class="istep"><div class="in">3</div><div class="it"><b>Dig there &amp; log your haul</b><div>Tap a marked spot, confirm the species, and dig gently. You can even teach the AI your own beach.</div></div></div>
+    </div>
+    <div class="intro-creed">Respect · Identify · Conserve</div>
+    <button class="btn primary" onclick="startIntro()"><i class="fa-solid fa-expand"></i> Start AI Vision Scan</button>
+  </div>
+</div>
 
 <!-- GATE -->
 <div id="gate">
@@ -865,8 +900,13 @@ function fmtDate(d){try{return new Date(d+"T00:00:00").toLocaleDateString(undefi
 let toastT;function flash(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1900);}
 
 /* ===================== BOOT ===================== */
-window.addEventListener("load",()=>{ if(localStorage.getItem("clamsight.ack")){document.getElementById("gate").style.display="none";boot();} });
-if(document.readyState==="complete"&&localStorage.getItem("clamsight.ack")){document.getElementById("gate").style.display="none";boot();}
+function startIntro(){ localStorage.setItem("clamfinder.intro","1"); const i=document.getElementById("intro"); if(i)i.style.display="none"; if(localStorage.getItem("clamsight.ack")){ document.getElementById("gate").style.display="none"; boot(); } }
+function initFlow(){
+  const seen=localStorage.getItem("clamfinder.intro"), ack=localStorage.getItem("clamsight.ack");
+  if(seen){ const i=document.getElementById("intro"); if(i)i.style.display="none"; if(ack){ document.getElementById("gate").style.display="none"; boot(); } }
+}
+window.addEventListener("load",initFlow);
+if(document.readyState==="complete")initFlow();
 </script>
 </body>
 </html>
