@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Paranormal Pulse" />
 <link rel="manifest" href="manifest.json" />
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
-<title>Paranormal Pulse — Paranormal Investigation Platform</title>
+<title>Paranormal Pulse — Spooky Sensor Entertainment</title>
 <style>
 :root{
   --bg:#08080d; --bg2:#0e0e16; --panel:rgba(255,255,255,.035); --panel-line:rgba(255,255,255,.08);
@@ -314,7 +314,7 @@ body::after{
 .card{background:var(--panel);border:1px solid var(--panel-line);border-radius:18px;backdrop-filter:blur(8px);
   box-shadow:0 12px 35px rgba(0,0,0,.7);transition:transform .3s cubic-bezier(.23,1,.32,1),border-color .3s,box-shadow .3s}
 .card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:0 20px 45px rgba(212,175,55,.25)}
-/* timeline = classified evidence log */
+/* timeline = classified spook log */
 .log{background:var(--panel);border:2px solid rgba(212,175,55,.3);box-shadow:0 15px 40px rgba(0,0,0,.75)}
 .log .items{max-height:340px}
 .entry .sev{box-shadow:0 0 10px currentColor}
@@ -586,17 +586,57 @@ body{
 @keyframes pulseRing{0%,100%{opacity:.55}50%{opacity:1}}
 @media (prefers-reduced-motion: reduce){ .fx-scan{display:none} .gauge .pulse-ring{animation:none} }
 
-/* ===== v4.7 — thermal camera filter ===== */
-#lvThermalCv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;filter:contrast(1.06) saturate(1.18)}
-#liveView.thermal #lvThermalCv{display:block}
-#liveView.thermal #lvVideo{visibility:hidden}
+/* ===== v4.7 — contrast camera filter ===== */
+#lvContrastCv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;filter:contrast(1.06) saturate(1.18)}
+#liveView.contrast #lvContrastCv{display:block}
+#liveView.contrast #lvVideo{visibility:hidden}
 .lv-actions{flex-wrap:wrap}
-.lv-actions .thermal.on{background:linear-gradient(120deg,#7a1020,#c8364a);color:#fff;border-color:rgba(255,83,102,.5)}
+.lv-actions .contrast.on{background:linear-gradient(120deg,#5b2a8c,#c84ab8);color:#fff;border-color:rgba(199,74,184,.6)}
 #lvSkel{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
 .lv-actions .skel.on{background:linear-gradient(120deg,#0c3a2e,#10b981);color:#04121a;border-color:rgba(16,185,129,.6)}
+
+/* ===== Entertainment-only launch gate (shows every launch) ===== */
+#entGate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(120% 120% at 50% 18%,#10101c 0%,#08080d 70%);overflow-y:auto}
+#entGate.hidden{display:none}
+.eg-card{max-width:420px;width:100%;text-align:center;background:rgba(18,18,30,.92);border:1px solid rgba(167,139,250,.35);
+  border-radius:22px;padding:30px 24px 26px;box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.eg-emoji{font-size:46px;line-height:1;margin-bottom:6px}
+.eg-badge{display:inline-block;font-size:11px;letter-spacing:.16em;font-weight:700;color:#0b0b12;
+  background:linear-gradient(120deg,#5EEAD4,#A78BFA);padding:5px 12px;border-radius:999px;margin-bottom:14px}
+.eg-card h1{font-size:25px;letter-spacing:.02em;margin:0 0 4px;color:#f4f1e8}
+.eg-card h1 small{display:block;font-size:12px;letter-spacing:.22em;color:#A78BFA;font-weight:600;margin-top:6px}
+.eg-lead{font-size:15px;line-height:1.55;color:#e7e4f0;margin:14px 0 0}
+.eg-note{font-size:13px;line-height:1.6;color:#b9b6c8;margin:12px 0 0}
+.eg-note b{color:#FCA5A5;font-weight:700}
+.eg-list{list-style:none;margin:16px 0 0;padding:0;text-align:left;display:grid;gap:8px}
+.eg-list li{font-size:12.5px;line-height:1.45;color:#cfccdd;padding-left:24px;position:relative}
+.eg-list li::before{content:"✦";position:absolute;left:4px;top:0;color:#5EEAD4}
+.eg-btn{margin-top:22px;width:100%;border:none;cursor:pointer;font-size:16px;font-weight:700;letter-spacing:.02em;
+  color:#0b0b12;background:linear-gradient(120deg,#5EEAD4,#A78BFA);border-radius:14px;padding:15px 18px}
+.eg-btn:active{transform:translateY(1px)}
+.eg-fine{font-size:11px;color:#7d7a90;margin:14px 0 0;line-height:1.5}
 </style>
 </head>
 <body>
+
+<!-- ===== Entertainment-only gate — shows on every launch, must be acknowledged ===== -->
+<div id="entGate" role="dialog" aria-modal="true" aria-labelledby="egTitle">
+  <div class="eg-card">
+    <div class="eg-emoji">👻🎮</div>
+    <div class="eg-badge">ENTERTAINMENT GAME</div>
+    <h1 id="egTitle">Paranormal Pulse<small>JUST FOR FUN</small></h1>
+    <p class="eg-lead">This is a <b>spooky entertainment game</b> — a playful toy that turns your phone's sensors into fun ghost-hunting effects.</p>
+    <p class="eg-note">It does <b>NOT</b> and <b>CANNOT</b> detect real ghosts, spirits, or paranormal activity. Everything you see is a game effect for amusement only — never real proof of the supernatural.</p>
+    <ul class="eg-list">
+      <li>Meters and filters are playful effects — not the real thing.</li>
+      <li>No reading here is proof of anything paranormal.</li>
+      <li>Made to have fun with friends — not for real ghost hunting.</li>
+    </ul>
+    <button class="eg-btn" id="egEnter">I understand — it's just for fun</button>
+    <p class="eg-fine">By tapping you confirm you understand this app is for entertainment only.</p>
+  </div>
+</div>
 
 <!-- Atmospheric background -->
 <canvas id="bg-canvas"></canvas>
@@ -611,11 +651,11 @@ body{
 
 <!-- Correlation banner -->
 <div id="corrBanner"></div>
-<!-- Baseline drift banner -->
+<!-- Calm drift banner -->
 <div id="driftBanner"></div>
 
 <div class="wrap">
-<div class="topbar"><b>FOR INVESTIGATION &amp; ENTERTAINMENT ONLY</b> · Not scientific proof of the paranormal</div>
+<div class="topbar"><b>🎮 ENTERTAINMENT GAME · JUST FOR FUN</b> · Cannot detect real ghosts or paranormal activity</div>
 <header>
   <div class="logo">
     <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -623,7 +663,7 @@ body{
       <path d="M24 3 L43 14 L43 31 C43 39 34 44 24 46 C14 44 5 39 5 31 L5 14 Z" fill="none" stroke="url(#g)" stroke-width="2"/>
       <circle cx="24" cy="22" r="9" fill="none" stroke="url(#g)" stroke-width="2"/><circle cx="24" cy="22" r="3" fill="#5EEAD4"/>
     </svg>
-    <div class="wm">Paranormal Pulse<small>INVESTIGATION PLATFORM</small></div>
+    <div class="wm">Paranormal Pulse<small>SPOOKY SENSOR GAME · JUST FOR FUN</small></div>
   </div>
   <div class="head-right">
     <div class="status-dot"><span class="dot" id="dot"></span><span id="sensorMode">STANDBY</span></div>
@@ -641,22 +681,22 @@ body{
   <div class="ringwrap">
     <canvas class="gaugecv" id="gaugeCv"></canvas>
     <svg class="ring" viewBox="0 0 208 208"><circle class="ring-bg" cx="104" cy="104" r="92"/><circle class="ring-fg" id="ringFg" cx="104" cy="104" r="92"/></svg>
-    <div class="ring-center"><div class="reading" id="reading">0.0</div><div class="unit">mG · EMF</div></div>
+    <div class="ring-center"><div class="reading" id="reading">0.0</div><div class="unit">SPOOK-O-METER</div></div>
   </div>
   <div class="threat" id="threat">● STANDBY</div>
   <div class="hero-activity">Activity Index <b id="activity">0</b></div>
-  <div class="hero-status" id="heroStatus">READY TO INVESTIGATE</div>
+  <div class="hero-status" id="heroStatus">READY TO PLAY</div>
   <div class="anomaly-line" id="anomalyLine"></div>
   <div class="corr-break" id="corrBreak"></div>
 </div>
 
 <div class="offline-badge">🔒 Fully offline · all data stays on your device · no accounts, no tracking</div>
 
-<div class="disclaimer-ribbon"><b>For entertainment &amp; EMF education</b> — Paranormal Pulse logs real sensor data and never claims a ghost is present. Not proof of the paranormal.</div>
+<div class="disclaimer-ribbon"><b>Just for fun 👻</b> — Paranormal Pulse is an entertainment game. Its meters and filters are playful effects driven by your phone's sensors. It cannot detect real ghosts or paranormal activity.</div>
 
 <div class="metrics">
-  <div class="tile"><div class="k">Baseline</div><div class="v" id="baseline">—<small> mG</small></div></div>
-  <div class="tile"><div class="k">Evidence</div><div class="v" id="evidence" style="color:var(--muted)">—</div></div>
+  <div class="tile"><div class="k">Calm Level</div><div class="v" id="calm">—<small> </small></div></div>
+  <div class="tile"><div class="k">Spook Vibe</div><div class="v" id="spook" style="color:var(--muted)">—</div></div>
   <div class="tile"><div class="k">Audio</div><div class="v" id="sound">—<small> dB</small></div></div>
 </div>
 
@@ -675,7 +715,7 @@ body{
 </div>
 <div class="last-sess" id="lastSess"></div>
 
-<div class="sec-label">Investigation Tools</div>
+<div class="sec-label">Sensor Tools</div>
 <div class="tools">
   <button class="tool" id="spectrumBtn">
     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/><path d="M12 1.5v2.6M12 19.9v2.6M1.5 12h2.6M19.9 12h2.6"/></svg></span>
@@ -683,7 +723,7 @@ body{
   </button>
   <button class="tool" id="evpCard">
     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2.2M7.3 8.5v7M11 4.5v15M14.7 7v10M18.4 9.5v5M21 12h.01"/></svg></span>
-    <span class="tt">EVP Recorder</span><span class="ts" id="tsEvp">Capture &amp; review audio</span>
+    <span class="tt">Voice Recorder</span><span class="ts" id="tsEvp">Capture &amp; review audio</span>
   </button>
   <button class="tool" id="hauntBtn">
     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12z"/><path d="M9.2 12.2l2.8-2.6 2.8 2.6V15h-5.6z"/></svg></span>
@@ -691,11 +731,11 @@ body{
   </button>
   <button class="tool" id="timelineCard">
     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="18" r="1.6" fill="currentColor" stroke="none"/><path d="M9.5 6H20M9.5 12H20M9.5 18h7"/></svg></span>
-    <span class="tt">Evidence Timeline</span><span class="ts" id="tsTimeline">Timestamped session log</span>
+    <span class="tt">Spooky Timeline</span><span class="ts" id="tsTimeline">Timestamped fun log</span>
   </button>
-  <button class="tool" id="thermalCard">
-    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.6V5a2 2 0 0 0-4 0v9.6a4 4 0 1 0 4 0z"/><path d="M12 8.5v6.5"/></svg></span>
-    <span class="tt">Thermal Cam</span><span class="ts">Heat-map camera view</span>
+  <button class="tool" id="contrastCard">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="10" r="5"/><circle cx="15" cy="14" r="5"/></svg></span>
+    <span class="tt">Contrast Cam</span><span class="ts">Playful color filter — just for fun</span>
   </button>
   <button class="tool" id="skelCard">
     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.4" r="2.1"/><path d="M12 6.6v6.2M12 9l-4 2M12 9l4 2M12 12.8l-3 6.6M12 12.8l3 6.6"/></svg></span>
@@ -706,7 +746,7 @@ body{
 <button id="calBtn" style="display:none">CALIBRATE</button>
 
 <!-- ===== TIMELINE ===== -->
-<div class="sec-label">Evidence Timeline</div>
+<div class="sec-label">Spooky Timeline</div>
 <div class="log">
   <h3><span id="logCount">0 EVENTS</span>
     <span class="acts"><button id="markBtn2" title="Log the current moment to the timeline">Mark</button><button id="shareBtn" title="Share the top moment as an image card">Share</button><button id="sessionsBtn" title="Save this session with a name and reopen past ones">Sessions</button><button id="reportBtn" title="Session score, summary &amp; shareable report card">Report</button><button id="exportBtn" title="Download the session as an HTML report">Export</button><button class="danger" id="clearBtn" title="Clear the current timeline">Clear</button></span>
@@ -717,25 +757,25 @@ body{
 <!-- ===== SECONDARY ===== -->
 <div class="sec-label">Reference</div>
 <details class="acc"><summary>How Paranormal Pulse works<span class="chev">▾</span></summary>
-  <div class="acc-body">It reads your phone's magnetic sensor (EMF), camera (movement) and microphone (audio) together and timestamps anything unusual. Evidence Confidence only rises when signals <b>correlate</b> within seconds — it never claims a ghost, it shows the data and lets you decide.</div></details>
+  <div class="acc-body">It's a game. It turns your phone's sensors — magnetic field, camera movement and microphone — into playful spooky effects and timestamps the fun moments. The Spook-o-Meter is just for entertainment — it never claims a ghost and <b>cannot detect real paranormal activity</b>.</div></details>
 <details class="acc"><summary>Sensors &amp; device support<span class="chev">▾</span></summary>
   <div class="acc-body" id="capabilityNote"></div></details>
-<details class="acc"><summary>Safety &amp; investigation tips<span class="chev">▾</span></summary>
-  <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't investigate alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any reading.<br/><br/>Calibrate in a quiet baseline spot, then move slowly. Treat single spikes as noise — look for <b>correlated</b> EMF + audio + motion. For EVP, ask a question then leave silence. Review the timeline afterward and export your session.</div></details>
+<details class="acc"><summary>Safety &amp; play tips<span class="chev">▾</span></summary>
+  <div class="acc-body"><b style="color:var(--gold)">Stay safe first:</b> don't explore alone in unsafe or unfamiliar places, always get permission before entering private property, watch your footing in the dark, and keep aware of your surroundings. Your safety matters more than any in-game effect.<br/><br/>This is a spooky game for fun — the Spook-o-Meter reacts to your phone's sensors, so wave the phone around, make some noise, and watch the playful effects. Record voice clips, save sessions, and share the spooky moments with friends.</div></details>
 
-<footer>Paranormal Pulse v5.5 · Evidence-logging platform · No tracking<br/>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
+<footer>Paranormal Pulse v5.5 · A spooky entertainment game · No tracking<br/>Just for fun. Cannot detect real ghosts or paranormal activity.<br/><a href="#" class="footer-link" id="contactLink">Contact &amp; Support</a> &nbsp;·&nbsp; <a href="privacy.html" class="footer-link">Privacy Policy</a></footer>
 </div>
 
 <!-- Welcome -->
 <div class="modal" id="welcomeModal"><div class="sheet" role="dialog" aria-modal="true">
   <h2>HOW IT WORKS <button class="close" aria-label="Close" id="welcomeClose">×</button></h2>
   <div class="tut"><div class="tut-track" id="tutTrack">
-    <div class="tut-slide"><div class="tut-ic">🛰️</div><div class="tut-t">Welcome to Paranormal Pulse</div><div class="tut-d">An honest, evidence-logging investigation tool. It reads your phone's <b>real sensors</b> — magnetic field (EMF), microphone and camera — and timestamps anything unusual. It never claims a ghost; it shows you the data and lets you decide.</div></div>
-    <div class="tut-slide"><div class="tut-ic">🎯</div><div class="tut-t">1 · Calibrate</div><div class="tut-d">Stand still in a quiet spot and tap <b>Start Session</b>. Paranormal Pulse learns your area's normal EMF baseline, so it can spot real changes instead of random noise.</div></div>
-    <div class="tut-slide"><div class="tut-ic">📡</div><div class="tut-t">2 · Full Spectrum</div><div class="tut-d">Opens the live view — camera, EMF and audio together. Record <b>EVP</b> audio, switch on the <b>thermal</b> camera, and the <b>skeleton</b> body tracker (real pose detection — it finds people, not ghosts).</div></div>
-    <div class="tut-slide"><div class="tut-ic">⚡</div><div class="tut-t">3 · Read the evidence</div><div class="tut-d">The <b>Activity Index</b> (0–100) reflects the room. <b>Evidence Confidence</b> rises to Medium/High only when signals <b>correlate</b> within seconds (e.g. EMF + audio together). Single spikes are treated as noise — that's the honest part.</div></div>
+    <div class="tut-slide"><div class="tut-ic">🛰️</div><div class="tut-t">Welcome to Paranormal Pulse</div><div class="tut-d">A spooky <b>entertainment game</b>. It turns your phone's sensors — magnetic field, microphone and camera — into playful ghost-hunting effects, just for fun. It cannot detect real ghosts or paranormal activity.</div></div>
+    <div class="tut-slide"><div class="tut-ic">🎯</div><div class="tut-t">1 · Warm up</div><div class="tut-d">Stand still for a moment and tap <b>Start Session</b>. Paranormal Pulse warms up the Spook-o-Meter using your phone's sensors so the playful effects feel responsive — all just for fun.</div></div>
+    <div class="tut-slide"><div class="tut-ic">📡</div><div class="tut-t">2 · Full Spectrum</div><div class="tut-d">Opens the live view — camera, meter and audio together. Record <b>audio</b> clips, switch on the <b>Contrast Cam</b> color filter, and the <b>skeleton</b> body tracker (it finds real people in frame, just for fun — not ghosts).</div></div>
+    <div class="tut-slide"><div class="tut-ic">⚡</div><div class="tut-t">3 · Watch the effects</div><div class="tut-d">The <b>Activity Index</b> (0–100) reacts to the room. The <b>Spook-o-Meter</b> climbs when your phone's sensors wiggle together — a playful effect, not a real detection. Wave the phone and make some noise to see it react!</div></div>
     <div class="tut-slide"><div class="tut-ic">📋</div><div class="tut-t">4 · Review &amp; share</div><div class="tut-d">Everything lands in the <b>timeline</b>. Get a <b>Session Score</b>, an auto <b>summary</b>, a shareable <b>report card</b>, save named <b>sessions</b>, and unlock <b>achievements</b>.</div></div>
-    <div class="tut-slide"><div class="tut-ic">🛡️</div><div class="tut-t">Stay safe &amp; have fun</div><div class="tut-d">Don't investigate alone in unsafe places, and get permission before entering private property. Paranormal Pulse is for <b>investigation &amp; entertainment</b> — not scientific proof of the paranormal.</div></div>
+    <div class="tut-slide"><div class="tut-ic">🛡️</div><div class="tut-t">Stay safe &amp; have fun</div><div class="tut-d">Don't explore alone in unsafe places, and get permission before entering private property. Paranormal Pulse is <b>just for fun</b> — an entertainment game that cannot detect real ghosts or paranormal activity.</div></div>
   </div></div>
   <div class="tut-dots" id="tutDots"></div>
   <div class="tut-nav"><button class="btn-quick" id="tutBack">Back</button><button class="startnow" id="welcomeStart">Next</button></div>
@@ -744,24 +784,24 @@ body{
 <!-- About -->
 <div class="modal" id="infoModal"><div class="sheet" role="dialog" aria-modal="true">
   <h2>HOW Paranormal Pulse WORKS <button class="close" aria-label="Close" id="closeBtn">×</button></h2>
-  <p class="m">Most paranormal apps are random-number generators. Paranormal Pulse is built on provable cause and effect: sensor changes drive the readings, events are timestamped, and you can review the data afterward.</p>
-  <h3>What each sensor does</h3>
+  <p class="m">Paranormal Pulse is a <b>spooky entertainment game</b>. It turns the wiggles your phone's everyday sensors pick up into playful ghost-hunting effects. It's a toy for fun — not a scientific instrument, and it cannot detect real ghosts or paranormal activity.</p>
+  <h3>What each sensor does (just for fun)</h3>
   <ul class="trust">
-    <li><b>Magnetometer →</b> detects magnetic-field (EMF) changes, in milliGauss</li>
-    <li><b>Microphone →</b> detects audio peaks (EVP review)</li>
-    <li><b>Camera →</b> detects movement &amp; contrast shifts</li>
-    <li><b>Correlation engine →</b> flags when signals co-occur within seconds</li>
+    <li><b>Magnetometer →</b> its wiggles drive the Spook-o-Meter effect</li>
+    <li><b>Microphone →</b> lets you record &amp; play back audio</li>
+    <li><b>Camera →</b> powers the live view, color filters &amp; movement effects</li>
+    <li><b>The game →</b> reacts with extra flair when several sensors wiggle at once</li>
   </ul>
   <h3>Our promise</h3>
-  <p class="m"><span class="nope">✓</span> No ghost-detection claims &nbsp; <span class="nope">✓</span> No AI-invented evidence &nbsp; <span class="nope">✓</span> No fabricated readings &nbsp; <span class="nope">✓</span> No tracking — data stays on your device</p>
+  <p class="m"><span class="nope">✓</span> Just for fun — cannot detect real ghosts &nbsp; <span class="nope">✓</span> No AI-invented readings &nbsp; <span class="nope">✓</span> No fabricated claims &nbsp; <span class="nope">✓</span> No tracking — data stays on your device</p>
   <h3>Device support</h3>
   <table class="ptable">
-    <tr><td>Android · Chrome</td><td><span class="pill real">LIVE EMF</span> Real magnetometer.</td></tr>
-    <tr><td>iPhone · browser</td><td><span class="pill demo">DEMO FIELD</span> Sensor blocked by Apple on the web.</td></tr>
+    <tr><td>Android · Chrome</td><td><span class="pill real">LIVE METER</span> Meter reacts to the magnetometer.</td></tr>
+    <tr><td>iPhone · browser</td><td><span class="pill demo">DEMO MODE</span> Sensor blocked by Apple on the web.</td></tr>
     <tr><td>Camera &amp; audio</td><td><span class="pill real">REAL</span> Work on every phone, iPhone included.</td></tr>
   </table>
-  <h3>Real EMF on iPhone</h3>
-  <p class="m">Requires a native app. The plan's path is <b>Capacitor</b> (keeps this exact web build, adds a native magnetometer bridge). EMF math: <code style="background:rgba(0,0,0,.4);color:var(--gold-soft);padding:1px 6px;border-radius:5px;font-size:12px">√(x²+y²+z²) × 10 = mG</code>.</p>
+  <h3>A note on the meter</h3>
+  <p class="m">The Spook-o-Meter is a <b>playful effect</b>, not a real measuring tool. On the native app it can react to the phone's magnetometer for extra responsiveness — but nothing it shows is proof of anything paranormal. It's all in good spooky fun.</p>
 </div></div>
 
 <!-- Local Haunts -->
@@ -779,7 +819,7 @@ body{
 <!-- Saved Sessions -->
 <div class="modal" id="sessionsModal"><div class="sheet" role="dialog" aria-modal="true">
   <h2>SAVED SESSIONS <button class="close" aria-label="Close" id="sessionsClose">×</button></h2>
-  <p class="m">Save the current timeline as a named investigation you can reopen later. Stored on this device only — nothing is uploaded.</p>
+  <p class="m">Save the current timeline as a named session you can reopen later. Stored on this device only — nothing is uploaded.</p>
   <div class="sess-save"><input id="sessName" placeholder="Name this session (e.g. Basement — Oct 12)" autocomplete="off"/><button class="btn-quick" id="sessSave">Save</button></div>
   <div id="sessList"></div>
 </div></div>
@@ -789,9 +829,9 @@ body{
   <h2>BEFORE WE START <button class="close" aria-label="Close" id="permClose">×</button></h2>
   <p class="m">Full Spectrum uses your phone's sensors. Your phone will ask permission next — here's exactly why:</p>
   <ul class="perm-list">
-    <li><b>Camera —</b> detects movement &amp; contrast shifts in view.</li>
-    <li><b>Microphone —</b> records audio for EVP review.</li>
-    <li><b>Motion —</b> reads magnetic-field (EMF) &amp; movement.</li>
+    <li><b>Camera —</b> powers the live view, color filters &amp; movement effects.</li>
+    <li><b>Microphone —</b> records audio for playback.</li>
+    <li><b>Motion —</b> drives the Spook-o-Meter effect.</li>
   </ul>
   <p class="m" style="font-size:12px;margin-top:12px">Nothing is uploaded — every reading stays on your device.</p>
   <button class="startnow" id="permContinue">CONTINUE</button>
@@ -815,7 +855,7 @@ body{
 <!-- Session Report -->
 <div class="modal" id="reportModal"><div class="sheet" role="dialog" aria-modal="true">
   <h2>SESSION REPORT <button class="close" aria-label="Close" id="reportClose">×</button></h2>
-  <p class="m">An automated recap of your recorded sensor data — a measure of session activity, not a determination of paranormal activity.</p>
+  <p class="m">A fun recap of your play session — a measure of how lively the game effects were, not a determination of any real paranormal activity.</p>
   <div class="rp-score-wrap"><div class="rp-score"><span id="rpScore">0</span><small> / 100</small></div></div>
   <div class="rp-bar"><i id="rpScoreFill"></i></div>
   <div class="rp-cap">Session Activity Score</div>
@@ -827,8 +867,8 @@ body{
 <!-- Achievements -->
 <div class="modal" id="achModal"><div class="sheet" role="dialog" aria-modal="true">
   <h2>ACHIEVEMENTS <button class="close" aria-label="Close" id="achClose">×</button></h2>
-  <p class="m">The 🏅 badge button up top opens this screen. Badges are just-for-fun rewards you earn as you use Paranormal Pulse — each one unlocks when you do the thing it describes (calibrate, log an event, record an EVP, and so on).</p>
-  <p class="m" style="font-size:12px">A <b>🔒 lock</b> = not earned yet. A <b style="color:var(--green)">✓</b> = unlocked. They're saved on your device only and don't affect your investigations.</p>
+  <p class="m">The 🏅 badge button up top opens this screen. Badges are just-for-fun rewards you earn as you use Paranormal Pulse — each one unlocks when you do the thing it describes (calibrate, log an event, record a voice clip, and so on).</p>
+  <p class="m" style="font-size:12px">A <b>🔒 lock</b> = not earned yet. A <b style="color:var(--green)">✓</b> = unlocked. They're saved on your device only and are just for fun.</p>
   <div class="ach-head"><span>Your progress</span><b id="achCount">0 / 8</b></div>
   <div class="ach-grid" id="achGrid"></div>
 </div></div>
@@ -836,35 +876,35 @@ body{
 <!-- Full Spectrum -->
 <div id="liveView">
   <video id="lvVideo" playsinline muted></video>
-  <canvas id="lvThermalCv" width="192" height="144"></canvas>
+  <canvas id="lvContrastCv" width="192" height="144"></canvas>
   <canvas id="lvOverlay"></canvas>
   <canvas id="lvSkel"></canvas>
   <div class="lv-crt"></div><div class="lv-vig"></div><div class="lv-scan"></div>
   <div class="lv-recdot" id="lvRecDot">REC</div>
   <div class="lv-top"><div class="lv-brand">Paranormal Pulse <span>· LIVE SPECTRUM</span></div><button class="cam-x" id="lvClose" aria-label="Close live view">×</button></div>
   <div class="hud emf-hud">
-    <div class="hud-k">EMF</div><div class="hud-v"><span id="lvEmf">0.0</span><i>mG</i></div>
-    <div class="hud-threat" id="lvThreat">BASELINE</div><canvas class="spark" id="lvSpark"></canvas>
+    <div class="hud-k">Spook-o-Meter</div><div class="hud-v"><span id="lvEmf">0.0</span><i></i></div>
+    <div class="hud-threat" id="lvThreat">CALM</div><canvas class="spark" id="lvSpark"></canvas>
   </div>
   <div class="hud pres-hud">
     <div class="hud-k">Activity Index</div><div class="hud-v"><span id="lvAct">0</span><i>/100</i></div>
-    <div class="hud-k" style="margin-top:6px">Evidence</div><div class="hud-threat" id="lvEvid" style="font-size:13px;letter-spacing:.1em">—</div>
+    <div class="hud-k" style="margin-top:6px">Spook Vibe</div><div class="hud-threat" id="lvEvid" style="font-size:13px;letter-spacing:.1em">—</div>
     <div class="hud-k" style="margin-top:6px">Audio</div><div class="hud-v" style="font-size:17px"><span id="lvDb">—</span><i>dB</i></div>
   </div>
   <div class="lv-transcript" id="lvTranscript"></div>
   <div class="lv-bottom">
-    <div class="evp-line"><span>EVP · Audio Spectrum</span><span class="rec" id="lvRecTime"></span></div>
+    <div class="evp-line"><span>Voice · Audio Spectrum</span><span class="rec" id="lvRecTime"></span></div>
     <canvas id="lvWave"></canvas>
     <div class="lv-actions">
-      <button class="rec" id="lvRec" aria-label="Record EVP audio clip">● REC EVP</button>
-      <button class="ears" id="lvEars" aria-label="AI Ears — transcribe audible speech" title="AI-assisted audio analysis — transcribes audible speech to text. It does not generate or invent speech.">👂 AI EARS</button>
-      <button class="thermal" id="lvThermal" aria-label="Thermal camera view">🌡 THERMAL</button>
+      <button class="rec" id="lvRec" aria-label="Record audio clip">● REC AUDIO</button>
+      <button class="ears" id="lvEars" aria-label="Speech-to-text — transcribe audible speech" title="Speech-to-text audio analysis — transcribes audible speech only. It does not generate or invent speech.">👂 SPEECH-TO-TEXT</button>
+      <button class="contrast" id="lvContrast" aria-label="Contrast Cam color filter">🎨 CONTRAST</button>
       <button class="skel" id="lvSkelBtn" aria-label="Skeleton body tracker">🦴 SKELETON</button>
       <button id="lvFlag" aria-label="Flag this moment in the timeline">■ FLAG</button>
       <button id="lvFlip" aria-label="Flip camera">■ FLIP</button>
     </div>
     <div class="lv-clip" id="lvClip"></div>
-    <div class="lv-hint">Camera, EMF &amp; audio live together. Evidence rises only when signals correlate. AI Ears transcribes audible speech only (it never invents words). Skeleton tracks real human bodies in frame — not ghosts. For investigation &amp; entertainment — not proof of the paranormal.</div>
+    <div class="lv-hint">Camera, meter &amp; audio play together. The Spook-o-Meter climbs when your phone's sensors wiggle at once — a playful effect, not a real detection. Speech-to-text transcribes audible speech only (it never invents words). Skeleton tracks real human bodies in frame — not ghosts. Just for fun — cannot detect real paranormal activity.</div>
   </div>
   <div class="cam-msg" id="lvMsg"></div>
 </div>
@@ -874,11 +914,17 @@ body{
 "use strict";
 const el=id=>document.getElementById(id);
 
+// ── ENTERTAINMENT GATE — blocks the app on every launch until acknowledged ──
+(function(){ const g=el("entGate"), b=el("egEnter"); if(!g||!b) return;
+  document.body.style.overflow="hidden";
+  b.addEventListener("click",()=>{ g.classList.add("hidden"); document.body.style.overflow=""; });
+})();
+
 // ── STATE ──────────────────────────────────────────────────
-const S={ baseline:null,current:0,peak:0,mode:"none",motion:0,gyro:0,soundDb:null,armed:false,log:[],
-  lastThreat:"STANDBY",lastEventAt:0,presence:0,activity:0,confidence:"—",
+const S={ calm:null,current:0,peak:0,mode:"none",motion:0,gyro:0,soundDb:null,armed:false,log:[],
+  lastThreat:"STANDBY",lastEventAt:0,presence:0,activity:0,vibe:"—",
   spikeT:0,audioT:0,motionT:0,lastConf:"—",lastCorrT:0 };
-const THREAT=[{n:"BASELINE",c:"#42e29b",min:0},{n:"LOW",c:"#f5c451",min:15},{n:"MEDIUM",c:"#f5934a",min:40},{n:"HIGH",c:"#ff5366",min:80},{n:"CRITICAL",c:"#ff5366",min:140}];
+const THREAT=[{n:"CALM",c:"#42e29b",min:0},{n:"LOW",c:"#f5c451",min:15},{n:"MEDIUM",c:"#f5934a",min:40},{n:"HIGH",c:"#ff5366",min:80},{n:"CRITICAL",c:"#ff5366",min:140}];
 function threatFor(d){ let lv=THREAT[0]; for(const t of THREAT){ if(d>=t.min) lv=t; } return lv; }
 function confColor(c){ return c==="HIGH"?"#ff5366":c==="MEDIUM"?"#f5934a":c==="LOW"?"#f5c451":"#8c8ca0"; }
 
@@ -945,8 +991,8 @@ const emfWin=[];
 })();
 
 // ── PERSISTENCE ────────────────────────────────────────────
-function saveLog(){ try{ localStorage.setItem("phantasm_log",JSON.stringify(S.log.slice(0,200))); if(S.baseline!=null) localStorage.setItem("phantasm_base",String(S.baseline)); }catch(_){}}
-function loadLog(){ try{ const l=localStorage.getItem("phantasm_log"); if(l){ S.log=JSON.parse(l)||[]; } const b=localStorage.getItem("phantasm_base"); if(b){ S.baseline=parseFloat(b); el("baseline").innerHTML=S.baseline.toFixed(1)+'<small> mG</small>'; } }catch(_){}}
+function saveLog(){ try{ localStorage.setItem("phantasm_log",JSON.stringify(S.log.slice(0,200))); if(S.calm!=null) localStorage.setItem("phantasm_base",String(S.calm)); }catch(_){}}
+function loadLog(){ try{ const l=localStorage.getItem("phantasm_log"); if(l){ S.log=JSON.parse(l)||[]; } const b=localStorage.getItem("phantasm_base"); if(b){ S.calm=parseFloat(b); el("calm").innerHTML=S.calm.toFixed(1)+'<small></small>'; } }catch(_){}}
 
 // ── SENSORS ────────────────────────────────────────────────
 async function startMagnetometer(){
@@ -1025,10 +1071,10 @@ async function calibrate(){
   const samples=[],t0=Date.now();
   const iv=setInterval(()=>{ samples.push(S.current);
     if(Date.now()-t0>=3000){ clearInterval(iv);
-      S.baseline=samples.reduce((a,c)=>a+c,0)/Math.max(1,samples.length);
-      el("baseline").innerHTML=S.baseline.toFixed(1)+'<small> mG</small>';
+      S.calm=samples.reduce((a,c)=>a+c,0)/Math.max(1,samples.length);
+      el("calm").innerHTML=S.calm.toFixed(1)+'<small></small>';
       b.textContent="RECALIBRATE"; b.disabled=false; S.armed=true; updateBadge();
-      addEntry("BASELINE","BASELINE LOCKED — "+S.baseline.toFixed(1)+" mG · monitoring armed");
+      addEntry("CALM","Spook-o-Meter ready — let's play! 👻");
       if(quickPending){ quickPending=false; openLive(); }
     }
   },80);
@@ -1036,8 +1082,8 @@ async function calibrate(){
 function updateBadge(){
   const d=el("dot"); d.className="dot";
   if(S.armed&&S.mode!=="none"){ d.classList.add(S.mode==="magnetometer"?"live":"armed"); el("sensorMode").textContent=S.mode==="magnetometer"?"LIVE · ARMED":"DEMO · ARMED"; }
-  else if(S.mode==="magnetometer"){ d.classList.add("live"); el("sensorMode").textContent="LIVE EMF"; }
-  else if(S.mode==="demo"){ d.classList.add("demo"); el("sensorMode").textContent="DEMO FIELD"; }
+  else if(S.mode==="magnetometer"){ d.classList.add("live"); el("sensorMode").textContent="LIVE METER"; }
+  else if(S.mode==="demo"){ d.classList.add("demo"); el("sensorMode").textContent="DEMO MODE"; }
   else el("sensorMode").textContent="STANDBY";
 }
 
@@ -1057,16 +1103,16 @@ function metrics(){
   // low-pass smooth so the Activity Index glides instead of flickering
   S._actEma=(S._actEma==null)?rawAct:S._actEma+(rawAct-S._actEma)*0.10;
   S.activity=Math.round(S._actEma);
-  const now=Date.now(), base=S.baseline==null?30:S.baseline, dev=base>0?(S.current-base)/base*100:0;
+  const now=Date.now(), base=S.calm==null?30:S.calm, dev=base>0?(S.current-base)/base*100:0;
   if(dev>=15) S.spikeT=now; if(audioN>0.55) S.audioT=now; if(motionN>0.45) S.motionT=now;
   const W=5000, e=now-S.spikeT<W, a=now-S.audioT<W, m=now-S.motionT<W; S.corrFlags={e,a,m};
   let conf="—"; if(e&&a&&m) conf="HIGH"; else if(e&&a) conf="MEDIUM"; else if(e||a||m) conf="LOW";
   if(S.armed&&(e&&a)&&conf!==S.lastConf&&(conf==="HIGH"||conf==="MEDIUM")&&now-S.lastCorrT>4000){
-    addEntry(conf==="HIGH"?"HIGH":"MEDIUM","Correlated "+anomalyClass(conf)+" event — EMF + audio"+(m?" + motion":"")+" within 5s · "+conf+" confidence");
-    showCorrBanner("⚡ CORRELATED EVENT — EMF + Audio"+(m?" + Motion":"")+" · "+conf);
+    addEntry(conf==="HIGH"?"HIGH":"MEDIUM","Spooky combo! 👻 wiggle + sound"+(m?" + motion":"")+" at once");
+    showCorrBanner("👻 SPOOKY COMBO! — wiggle + sound"+(m?" + motion":""));
     S.lastCorrT=now;
   }
-  S.confidence=conf; S.lastConf=conf;
+  S.vibe=conf; S.lastConf=conf;
 }
 
 // ── CORRELATION BANNER ─────────────────────────────────────
@@ -1108,50 +1154,50 @@ function homeLoop(){
   metrics();
   const v=S.current; if(v>S.peak) S.peak=v;
   el("reading").textContent=v.toFixed(1);
-  const base=S.baseline==null?30:S.baseline, dev=base>0?Math.max(0,(v-base)/base*100):0;
+  const base=S.calm==null?30:S.calm, dev=base>0?Math.max(0,(v-base)/base*100):0;
   if(!S._numT || Date.now()-S._numT>200){ S._numT=Date.now();
     el("activity").innerHTML=S.activity+'<small> /100</small>';
     el("sound").innerHTML=(S.soundDb==null?'—':S.soundDb)+'<small> dB</small>';
   }
-  const ev=el("evidence"); ev.textContent=S.confidence; ev.style.color=confColor(S.confidence);
+  const ev=el("spook"); ev.textContent=S.vibe; ev.style.color=confColor(S.vibe);
   const lv=threatFor(dev), frac=Math.min(1,dev/150);
   el("ringFg").style.strokeDashoffset=RING*(1-frac); el("ringFg").style.stroke=lv.c; el("reading").style.color=lv.c;
   drawGauge(frac, lv.c, S.armed);
   { const _g=document.querySelector(".gauge"); if(_g){ _g.style.setProperty("--g",(0.12+frac*0.55).toFixed(3)); _g.style.setProperty("--pulse",(S.armed?S.activity/100:0).toFixed(2)); } }
   const th=el("threat"); th.style.color=lv.c; th.textContent="● "+(S.armed?lv.n:"STANDBY");
-  if(S.armed&&lv.n!==S.lastThreat&&lv.n!=="BASELINE"&&Date.now()-S.lastEventAt>1500){
-    addEntry(lv.n,"Electromagnetic event · "+anomalyClass(lv.n)+" — "+v.toFixed(1)+" mG ("+Math.round(dev)+"% over baseline) · "+classConfidence(lv.n)+"% confidence"); S.lastEventAt=Date.now();
+  if(S.armed&&lv.n!==S.lastThreat&&lv.n!=="CALM"&&Date.now()-S.lastEventAt>1500){
+    addEntry(lv.n,"Spooky spike! 👻 the meter jumped to "+lv.n+" — "+anomalyClass(lv.n)); S.lastEventAt=Date.now();
   }
   S.lastThreat=lv.n;
-  { const al=el("anomalyLine"); if(al){ if(S.armed&&lv.n!=="BASELINE"){ al.textContent="⬡ "+anomalyClass(lv.n)+" electromagnetic event · "+classConfidence(lv.n)+"%"; al.style.color=lv.c; } else { al.textContent=""; } } }
+  { const al=el("anomalyLine"); if(al){ if(S.armed&&lv.n!=="CALM"){ al.textContent="👻 spooky vibes rising · "+anomalyClass(lv.n); al.style.color=lv.c; } else { al.textContent=""; } } }
   updateCorrBreak(); driftCheck(base);
   // Tesla-calm status surfaces (throttled)
-  const hs=el("heroStatus"); if(hs){ hs.textContent=(liveView&&liveView.classList.contains("open"))?"LIVE SPECTRUM ACTIVE":(S.armed?"INVESTIGATION ACTIVE":"READY TO INVESTIGATE"); }
+  const hs=el("heroStatus"); if(hs){ hs.textContent=(liveView&&liveView.classList.contains("open"))?"LIVE VIEW ON":(S.armed?"GAME ON 👻":"READY TO PLAY"); }
   const cl=el("ctaLabel"); if(cl){ cl.textContent=S.armed?"ENTER FULL SPECTRUM":"START SESSION"; }
   homeLoop._n=(homeLoop._n||0)+1; if(homeLoop._n%30===1){ updateSensors(); updateLastSession(); }
 }
 
-// ── CORRELATION BREAKDOWN (why confidence rose) ───────────
+// ── CORRELATION BREAKDOWN (why vibe rose) ───────────
 function updateCorrBreak(){
   const elb=el("corrBreak"); if(!elb) return;
   if(!S.armed){ elb.textContent=""; return; }
   const f=S.corrFlags||{}; const parts=[];
-  if(f.e) parts.push("EMF"); if(f.a) parts.push("Audio"); if(f.m) parts.push("Motion");
-  if(S.confidence==="HIGH"||S.confidence==="MEDIUM"){ elb.innerHTML="Why: "+parts.join(" + ")+" within 5s → <b>"+S.confidence+"</b>"; }
-  else if(S.confidence==="LOW"&&parts.length){ elb.innerHTML=parts.join(" + ")+" active — single signal, low confidence"; }
-  else { elb.textContent="Awaiting correlated signals…"; }
+  if(f.e) parts.push("Wiggle"); if(f.a) parts.push("Sound"); if(f.m) parts.push("Motion");
+  if(S.vibe==="HIGH"||S.vibe==="MEDIUM"){ elb.innerHTML="Spooky combo: "+parts.join(" + ")+" together 👻"; }
+  else if(S.vibe==="LOW"&&parts.length){ elb.innerHTML=parts.join(" + ")+" — one playful signal"; }
+  else { elb.textContent="Waiting for spooky wiggles…"; }
 }
 
-// ── BASELINE DRIFT WARNING ─────────────────────────────────
+// ── CALM DRIFT WARNING ─────────────────────────────────
 let _driftAt=0;
 function driftCheck(base){
   const db=el("driftBanner"); if(!db) return;
-  if(!S.armed||S.baseline==null||emfWin.length<15){ return; }
+  if(!S.armed||S.calm==null||emfWin.length<15){ return; }
   const mean=emfWin.reduce((a,b)=>a+b,0)/emfWin.length;
   const drift=base>0?Math.abs(mean-base)/base:0;
   if(drift>0.6){
     if(!db.classList.contains("show")&&Date.now()-_driftAt>20000){
-      db.innerHTML="<span>Baseline shifted "+Math.round(drift*100)+"% — recalibrate for accurate readings?</span>";
+      db.innerHTML="<span>The Spook-o-Meter drifted — tap to re-tune the fun?</span>";
       const rb=document.createElement("button"); rb.textContent="Recalibrate";
       rb.addEventListener("click",()=>{ db.classList.remove("show"); calibrate(); });
       const xb=document.createElement("button"); xb.textContent="Dismiss"; xb.style.background="transparent";
@@ -1164,7 +1210,7 @@ function driftCheck(base){
 
 function sevColor(n){ const t=THREAT.find(x=>x.n===n); return t?t.c:"#8c8ca0"; }
 function addEntry(sev,msg){ const now=new Date();
-  S.log.unshift({time:now.toISOString(),display:now.toLocaleTimeString([],{hour12:false}),severity:sev,message:msg,emf:+S.current.toFixed(1),activity:S.activity,confidence:S.confidence,sound:S.soundDb,motion:!!(S.corrFlags&&S.corrFlags.m),spark:emfWin.slice(-40)});
+  S.log.unshift({time:now.toISOString(),display:now.toLocaleTimeString([],{hour12:false}),severity:sev,message:msg,emf:+S.current.toFixed(1),activity:S.activity,vibe:S.vibe,sound:S.soundDb,motion:!!(S.corrFlags&&S.corrFlags.m),spark:emfWin.slice(-40)});
   if(S.log.length>200) S.log.pop(); render(); saveLog(); checkAch();
 }
 function render(){
@@ -1179,7 +1225,7 @@ function render(){
 }
 function updateToolSummaries(){
   const t=el("tsTimeline"); if(t) t.textContent=S.log.length+(S.log.length===1?" logged event":" logged events");
-  const clips=S.log.filter(e=>/EVP clip/.test(e.message)).length;
+  const clips=S.log.filter(e=>/Voice clip/.test(e.message)).length;
   const ev=el("tsEvp"); if(ev) ev.textContent=clips?(clips+(clips===1?" clip recorded":" clips recorded")):"Capture & review audio";
   const h=el("tsHaunt"); if(h && typeof STORIES!=="undefined") h.textContent=STORIES.length+" real stories";
 }
@@ -1188,13 +1234,13 @@ function updateToolSummaries(){
 el("calBtn").addEventListener("click",calibrate);
 el("quickBtn").addEventListener("click",()=>{ if(S.armed){ openLive(); } else { quickPending=true; calibrate(); } });
 el("markBtn2").addEventListener("click",()=>{
-  addEntry(S.armed?(S.lastThreat==="STANDBY"?"BASELINE":S.lastThreat):"BASELINE","Manual mark — "+S.current.toFixed(1)+" mG · Activity "+S.activity);
+  addEntry(S.armed?(S.lastThreat==="STANDBY"?"CALM":S.lastThreat):"CALM","Marked this moment 👻 · Activity "+S.activity);
 });
 el("clearBtn").addEventListener("click",()=>{ S.log=[]; S.peak=0; render(); saveLog(); });
 
 // ── EXPORT BUTTON — generates a formatted HTML report ─────
 el("exportBtn").addEventListener("click",()=>{
-  if(!S.log.length){ alert("No events to export yet. Run an investigation first."); return; }
+  if(!S.log.length){ alert("No events to export yet. Start a session first."); return; }
   const now=new Date();
   const dateStr=now.toLocaleDateString([],{year:'numeric',month:'long',day:'numeric'});
   const timeStr=now.toLocaleTimeString([],{hour12:true});
@@ -1208,7 +1254,7 @@ el("exportBtn").addEventListener("click",()=>{
       <td style="color:#8c8ca0;font-family:monospace;white-space:nowrap">${e.display}</td>
       <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${sevColor(e.severity)};margin-right:6px;box-shadow:0 0 4px ${sevColor(e.severity)}"></span>${e.severity}</td>
       <td style="color:#d7d7e2">${e.message}</td>
-      <td style="font-family:monospace;color:#76d3ff">${e.emf!=null?e.emf+' mG':'—'}</td>
+      <td style="font-family:monospace;color:#76d3ff">${e.emf!=null?e.emf:'—'}</td>
     </tr>`).join("");
 
   const html=`<!DOCTYPE html>
@@ -1233,22 +1279,22 @@ el("exportBtn").addEventListener("click",()=>{
   footer{margin-top:28px;font-size:10px;color:#54546a;text-align:center;border-top:1px solid rgba(255,255,255,.06);padding-top:16px}
 </style></head><body>
 <h1>Paranormal Pulse</h1>
-<div class="sub">INVESTIGATION SESSION REPORT</div>
+<div class="sub">SPOOKY SESSION RECAP · JUST FOR FUN</div>
 <div class="stats">
   <div class="stat"><div class="k">Date</div><div class="v" style="font-size:13px;color:#f4f1e8">${dateStr}</div></div>
   <div class="stat"><div class="k">Events Logged</div><div class="v">${S.log.length}</div></div>
   <div class="stat"><div class="k">Duration</div><div class="v" style="font-size:16px;color:#f5c451">${duration}</div></div>
-  <div class="stat"><div class="k">Peak EMF</div><div class="v" style="color:#ff5366">${highest.toFixed(1)} <span style="font-size:12px">mG</span></div></div>
-  <div class="stat"><div class="k">Avg EMF</div><div class="v" style="color:#f5934a">${avgEmf} <span style="font-size:12px">mG</span></div></div>
-  <div class="stat"><div class="k">Sensor Mode</div><div class="v" style="font-size:13px;color:#76d3ff">${S.mode==="magnetometer"?"LIVE":"DEMO"}</div></div>
+  <div class="stat"><div class="k">Peak Meter</div><div class="v" style="color:#ff5366">${highest.toFixed(1)}</div></div>
+  <div class="stat"><div class="k">Avg Meter</div><div class="v" style="color:#f5934a">${avgEmf}</div></div>
+  <div class="stat"><div class="k">Mode</div><div class="v" style="font-size:13px;color:#76d3ff">${S.mode==="magnetometer"?"LIVE":"DEMO"}</div></div>
 </div>
-${corrEvents.length?`<div class="corr"><h2>⚡ Correlated Events (${corrEvents.length})</h2>${corrEvents.map(e=>`<p>${e.display} — ${e.message}</p>`).join("")}</div>`:""}
-<h2>Full Event Timeline</h2>
+${corrEvents.length?`<div class="corr"><h2>👻 Spooky Combos (${corrEvents.length})</h2>${corrEvents.map(e=>`<p>${e.display} — ${e.message}</p>`).join("")}</div>`:""}
+<h2>Full Fun Timeline</h2>
 <table>
-  <tr><th>Time</th><th>Level</th><th>Event</th><th>EMF</th></tr>
+  <tr><th>Time</th><th>Level</th><th>Moment</th><th>Meter</th></tr>
   ${rows}
 </table>
-<footer>Paranormal Pulse v2.1 · Evidence-logging platform · Exported ${timeStr} on ${dateStr}<br>For entertainment &amp; EMF education. Not scientific evidence of the paranormal.</footer>
+<footer>Paranormal Pulse v5.5 · A spooky entertainment game · Exported ${timeStr} on ${dateStr}<br>Just for fun. Cannot detect real ghosts or paranormal activity.</footer>
 </body></html>`;
 
   const blob=new Blob([html],{type:"text/html"});
@@ -1333,7 +1379,7 @@ function closeLive(){
   if(mediaRec&&mediaRec.state!=="inactive"){ mediaRec.stop(); }
   if(recTimer){ clearInterval(recTimer); recTimer=null; }
   if(listening){ stopListen(); }
-  S.camActive=false; updateSensors(); if(typeof setThermal==="function") setThermal(false); if(typeof setSkel==="function") setSkel(false);
+  S.camActive=false; updateSensors(); if(typeof setContrast==="function") setContrast(false); if(typeof setSkel==="function") setSkel(false);
   el("lvRecDot").classList.remove("on"); prevFrame=null;
 }
 
@@ -1353,8 +1399,8 @@ function liveLoop(){
     }
     prevFrame=Array.from(cur.data);
   }
-  // thermal filter — color-map the live camera by brightness (honest: real camera, recolored)
-  if(thermalOn && tctx && video.readyState>=2){
+  // contrast filter — color-map the live camera by brightness (honest: real camera, recolored)
+  if(contrastOn && tctx && video.readyState>=2){
     tctx.drawImage(video,0,0,192,144);
     const id=tctx.getImageData(0,0,192,144), d=id.data;
     for(let i=0;i<d.length;i+=4){ const l=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114)|0; d[i]=TLR[l]; d[i+1]=TLG[l]; d[i+2]=TLB[l]; }
@@ -1377,10 +1423,10 @@ function liveLoop(){
   drawSpark(el("lvSpark"),sparkData,sc);
   // HUD updates
   el("lvEmf").textContent=S.current.toFixed(1);
-  const base=S.baseline==null?30:S.baseline,dev=base>0?Math.max(0,(S.current-base)/base*100):0;
+  const base=S.calm==null?30:S.calm,dev=base>0?Math.max(0,(S.current-base)/base*100):0;
   const lv=threatFor(dev);
   el("lvThreat").textContent=lv.n; el("lvThreat").style.color=lv.c;
-  el("lvEvid").textContent=S.confidence; el("lvEvid").style.color=confColor(S.confidence);
+  el("lvEvid").textContent=S.vibe; el("lvEvid").style.color=confColor(S.vibe);
   if(!S._lvNumT || Date.now()-S._lvNumT>200){ S._lvNumT=Date.now();
     el("lvAct").textContent=S.activity;
     el("lvDb").textContent=S.soundDb==null?'—':S.soundDb;
@@ -1395,25 +1441,25 @@ function liveLoop(){
   }
 }
 
-// ── THERMAL CAMERA FILTER (real: recolors the live camera by brightness) ──
+// ── CONTRAST CAM — playful color filter (recolors the live camera by brightness, just for fun) ──
 const TLR=new Uint8Array(256),TLG=new Uint8Array(256),TLB=new Uint8Array(256);
-(function(){ const stops=[[0,0,0,20],[35,40,0,120],[80,0,120,200],[120,0,190,120],[160,150,220,40],[200,245,180,30],[230,245,90,20],[255,255,230,200]];
+(function(){ const stops=[[0,30,8,60],[60,90,30,150],[120,190,55,165],[180,90,225,200],[230,150,250,225],[255,225,255,245]];
   for(let l=0;l<256;l++){ let a=stops[0],b=stops[stops.length-1];
     for(let s=0;s<stops.length-1;s++){ if(l>=stops[s][0]&&l<=stops[s+1][0]){ a=stops[s]; b=stops[s+1]; break; } }
     const f=(l-a[0])/((b[0]-a[0])||1);
     TLR[l]=a[1]+(b[1]-a[1])*f; TLG[l]=a[2]+(b[2]-a[2])*f; TLB[l]=a[3]+(b[3]-a[3])*f; }
 })();
-const lvTherm=el("lvThermalCv"); const tctx=lvTherm?lvTherm.getContext("2d",{willReadFrequently:true}):null;
-let thermalOn=false;
-function setThermal(on){ thermalOn=on; liveView.classList.toggle("thermal",on); const b=el("lvThermal"); if(b) b.classList.toggle("on",on); }
-{ const b=el("lvThermal"); if(b) b.addEventListener("click",()=>setThermal(!thermalOn)); }
+const lvTherm=el("lvContrastCv"); const tctx=lvTherm?lvTherm.getContext("2d",{willReadFrequently:true}):null;
+let contrastOn=false;
+function setContrast(on){ contrastOn=on; liveView.classList.toggle("contrast",on); const b=el("lvContrast"); if(b) b.classList.toggle("on",on); }
+{ const b=el("lvContrast"); if(b) b.addEventListener("click",()=>setContrast(!contrastOn)); }
 
 // ── SKELETON BODY TRACKER (real on-device pose detection · TF.js MoveNet) ──
-let skelOn=false, poseDetector=null, poseLoading=false, latestPoses=[];
+let skelOn=false, poseModel=null, poseLoading=false, latestPoses=[];
 const SKEL_PAIRS=[[5,7],[7,9],[6,8],[8,10],[5,6],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16],[0,5],[0,6]];
 function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
 async function ensurePoseModel(){
-  if(poseDetector) return poseDetector;
+  if(poseModel) return poseModel;
   if(poseLoading) return null;
   poseLoading=true;
   try{
@@ -1421,18 +1467,18 @@ async function ensurePoseModel(){
     if(!window.poseDetection) await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js");
     try{ await window.tf.setBackend("webgl"); }catch(_){}
     try{ await window.tf.ready(); }catch(_){}
-    poseDetector=await window.poseDetection.createDetector(window.poseDetection.SupportedModels.MoveNet,{modelType:window.poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING});
+    poseModel=await window.poseDetection.createDetector(window.poseDetection.SupportedModels.MoveNet,{modelType:window.poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING});
     // warm up the model on a blank frame so the first LIVE frame doesn't freeze the UI
-    try{ const wu=document.createElement("canvas"); wu.width=192; wu.height=192; await poseDetector.estimatePoses(wu); }catch(_){}
-  }catch(e){ poseDetector=null; }
-  poseLoading=false; return poseDetector;
+    try{ const wu=document.createElement("canvas"); wu.width=192; wu.height=192; await poseModel.estimatePoses(wu); }catch(_){}
+  }catch(e){ poseModel=null; }
+  poseLoading=false; return poseModel;
 }
 function skelMsg(t){ const m=el("lvMsg"); if(!m) return; m.innerHTML="<div><p style='font-size:14px'>"+t+"</p></div>"; m.classList.add("show"); setTimeout(()=>m.classList.remove("show"),2400); }
 async function setSkel(on){
   const b=el("lvSkelBtn");
   if(on){
     if(b){ b.classList.add("on"); b.textContent="🦴 LOADING…"; }
-    if(!poseDetector) skelMsg("Loading body tracker… first time only — it downloads a few MB, so give it a few seconds.");
+    if(!poseModel) skelMsg("Loading body tracker… first time only — it downloads a few MB, so give it a few seconds.");
     const det=await ensurePoseModel();
     if(!det){ if(b){ b.classList.remove("on"); b.textContent="🦴 SKELETON"; } skelMsg("Body tracker needs a connection to load. Try again online."); return; }
     skelOn=true; if(b) b.textContent="🦴 SKELETON";
@@ -1444,8 +1490,8 @@ async function setSkel(on){
 }
 async function detectLoop(){
   if(!skelOn) return;
-  if(poseDetector && video.readyState>=2 && video.videoWidth){
-    try{ latestPoses=await poseDetector.estimatePoses(video,{maxPoses:1,flipHorizontal:false}); }catch(_){ latestPoses=[]; }
+  if(poseModel && video.readyState>=2 && video.videoWidth){
+    try{ latestPoses=await poseModel.estimatePoses(video,{maxPoses:1,flipHorizontal:false}); }catch(_){ latestPoses=[]; }
     drawSkeleton();
   }
   setTimeout(detectLoop,110);
@@ -1475,8 +1521,8 @@ function drawSkeleton(){
 
 // ── FLAG BUTTON (FIXED) ───────────────────────────────────
 el("lvFlag").addEventListener("click",()=>{
-  addEntry(S.armed?(S.lastThreat==="STANDBY"?"BASELINE":S.lastThreat):"BASELINE",
-    "FLAG marked in Full Spectrum — "+S.current.toFixed(1)+" mG · Activity "+S.activity+" · Evidence "+S.confidence);
+  addEntry(S.armed?(S.lastThreat==="STANDBY"?"CALM":S.lastThreat):"CALM",
+    "Flagged a moment in Full Spectrum 👻 · Activity "+S.activity+" · Spook Vibe "+S.vibe);
   // visual flash feedback
   const flash=document.createElement("div");
   flash.className="flag-flash";
@@ -1484,11 +1530,11 @@ el("lvFlag").addEventListener("click",()=>{
   setTimeout(()=>flash.remove(),400);
 });
 
-// ── REC EVP ───────────────────────────────────────────────
+// ── REC AUDIO ───────────────────────────────────────────────
 el("lvRec").addEventListener("click",()=>{
   if(!camStream){ return; }
   if(mediaRec&&mediaRec.state==="recording"){
-    mediaRec.stop(); clearInterval(recTimer); recTimer=null; el("lvRecDot").classList.remove("on"); el("lvRec").textContent="● REC EVP"; return;
+    mediaRec.stop(); clearInterval(recTimer); recTimer=null; el("lvRecDot").classList.remove("on"); el("lvRec").textContent="● REC AUDIO"; return;
   }
   recChunks=[];
   try{ mediaRec=new MediaRecorder(camStream,{mimeType:"audio/webm"}); }
@@ -1502,10 +1548,10 @@ el("lvRec").addEventListener("click",()=>{
     const acts=document.createElement("div"); acts.className="clip-acts";
     const loop=document.createElement("button"); loop.className="loopbtn"; loop.textContent="↻ Loop";
     loop.addEventListener("click",()=>{ aud.loop=!aud.loop; loop.classList.toggle("on",aud.loop); if(aud.loop){ aud.play().catch(()=>{}); } });
-    const dl=document.createElement("a"); dl.href=url; dl.download="phantasm_evp_"+Date.now()+".webm"; dl.textContent="⬇ Download EVP";
+    const dl=document.createElement("a"); dl.href=url; dl.download="paranormalpulse_voice_"+Date.now()+".webm"; dl.textContent="⬇ Download Audio";
     dl.style.cssText="display:inline-block;color:var(--cyan);font-size:11px;text-decoration:none;border:1px solid rgba(118,211,255,.3);padding:7px 12px;border-radius:9px";
     acts.appendChild(loop); acts.appendChild(dl); clip.appendChild(acts);
-    addEntry("BASELINE","EVP recording saved — "+Math.round((Date.now()-recStart)/1000)+"s · scrub or loop to review");
+    addEntry("CALM","Voice recording saved — "+Math.round((Date.now()-recStart)/1000)+"s · scrub or loop to review");
   };
   mediaRec.start(); recStart=Date.now(); el("lvRecDot").classList.add("on"); el("lvRec").textContent="■ STOP REC";
   let secs=0; recTimer=setInterval(()=>{ secs++; el("lvRecTime").textContent=Math.floor(secs/60)+":"+(secs%60).toString().padStart(2,"0"); },1000);
@@ -1524,21 +1570,21 @@ el("lvFlip").addEventListener("click",()=>{
 el("lvClose").addEventListener("click",closeLive);
 el("spectrumBtn").addEventListener("click",openLive);
 { const _evp=el("evpCard"); if(_evp) _evp.addEventListener("click",openLive); }
-{ const _t=el("thermalCard"); if(_t) _t.addEventListener("click",()=>{ openLive(); setTimeout(()=>{ try{ setThermal(true); }catch(_){}}, 450); }); }
+{ const _t=el("contrastCard"); if(_t) _t.addEventListener("click",()=>{ openLive(); setTimeout(()=>{ try{ setContrast(true); }catch(_){}}, 450); }); }
 { const _s=el("skelCard"); if(_s) _s.addEventListener("click",()=>{ openLive(); setTimeout(()=>{ try{ setSkel(true); }catch(_){}}, 650); }); }
 { const _tl=el("timelineCard"); if(_tl) _tl.addEventListener("click",()=>{ const l=document.querySelector(".log"); if(l) l.scrollIntoView({behavior:"smooth",block:"start"}); }); }
 
-// ── AI EVP TRANSCRIPTION (Web Speech API) ────────────────
+// ── SPEECH-TO-TEXT TRANSCRIPTION (Web Speech API) ────────────────
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let recog=null, listening=false, transcriptBuf="";
 const tEl=el("lvTranscript");
 function showCap(){
   const has=transcriptBuf.trim()||tEl._interim;
-  tEl.innerHTML=has?('<span class="cap"><span class="tag">AI EARS · AUDIO ANALYSIS — TRANSCRIBES SPEECH</span>'+
+  tEl.innerHTML=has?('<span class="cap"><span class="tag">SPEECH-TO-TEXT · AUDIO ANALYSIS — TRANSCRIBES SPEECH</span>'+
     transcriptBuf+(tEl._interim?' <span class="interim">'+tEl._interim+'</span>':'')+'</span>'):'';
 }
 function startListen(){
-  if(!SR){ tEl.innerHTML='<span class="cap">Speech recognition isn’t supported here. Use Chrome on Android for AI Ears.</span>'; setTimeout(()=>{ if(!listening) tEl.innerHTML=''; },3500); return; }
+  if(!SR){ tEl.innerHTML='<span class="cap">Speech recognition isn’t supported here. Use Chrome on Android for speech-to-text.</span>'; setTimeout(()=>{ if(!listening) tEl.innerHTML=''; },3500); return; }
   if(listening) return;
   transcriptBuf=''; tEl._interim='';
   recog=new SR(); recog.continuous=true; recog.interimResults=true; recog.lang='en-US';
@@ -1546,7 +1592,7 @@ function startListen(){
     let interim='';
     for(let i=ev.resultIndex;i<ev.results.length;i++){
       const r=ev.results[i];
-      if(r.isFinal){ const txt=r[0].transcript.trim(); if(txt){ transcriptBuf+=(transcriptBuf?' ':'')+txt; addEntry("MEDIUM","EVP transcript: “"+txt+"”"); } }
+      if(r.isFinal){ const txt=r[0].transcript.trim(); if(txt){ transcriptBuf+=(transcriptBuf?' ':'')+txt; addEntry("MEDIUM","Voice transcript: “"+txt+"”"); } }
       else interim+=r[0].transcript;
     }
     tEl._interim=interim; showCap();
@@ -1558,8 +1604,8 @@ function startListen(){
 function stopListen(){
   listening=false;
   if(recog){ try{ recog.stop(); }catch(_){} recog=null; }
-  el("lvEars").classList.remove("on"); el("lvEars").textContent="👂 AI EARS";
-  if(transcriptBuf.trim()) addEntry("HIGH","EVP transcript (session): “"+transcriptBuf.trim()+"”");
+  el("lvEars").classList.remove("on"); el("lvEars").textContent="👂 SPEECH-TO-TEXT";
+  if(transcriptBuf.trim()) addEntry("HIGH","Voice transcript (session): “"+transcriptBuf.trim()+"”");
   tEl._interim=''; setTimeout(()=>{ if(!listening) tEl.innerHTML=''; },4500);
 }
 el("lvEars").addEventListener("click",()=>{ listening?stopListen():startListen(); });
@@ -1586,11 +1632,11 @@ const STORIES=[
  {t:"Gettysburg Battlefield",city:"Gettysburg",st:"Pennsylvania",tag:"Historic · 1863",x:"The 1863 battle left more than seven thousand dead across these fields in three days. Visitors and re-enactors report soldiers who appear and vanish, phantom drums and rifle fire drifting over empty ground, and at Devil's Den a helpful 'soldier' who points the way before disappearing. Few American places carry as much reported residual activity."},
  {t:"Lizzie Borden House",city:"Fall River",st:"Massachusetts",tag:"Historic case · 1892",x:"In 1892 Andrew and Abby Borden were killed with a hatchet inside this house; daughter Lizzie was tried and acquitted, and the murders were never solved. Now a bed-and-breakfast, guests report a woman who tucks them in at night, muffled weeping, and footsteps on the stairs near where the bodies were found."},
  {t:"The Perron Farmhouse",city:"Harrisville",st:"Rhode Island",tag:"Reported haunting",x:"The Perron family's years in this 1736 farmhouse inspired The Conjuring. They described a spirit they came to call Bathsheba and unseen forces that grew violent toward the mother. Skeptics question the lore around Bathsheba Sherman, but the family stood by their account for decades — and later owners say the disturbances never fully stopped."},
- {t:"Waverly Hills Sanatorium",city:"Louisville",st:"Kentucky",tag:"Reported haunting",x:"This enormous 1920s tuberculosis hospital saw thousands of deaths; the dead were reportedly moved through a 'body chute' tunnel to spare patients the sight. Investigators report shadow figures down the corridors, a child's ball that rolls on its own, and the apparition of a woman with bleeding wrists near room 502."},
+ {t:"Waverly Hills Sanatorium",city:"Louisville",st:"Kentucky",tag:"Reported haunting",x:"This enormous 1920s tuberculosis hospital saw thousands of deaths; the dead were reportedly moved through a 'body chute' tunnel to spare patients the sight. Visitors report shadow figures down the corridors, a child's ball that rolls on its own, and the apparition of a woman with bleeding wrists near room 502."},
  {t:"The Sallie House",city:"Atchison",st:"Kansas",tag:"Reported haunting",x:"A young couple here reported scratches appearing across the husband's body, small fires igniting on their own, and toys that moved when no one was near — activity blamed on Sallie, said to be a little girl who died during a botched operation when the house served as a doctor's office. The case drew national paranormal attention in the 1990s."},
  {t:"Sleepy Hollow",city:"Sleepy Hollow",st:"New York",tag:"Legend",x:"Washington Irving set his Headless Horseman in this Hudson Valley village, but the tale grew from real local lore — a Hessian soldier said to have been decapitated by a cannonball and buried in the Old Dutch Churchyard. On misty autumn nights, visitors still claim to hear hoofbeats and glimpse a galloping rider near the bridge by the cemetery."},
  {t:"The Amityville House",city:"Amityville",st:"New York",tag:"Famous case · 1974",x:"After a 1974 mass murder inside this Dutch Colonial, the next family to move in — the Lutzes — fled after just 28 days, describing swarms of flies in winter, doors that slammed on their own, cold rooms, and a presence they could not explain. The case spawned books and films and decades of fierce debate, but remains America's most famous alleged haunting."},
- {t:"Rolling Hills Asylum",city:"East Bethany",st:"New York",tag:"Reported haunting · 1820s",x:"This 1820s county 'poorhouse' took in the poor, orphaned, and mentally ill, and many died within its walls. Now toured by paranormal investigators, it's known for a towering shadow figure nicknamed Roy, disembodied voices answering questions, and footsteps tracked moving down its long, cold corridors."}
+ {t:"Rolling Hills Asylum",city:"East Bethany",st:"New York",tag:"Reported haunting · 1820s",x:"This 1820s county 'poorhouse' took in the poor, orphaned, and mentally ill, and many died within its walls. Now a popular stop on paranormal tours, it's known for a towering shadow figure nicknamed Roy, disembodied voices answering questions, and footsteps tracked moving down its long, cold corridors."}
 ];
 
 function storyCard(s){
@@ -1642,17 +1688,17 @@ showFeatured();
 // ── CAPABILITY NOTE ───────────────────────────────────────
 const note=el("capabilityNote");
 if(/iPhone|iPad|iPod/.test(navigator.userAgent)){
-  note.innerHTML="<b>iPhone detected:</b> Camera + audio work fully. EMF runs in Demo Field mode (Apple blocks web magnetometer access). <a href='#' onclick='document.getElementById(\"infoBtn\").click();return false;' style='color:#76d3ff'>Learn about the native app →</a>";
+  note.innerHTML="<b>On iPhone:</b> Camera + audio play fully. The Spook-o-Meter runs in Demo mode on the web (Apple blocks the magnetometer in browsers). <a href='#' onclick='document.getElementById(\"infoBtn\").click();return false;' style='color:#76d3ff'>Learn about the native app →</a>";
 } else if("Magnetometer" in window){
-  note.innerHTML="<b>Android detected:</b> Live EMF available. Tap Calibrate to start.";
+  note.innerHTML="<b>On Android:</b> The Spook-o-Meter reacts to your phone's magnetometer for extra fun. Tap Start Session to play.";
   note.style.background="rgba(66,226,155,.06)"; note.style.borderColor="rgba(66,226,155,.2)";
 } else {
-  note.innerHTML="<b>Note:</b> Magnetometer API not available in this browser. EMF will run in Demo Field mode. For live EMF, use Chrome on Android.";
+  note.innerHTML="<b>Note:</b> Your browser doesn't expose the magnetometer, so the Spook-o-Meter runs in Demo mode. For the magnetometer-driven version, use Chrome on Android.";
 }
 
 // ── SOUND ENGINE (Web Audio, generated — no files) ───────
 let sfxCtx=null, master=null, hum=null, soundOn=true, clickTimer=null;
-let sndPrevThreat="BASELINE", sndPrevArmed=false, sndPrevCorr=0;
+let sndPrevThreat="CALM", sndPrevArmed=false, sndPrevCorr=0;
 function initAudio(){
   if(sfxCtx) return;
   try{ sfxCtx=new (window.AudioContext||window.webkitAudioContext)();
@@ -1698,8 +1744,8 @@ function startHum(){ if(!sfxCtx||hum) return; const o=sfxCtx.createOscillator(),
 function clickLoop(){
   clearTimeout(clickTimer); let interval=2600;
   if(sfxCtx&&soundOn&&S.armed){
-    const base=S.baseline==null?30:S.baseline; let dev=base>0?Math.max(0,(S.current-base)/base*100):0;
-    if(dev<10) dev=0; // deadzone: ignore baseline noise so it doesn't get twitchy
+    const base=S.calm==null?30:S.calm; let dev=base>0?Math.max(0,(S.current-base)/base*100):0;
+    if(dev<10) dev=0; // deadzone: ignore calm noise so it doesn't get twitchy
     if(dev>0){
       interval=Math.max(320,2600-dev*9);
       clickSound(Math.min(0.16,0.06+dev/900));
@@ -1712,7 +1758,7 @@ function clickLoop(){
 function soundPoll(){
   if(!sfxCtx) return;
   if(S.armed&&!sndPrevArmed){ sndPrevArmed=true; if(soundOn){ sfxCalib(); startHum(); } }
-  if(S.armed){ const t=S.lastThreat; if(t!==sndPrevThreat){ const rank={BASELINE:0,LOW:1,MEDIUM:2,HIGH:3,CRITICAL:4}; if(soundOn && (rank[t]||0)>=2 && (rank[t]||0)>(rank[sndPrevThreat]||0)) sfxAlert(t); sndPrevThreat=t; } }
+  if(S.armed){ const t=S.lastThreat; if(t!==sndPrevThreat){ const rank={CALM:0,LOW:1,MEDIUM:2,HIGH:3,CRITICAL:4}; if(soundOn && (rank[t]||0)>=2 && (rank[t]||0)>(rank[sndPrevThreat]||0)) sfxAlert(t); sndPrevThreat=t; } }
   if(S.lastCorrT&&S.lastCorrT!==sndPrevCorr){ sndPrevCorr=S.lastCorrT; if(soundOn) sfxChime(); }
 }
 function stopHum(){ if(hum){ try{ hum.o.stop(); }catch(_){}; try{ hum.o.disconnect(); hum.g.disconnect(); }catch(_){}; hum=null; } }
@@ -1742,24 +1788,24 @@ el("markBtn2").addEventListener("click",()=>{ if(soundOn) noiseBurst(0.18,900,0.
 el("lvFlag").addEventListener("click",()=>{ if(soundOn) noiseBurst(0.18,900,0.24); });
 el("spectrumBtn").addEventListener("click",()=>{ initAudio(); acResume(); if(soundOn) sfxSweep(); });
 
-// ── SHAREABLE EVIDENCE CARD ───────────────────────────────
+// ── SHAREABLE SPOOK CARD ───────────────────────────────
 function roundRect(x,rx,ry,rw,rh,r){ x.beginPath(); x.moveTo(rx+r,ry); x.arcTo(rx+rw,ry,rx+rw,ry+rh,r); x.arcTo(rx+rw,ry+rh,rx,ry+rh,r); x.arcTo(rx,ry+rh,rx,ry,r); x.arcTo(rx,ry,rx+rw,ry,r); x.closePath(); }
 function wrapText(x,text,tx,ty,maxW,lh){ const words=(text||"").split(/\s+/); let line="",yy=ty; for(let i=0;i<words.length;i++){ const test=line+words[i]+" "; if(x.measureText(test).width>maxW&&line){ x.fillText(line.trim(),tx,yy); line=words[i]+" "; yy+=lh; if(yy>ty+lh*3){ x.fillText(line.trim()+"…",tx,yy); return; } } else line=test; } x.fillText(line.trim(),tx,yy); }
-function renderEvidenceCard(e){
+function renderSpookCard(e){
   const W=1080,H=1920,c=document.createElement("canvas"); c.width=W; c.height=H;
   const x=c.getContext("2d");
   const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,"#0F172A"); g.addColorStop(1,"#070B14"); x.fillStyle=g; x.fillRect(0,0,W,H);
   const rg=x.createRadialGradient(W/2,H*0.40,120,W/2,H*0.40,H*0.7); rg.addColorStop(0,"rgba(94,234,212,0.10)"); rg.addColorStop(1,"rgba(94,234,212,0)"); x.fillStyle=rg; x.fillRect(0,0,W,H);
   x.textAlign="left";
   x.fillStyle="#5EEAD4"; x.font="700 52px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",90,160);
-  x.fillStyle="#94A3B8"; x.font="600 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("EVIDENCE LOG",92,206);
+  x.fillStyle="#94A3B8"; x.font="600 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("SPOOKY MOMENT · JUST FOR FUN",92,206);
   const dt=new Date(e.time);
   x.fillStyle="#F8FAFC"; x.font="500 34px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(dt.toLocaleDateString([],{year:'numeric',month:'long',day:'numeric'}),90,300);
   x.fillStyle="#CBD5E1"; x.font="400 30px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(dt.toLocaleTimeString([],{hour12:true}),90,344);
-  const conf=e.confidence||"—"; const cc=conf==="HIGH"?"#EF4444":conf==="MEDIUM"?"#F59E0B":conf==="LOW"?"#F5C451":"#94A3B8";
+  const conf=e.vibe||"—"; const cc=conf==="HIGH"?"#A78BFA":conf==="MEDIUM"?"#5EEAD4":conf==="LOW"?"#F5C451":"#94A3B8";
   x.fillStyle=cc; roundRect(x,90,396,480,76,16); x.fill();
-  x.fillStyle="#04121a"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("EVIDENCE: "+conf,116,446);
-  const tiles=[["PEAK EMF",(e.emf!=null?e.emf:"—")+"","mG"],["AUDIO",(e.sound!=null?e.sound:"—")+"","dB"],["MOTION",e.motion?"YES":"—",""]];
+  x.fillStyle="#04121a"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("SPOOK VIBE: "+conf,116,446);
+  const tiles=[["PEAK METER",(e.emf!=null?e.emf:"—")+"",""],["AUDIO",(e.sound!=null?e.sound:"—")+"","dB"],["MOTION",e.motion?"YES":"—",""]];
   const tw=300,th=200,gap=30,ty=540;
   tiles.forEach((t,i)=>{ const tx=90+i*(tw+gap);
     x.fillStyle="rgba(255,255,255,0.05)"; roundRect(x,tx,ty,tw,th,18); x.fill();
@@ -1770,7 +1816,7 @@ function renderEvidenceCard(e){
   });
   const gx=90,gy=800,gw=900,gh=300;
   x.fillStyle="rgba(255,255,255,0.04)"; roundRect(x,gx,gy,gw,gh,18); x.fill();
-  x.fillStyle="#94A3B8"; x.font="600 22px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("EMF — EVENT WINDOW",gx+24,gy+46);
+  x.fillStyle="#94A3B8"; x.font="600 22px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("SPOOK-O-METER · MOMENT",gx+24,gy+46);
   const sp=(e.spark&&e.spark.length>1)?e.spark:[e.emf||0,e.emf||0];
   const mx=Math.max(40,...sp);
   x.beginPath(); x.strokeStyle="#5EEAD4"; x.lineWidth=4;
@@ -1781,7 +1827,7 @@ function renderEvidenceCard(e){
   x.textAlign="center";
   x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",W/2,H-130);
   x.fillStyle="#94A3B8"; x.font="400 24px -apple-system,Segoe UI,Roboto,sans-serif";
-  x.font="400 21px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Real sensor data, shared for investigation & entertainment — not proof of the paranormal.",W/2,H-86);
+  x.font="400 21px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("A spooky entertainment game · just for fun — cannot detect real ghosts or paranormal activity.",W/2,H-86);
   x.fillStyle="#5EEAD4"; x.font="600 24px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
   x.textAlign="left";
   return c;
@@ -1789,22 +1835,22 @@ function renderEvidenceCard(e){
 async function shareEvent(e){
   if(!e) return;
   if(typeof unlock==="function") unlock("shared");
-  let canvas; try{ canvas=renderEvidenceCard(e); }catch(err){ return; }
+  let canvas; try{ canvas=renderSpookCard(e); }catch(err){ return; }
   canvas.toBlob(async(blob)=>{
     if(!blob) return;
     try{
-      const file=new File([blob],"phantasm-evidence.png",{type:"image/png"});
+      const file=new File([blob],"phantasm-spook.png",{type:"image/png"});
       if(navigator.canShare&&navigator.canShare({files:[file]})){
-        await navigator.share({files:[file],title:"Paranormal Pulse Evidence",text:"Logged with Paranormal Pulse — for entertainment."}); return;
+        await navigator.share({files:[file],title:"Paranormal Pulse — Spooky Moment",text:"Captured with Paranormal Pulse — just for fun!"}); return;
       }
     }catch(_){}
-    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="phantasm-evidence-"+Date.now()+".png"; a.click();
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="phantasm-spook-"+Date.now()+".png"; a.click();
   },"image/png");
 }
 function shareHighlight(){
-  if(!S.log.length){ alert("No events yet. Run an investigation first."); return; }
+  if(!S.log.length){ alert("No events yet. Start a session first."); return; }
   const order={HIGH:3,MEDIUM:2,LOW:1}; let best=S.log[0];
-  S.log.forEach(e=>{ if((order[e.confidence]||0)>(order[best.confidence]||0)) best=e; });
+  S.log.forEach(e=>{ if((order[e.vibe]||0)>(order[best.vibe]||0)) best=e; });
   shareEvent(best);
 }
 el("shareBtn").addEventListener("click",shareHighlight);
@@ -1831,7 +1877,7 @@ el("sessionsBtn").addEventListener("click",()=>{ renderSessions(); openM(el("ses
 el("sessionsClose").addEventListener("click",()=>closeM(el("sessionsModal")));
 el("sessionsModal").addEventListener("click",e=>{ if(e.target===el("sessionsModal")) closeM(el("sessionsModal")); });
 el("sessSave").addEventListener("click",()=>{
-  if(!S.log.length){ alert("Nothing to save yet — run an investigation first."); return; }
+  if(!S.log.length){ alert("Nothing to save yet — start a session first."); return; }
   const name=(el("sessName").value||"").trim()||("Session "+new Date().toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}));
   const arr=loadSessions(); arr.unshift({id:"s"+Date.now(),name:name,date:new Date().toISOString(),count:S.log.length,log:S.log.slice(0,200)});
   storeSessions(arr); el("sessName").value=""; renderSessions(); if(typeof unlock==="function") unlock("saved");
@@ -1865,15 +1911,14 @@ el("contactForm").addEventListener("submit",async(e)=>{
   send.disabled=false; send.textContent="Send inquiry";
 });
 
-// ── ANOMALY CLASSIFICATION (signal-strength tiers — not ghost claims) ──
-function anomalyClass(sev){ if(sev==="CRITICAL"||sev==="HIGH") return "Class A"; if(sev==="MEDIUM") return "Class B"; if(sev==="LOW") return "Class C"; return "Baseline"; }
-function classConfidence(sev){ const f=S.corrFlags||{}; let c=40; if(f.e) c+=20; if(f.a) c+=22; if(f.m) c+=10; if(sev==="HIGH"||sev==="CRITICAL") c+=8; else if(sev==="MEDIUM") c+=4; return Math.max(35,Math.min(96,Math.round(c))); }
+// ── SPOOK TIER (playful signal-strength labels — just for fun, not ghost claims) ──
+function anomalyClass(sev){ if(sev==="CRITICAL"||sev==="HIGH") return "Major spooks"; if(sev==="MEDIUM") return "Spooky"; if(sev==="LOW") return "Light tingles"; return "Calm"; }
 
 // ── SESSION STATS · ACTIVITY SCORE · AUTO SUMMARY ─────────
 function sessionStats(log){
   log=log||S.log;
-  const emfEvents=log.filter(e=>["LOW","MEDIUM","HIGH","CRITICAL"].indexOf(e.severity)>=0||/electromagnetic/i.test(e.message)).length;
-  const evp=log.filter(e=>/EVP/i.test(e.message)).length;
+  const emfEvents=log.filter(e=>["LOW","MEDIUM","HIGH","CRITICAL"].indexOf(e.severity)>=0||/spook|spike/i.test(e.message)).length;
+  const evp=log.filter(e=>/Voice recording|Voice transcript/i.test(e.message)).length;
   const motion=log.filter(e=>e.motion).length;
   const correlated=log.filter(e=>e.severity==="HIGH"||e.severity==="MEDIUM").length;
   const high=log.filter(e=>e.severity==="HIGH").length;
@@ -1882,15 +1927,15 @@ function sessionStats(log){
   let score=Math.min(100, emfEvents*6 + correlated*9 + evp*5 + motion*3 + high*4); if(!log.length) score=0;
   return {emfEvents,evp,motion,correlated,high,peak:+peak.toFixed(1),durMin,total:log.length,score:Math.round(score)};
 }
-function investigationSummary(log){
+function sessionSummary(log){
   log=log||S.log; const s=sessionStats(log);
-  if(!log.length) return "No events were logged in this session.";
+  if(!log.length) return "No spooky moments yet — start a session to play!";
   const first=log[log.length-1].display, last=log[0].display;
-  let t="During this "+(s.durMin?s.durMin+"-minute ":"")+"session, Paranormal Pulse logged "+s.emfEvents+" electromagnetic event"+(s.emfEvents===1?"":"s");
-  if(s.correlated) t+=" ("+s.correlated+" correlated with audio/motion)";
-  t+=", "+s.evp+" EVP "+(s.evp===1?"capture":"captures")+", and "+s.motion+" motion event"+(s.motion===1?"":"s")+". ";
-  t+="Peak EMF reached "+s.peak+" mG. Activity ran from "+first+" to "+last+". ";
-  t+="This is an automated recap of recorded sensor data — not a determination of paranormal activity.";
+  let t="During this "+(s.durMin?s.durMin+"-minute ":"")+"session, Paranormal Pulse logged "+s.emfEvents+" spooky moment"+(s.emfEvents===1?"":"s");
+  if(s.correlated) t+=" ("+s.correlated+" spooky combo"+(s.correlated===1?"":"s")+" with sound/motion)";
+  t+=", "+s.evp+" voice "+(s.evp===1?"capture":"captures")+", and "+s.motion+" motion moment"+(s.motion===1?"":"s")+". ";
+  t+="The Spook-o-Meter peaked at "+s.peak+". Fun ran from "+first+" to "+last+". ";
+  t+="It's all a playful recap of the game — not a determination of any real paranormal activity.";
   return t;
 }
 
@@ -1899,8 +1944,8 @@ function statTile(k,v){ return '<div class="rp-tile"><div class="rp-k">'+k+'</di
 function openReport(){
   const s=sessionStats();
   el("rpScore").textContent=s.score; el("rpScoreFill").style.width=s.score+"%";
-  el("rpStats").innerHTML=statTile("EMF EVENTS",s.emfEvents)+statTile("CORRELATED",s.correlated)+statTile("EVP",s.evp)+statTile("MOTION",s.motion)+statTile("PEAK EMF",s.peak+" mG")+statTile("DURATION",(s.durMin?s.durMin+" min":"—"));
-  el("rpSummary").textContent=investigationSummary();
+  el("rpStats").innerHTML=statTile("SPOOKY MOMENTS",s.emfEvents)+statTile("COMBOS",s.correlated)+statTile("VOICE",s.evp)+statTile("MOTION",s.motion)+statTile("PEAK METER",s.peak)+statTile("DURATION",(s.durMin?s.durMin+" min":"—"));
+  el("rpSummary").textContent=sessionSummary();
   openM(el("reportModal"));
 }
 function renderReportCard(){
@@ -1909,34 +1954,34 @@ function renderReportCard(){
   const rg=x.createRadialGradient(W/2,440,80,W/2,440,780); rg.addColorStop(0,"rgba(94,234,212,0.12)"); rg.addColorStop(1,"rgba(94,234,212,0)"); x.fillStyle=rg; x.fillRect(0,0,W,H);
   x.textAlign="center";
   x.fillStyle="#5EEAD4"; x.font="700 56px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",W/2,150);
-  x.fillStyle="#94A3B8"; x.font="600 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("INVESTIGATION REPORT",W/2,196);
+  x.fillStyle="#94A3B8"; x.font="600 26px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("SPOOKY SESSION RECAP · JUST FOR FUN",W/2,196);
   const cx=W/2,cy=440,r=150, sc=s.score, col=sc>=70?"#22C55E":sc>=40?"#F59E0B":"#5EEAD4";
   x.lineWidth=22; x.strokeStyle="rgba(255,255,255,0.08)"; x.beginPath(); x.arc(cx,cy,r,0,Math.PI*2); x.stroke();
   x.strokeStyle=col; x.lineCap="round"; x.beginPath(); x.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*(sc/100)); x.stroke(); x.lineCap="butt";
   x.fillStyle="#F8FAFC"; x.font="800 120px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(String(sc),cx,cy+38);
-  x.fillStyle="#94A3B8"; x.font="600 24px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("SESSION ACTIVITY SCORE",cx,cy+90);
-  const tiles=[["EMF EVENTS",s.emfEvents],["CORRELATED",s.correlated],["EVP",s.evp],["MOTION",s.motion],["PEAK EMF",s.peak+" mG"],["DURATION",(s.durMin?s.durMin+" min":"—")]];
+  x.fillStyle="#94A3B8"; x.font="600 24px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("SPOOKY FUN SCORE",cx,cy+90);
+  const tiles=[["SPOOKY MOMENTS",s.emfEvents],["COMBOS",s.correlated],["VOICE",s.evp],["MOTION",s.motion],["PEAK METER",s.peak],["DURATION",(s.durMin?s.durMin+" min":"—")]];
   const tw=420,th=150,gpx=40,gpy=24,gx=(W-(2*tw+gpx))/2,gy=730; x.textAlign="left";
   tiles.forEach((t,i)=>{ const tx=gx+(i%2)*(tw+gpx), ty=gy+Math.floor(i/2)*(th+gpy);
     x.fillStyle="rgba(255,255,255,0.05)"; roundRect(x,tx,ty,tw,th,18); x.fill();
     x.strokeStyle="rgba(255,255,255,0.10)"; x.lineWidth=1; roundRect(x,tx,ty,tw,th,18); x.stroke();
     x.fillStyle="#94A3B8"; x.font="600 22px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(t[0],tx+28,ty+52);
     x.fillStyle="#F8FAFC"; x.font="700 58px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText(String(t[1]),tx+28,ty+118); });
-  x.fillStyle="#CBD5E1"; x.font="400 28px -apple-system,Segoe UI,Roboto,sans-serif"; wrapText(x,investigationSummary(),90,1320,900,40);
+  x.fillStyle="#CBD5E1"; x.font="400 28px -apple-system,Segoe UI,Roboto,sans-serif"; wrapText(x,sessionSummary(),90,1320,900,40);
   x.fillStyle="rgba(255,255,255,0.05)"; x.fillRect(0,H-210,W,210); x.textAlign="center";
   x.fillStyle="#5EEAD4"; x.font="700 32px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Paranormal Pulse",W/2,H-130);
   x.fillStyle="#94A3B8"; x.font="400 24px -apple-system,Segoe UI,Roboto,sans-serif";
-  x.font="400 21px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("Real sensor data, shared for investigation & entertainment — not proof of the paranormal.",W/2,H-86);
+  x.font="400 21px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("A spooky entertainment game · just for fun — cannot detect real ghosts or paranormal activity.",W/2,H-86);
   x.fillStyle="#5EEAD4"; x.font="600 24px -apple-system,Segoe UI,Roboto,sans-serif"; x.fillText("themortgagemaster01-eng.github.io/phantasm",W/2,H-46);
   x.textAlign="left"; return c;
 }
 async function shareReport(){
-  if(!S.log.length){ alert("No session data yet — run an investigation first."); return; }
+  if(!S.log.length){ alert("No session data yet — start a session first."); return; }
   if(typeof unlock==="function") unlock("shared");
   let c; try{ c=renderReportCard(); }catch(_){ return; }
   c.toBlob(async(blob)=>{ if(!blob) return;
     try{ const file=new File([blob],"phantasm-report.png",{type:"image/png"});
-      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:"Paranormal Pulse Investigation Report",text:"My Paranormal Pulse session — for entertainment."}); return; } }catch(_){}
+      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:"Paranormal Pulse — Spooky Session",text:"My Paranormal Pulse game session — just for fun!"}); return; } }catch(_){}
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="phantasm-report-"+Date.now()+".png"; a.click();
   },"image/png");
 }
@@ -1947,14 +1992,14 @@ el("rpShare").addEventListener("click",shareReport);
 
 // ── ACHIEVEMENTS ──────────────────────────────────────────
 const ACH=[
-  {id:"first",t:"First Investigation",d:"Calibrate and arm Paranormal Pulse",i:"🛰️"},
-  {id:"evidence",t:"Evidence Logged",d:"Record your first timeline event",i:"📍"},
-  {id:"corr",t:"Correlator",d:"Capture a correlated (Medium+) event",i:"⚡"},
-  {id:"high",t:"Strong Signal",d:"Log a HIGH-confidence event",i:"🔺"},
-  {id:"evp",t:"EVP Captured",d:"Record an EVP clip",i:"🎙️"},
+  {id:"first",t:"First Session",d:"Start your first Paranormal Pulse session",i:"🛰️"},
+  {id:"spook",t:"First Spook",d:"Log your first timeline moment",i:"📍"},
+  {id:"corr",t:"Combo Catcher",d:"Trigger a spooky combo (Medium+)",i:"⚡"},
+  {id:"high",t:"Big Spook",d:"Hit a HIGH spook moment",i:"🔺"},
+  {id:"evp",t:"Voice Captured",d:"Record a voice clip",i:"🎙️"},
   {id:"saved",t:"Archivist",d:"Save a named session",i:"💾"},
-  {id:"shared",t:"Field Reporter",d:"Share an evidence or report card",i:"⤴️"},
-  {id:"night",t:"Night Owl",d:"Investigate between 10pm–4am",i:"🌙"}
+  {id:"shared",t:"Spook Sharer",d:"Share a spooky moment or recap card",i:"⤴️"},
+  {id:"night",t:"Night Owl",d:"Play between 10pm–4am",i:"🌙"}
 ];
 function loadAch(){ try{ return JSON.parse(localStorage.getItem("phantasm_ach")||"{}")||{}; }catch(_){ return {}; } }
 function saveAchObj(o){ try{ localStorage.setItem("phantasm_ach",JSON.stringify(o)); }catch(_){} }
@@ -1974,10 +2019,10 @@ function renderAch(){
 function checkAch(){
   const o=loadAch();
   if(S.armed&&!o.first) unlock("first");
-  if(S.log.length&&!o.evidence) unlock("evidence");
+  if(S.log.length&&!o.spook) unlock("spook");
   if(!o.corr&&S.log.some(e=>e.severity==="HIGH"||e.severity==="MEDIUM")) unlock("corr");
   if(!o.high&&S.log.some(e=>e.severity==="HIGH")) unlock("high");
-  if(!o.evp&&S.log.some(e=>/EVP recording saved|EVP clip|EVP transcript/i.test(e.message))) unlock("evp");
+  if(!o.evp&&S.log.some(e=>/Voice recording saved|Voice clip|Voice transcript/i.test(e.message))) unlock("evp");
   const h=new Date().getHours(); if(!o.night&&(h>=22||h<4)) unlock("night");
 }
 el("achBtn").addEventListener("click",()=>{ renderAch(); openM(el("achModal")); });
